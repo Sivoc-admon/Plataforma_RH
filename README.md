@@ -5,7 +5,7 @@ SIVOC es una empresa de servicio dedicada a la administración y puesta en march
 1. No se permite hacer commit directamente a la rama main o a las ramas de entregas.
 2. No realizar uso indebido de las ramas y archivos presentes en este repositorio.
 3. Comunicar cualquier anomalía, inconveniente o problema que se pueda presentar.
-4. Formalizar el nombrado de las ramas por requisito *feature / Número de la entrega a la que pertenece / ID del requisito / Nombre de la funcionalidad, como por ejemplo feature/E1/1/Login.*
+4. Formalizar el nombrado de las ramas por requisito *feature / Número de la entrega a la que pertenece / ID del requisito / Nombre de la funcionalidad,* como por ejemplo *feature/E1/1/Login.*
 
 # Contacto del autor del repositorio
 - Nombre: Alfonso Macias. *Programador.*
