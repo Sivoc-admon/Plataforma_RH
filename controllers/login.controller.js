@@ -1,26 +1,18 @@
 // Importar el modelo para utilizarlo
 const loginModel = require('../models/login.model.js'); 
 
-/* --- MODEL LOGIC --- */ 
 
-// Método para encontrar un usuario por email
+
+/* --- MODEL LOGIC --- */ 
 
 // POST Endpoint para '/POSTAUTH'
 exports.postAuthentication = async (req, res) => {
     try {
-        console.log(req.body);
         const user = await loginModel.find(req.body);
-        console.log(user);
-        
         if (user.length != 0) {
-            // Verificar que la contraseña coincida
-            //if (user.password === password) {
-                res.status(200).json({ success: true, redirectUrl: "/login/homepage" });
-            //} else {
-            //    res.status(401).json({ success: false, message: "Credenciales incorrectas" });
-            //}
+            // TODO esto me lo está haciendo json y antes me lo ejecutaba
+            res.status(200).json({ success: true, redirectUrl: "/login/homepage" });
         } else {
-            // Si el usuario no existe
             res.status(401).json({ success: false, message: "Usuario no existente" });
         }
     } catch (error) {
@@ -28,6 +20,8 @@ exports.postAuthentication = async (req, res) => {
         res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
 };
+
+
 
 /* --- VIEWS LOGIC --- */
 

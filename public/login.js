@@ -1,36 +1,31 @@
-// <script> for login.ejs file
+/* --- <script> for login.ejs --- */
 
 // Event listener : Formulario Login
 document.getElementById("idFormularioLogin").addEventListener("submit", async function (e) {
 
-    // on submit, execute: 
-    console.log("Execution: Log in credentials.")
+    // Preparar la información
+    const email = document.getElementById("MREMAILID");
+    //const password = document.getElementById("MRPASSWORDID");
+    console.log(email);
+    //console.log(password);
 
 
-    // 1. Information processing
-    e.preventDefault(); 
-    const email = e.target.children.email.value;
-    const password = e.target.children.password.value;
-
-    // 2. Information posting on /POSTAUTH
-    // Enviar la solicitud POST al servidor
+    // Ejecutar POST en "/login/POSTAUTH"
     try {
         const response = await fetch("/login/POSTAUTH", {
-            method: "POST",  // Usamos el método POST
+            method: "POST", 
             headers: {
-                "Content-Type": "application/json"  // Decimos que estamos enviando datos JSON
+                "Content-Type": "application/json"
             },
-            body: JSON.stringify({ email, password })  // Enviamos los datos del formulario como JSON
+            body: JSON.stringify({ email, password }) 
         });
 
-        // Verificar si la autenticación fue exitosa
+        // Redirigir al usuario si las credenciales son correctas
         const data = await response.json();
-        console.log(data)
         if (data.success) {
-            console.log("Exito!");
-            window.location.href = data.redirectUrl;  // Redirigir al usuario si las credenciales son correctas
+            window.location.href = data.redirectUrl;  
         } else {
-            alert(data.message);  // Mostrar un mensaje de error si las credenciales son incorrectas
+            alert(data.message);
         }
     } catch (error) {
         console.error("Error al enviar la solicitud", error);

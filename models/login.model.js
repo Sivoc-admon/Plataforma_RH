@@ -6,5 +6,5 @@ const userSchema = new mongoose.Schema({
     password: String
 });
 
-// Crear model
-module.exports = mongoose.model('usuarios', userSchema, 'collection_name'); // Specify the correct collection name
+// Crear model ('usuarios' = collection name)
+module.exports = mongoose.model('usuarios', userSchema);

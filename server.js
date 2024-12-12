@@ -5,8 +5,6 @@ const app = express();
 const bodyParser = require("body-parser");
 /*-------------*/
 
-// TODO refactorizar carpetas de utils en public pq en public van los script.js 
-
 // Middleware for parsing request bodies (used for login form or API request body)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
