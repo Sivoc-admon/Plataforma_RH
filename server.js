@@ -5,7 +5,14 @@ const app = express();
 const bodyParser = require("body-parser");
 /*-------------*/
 
-// Middleware for parsing request bodies (used for login form or API request body)
+
+/* Permitir solicitudes tipo JSON */
+app.use(express.json());
+/*-------------*/
+
+
+
+/* Middleware for parsing request bodies (used for login form or API request body) */
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 /*-------------*/

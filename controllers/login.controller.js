@@ -7,10 +7,19 @@ const loginModel = require('../models/login.model.js');
 
 // POST Endpoint para '/POSTAUTH'
 exports.postAuthentication = async (req, res) => {
+
+    // Desinfección de campos de entrada
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ success: false, message: "Todos los campos son requeridos."});
+    } else if  (/[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password)) {
+        return res.status(401).json({ success: false, message: "Uno o más campos contienen caracteres no permitidos: {} $ : = '' * [] " });
+    }
+
+    // Una vez pasó la desifección se permite ejecutar la operación asincrónica
     try {
         const user = await loginModel.find(req.body);
         if (user.length != 0) {
-            // TODO esto me lo está haciendo json y antes me lo ejecutaba
             res.status(200).json({ success: true, redirectUrl: "/login/homepage" });
         } else {
             res.status(401).json({ success: false, message: "Usuario no existente" });
