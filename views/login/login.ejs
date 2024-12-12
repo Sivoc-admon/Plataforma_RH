@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> RH SIVOC </title>
+    <script src="/login.js" defer></script>
+</head>
+<body>
+    <div>
+        <form id="idFormularioLogin" method="POST" action="/login/POSTAUTH"> 
+            <h2>Bienvenido!</h2>
+
+            <label for="email">Correo electrónico</label>
+            <input type="text" name="email" id="email" required>
+            <br>
+
+            <label for="password">Contraseña</label>
+            <input type="password" name="password" id="password" required>
+            <br>
+
+            <input type="submit" class="btn" value="Sign In" name="signIn">
+        </form>
+    </div>
+</body>
+</html>
