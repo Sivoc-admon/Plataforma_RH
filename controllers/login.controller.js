@@ -1,9 +1,9 @@
 // Importar el modelo para utilizarlo
-const loginModel = require('../models/login.model.js'); 
+const loginModel = require('../models/login.model.js');
 
 
 
-/* --- MODEL LOGIC --- */ 
+/* --- MODEL LOGIC --- */
 
 // POST Endpoint para '/POSTAUTH'
 exports.postAuthentication = async (req, res) => {
@@ -11,8 +11,8 @@ exports.postAuthentication = async (req, res) => {
     // Desinfección de campos de entrada
     const { email, password } = req.body;
     if (!email || !password) {
-        return res.status(400).json({ success: false, message: "Todos los campos son requeridos."});
-    } else if  (/[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password)) {
+        return res.status(400).json({ success: false, message: "Todos los campos son requeridos." });
+    } else if (/[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password)) {
         return res.status(401).json({ success: false, message: "Uno o más campos contienen caracteres no permitidos: {} $ : = '' * [] " });
     }
 

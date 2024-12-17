@@ -1,0 +1,70 @@
+@import url('global_values.css');
+
+/* Estilos para el sidebar oculto */
+.sidebar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100%;
+    padding-top: 1rem;
+    z-index: 10;
+    background-color: var(--black);
+
+    flex-direction: column;
+    /* Stack children vertically */
+    justify-content: center;
+    /* Vertically center the content */
+    align-items: center;
+    /* Horizontally center the content */
+}
+
+.sidebar.active {
+    display: block;
+}
+
+/* Estilos para el contenido principal */
+.content {
+    transition: margin-left 0.3s ease;
+}
+
+/* Desplazamiento cuando el sidebar está activo */
+.content.shifted {
+    margin-left: var(--sidebar-width);
+    height: 100px;
+}
+
+.menu-list a {
+    color: var(--white);
+    /* Blanco predeterminado */
+    text-decoration: none;
+    /* Elimina subrayado */
+    transition: background-color 0.3s ease, color 0.3s ease;
+    /* Suaviza cambios */
+    /* Vertically center the content */
+
+}
+
+.menu-list a:hover {
+    color: #000000 !important;
+    /* Negro para texto */
+    opacity: 1 !important;
+    /* Asegura opacidad completa */
+}
+
+/* Aplicar negritas solo en clic */
+.menu-list a.active {
+    font-weight: bold;
+}
+
+.icon-text {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.icon-text svg {
+    width: 24px;
+    height: 24px;
+}

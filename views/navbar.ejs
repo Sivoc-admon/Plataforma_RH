@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursos Humanos Sivoc</title>
+
+    <script src="https://kit.fontawesome.com/84a524f45a.js" crossorigin="anonymous"></script>
+
+    <!-- External CSS Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="/sidebar.css">
+
+    <!-- External JS Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/2.13.0/moment.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js" defer></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bulma.min.js" defer></script>
+</head>
+
+<body id="content" class="content">
+    <nav class="navbar" style="background-color: var(--light-blue); padding: 0.5rem 1.5rem; height: 100px;">
+        <div class="navbar-brand">
+            <div class="navbar-item">
+                <i class="fa-solid fa-bars fa-2x" style="color: var(--white); cursor: pointer;"
+                    onclick="toggleSidebar()"></i>
+            </div>
+        </div>
+        <div id="navbarMenu" class="navbar-menu">
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <a class="is-size-4 has-text-white px-6" href="#">Bienvenid@</a>
+                    <i class="fa-solid fa-circle-user fa-2x has-text-white"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <img src="/SIVOC_LOGO.png" style="width: 80%; display: block; margin-left: auto; margin-right: auto;">
+        <aside class="menu">
+            <ul class="menu-list" style="margin-right: 2rem;">
+                <a href="/stadistics/reporte_caritometro" class="has-text-white is-size-4 mt-2">Usuarios</a>
+                <a href="/stadistics/reporte_ausencias" class="has-text-white is-size-4 mt-2">Permisos</a>
+                <a href="/prestadores" class="has-text-white is-size-4 mt-4">Vacaciones</a>
+                <a href="/schools" class="has-text-white is-size-4 mt-2">Cursos</a>
+                <!-- <a href="#" onclick="signOut()" class="has-text-white is-size-4 mt-2">Cerrar Sesión</a> -->
+            </ul>
+        </aside>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            sidebar.classList.toggle('active');
+            content.classList.toggle('shifted');
+        }
+
+        document.querySelectorAll('.menu-list a').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.menu-list a').forEach(link => link.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        function signOut() {
+            fetch('/logout', { method: 'POST', credentials: 'include' })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = "/";  // Redirect to homepage
+                    }
+                }).catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+
+</html>
