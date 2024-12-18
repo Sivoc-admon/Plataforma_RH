@@ -11,7 +11,7 @@
     <!-- External CSS Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-    <link rel="stylesheet" href="/sidebar.css">
+    <link rel="stylesheet" href="/css/navbar.css">
 
     <!-- External JS Libraries -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
@@ -28,18 +28,23 @@
 </head>
 
 <body id="content" class="content">
-    <nav class="navbar" style="background-color: var(--light-blue); padding: 0.5rem 1.5rem; height: 100px;">
-        <div class="navbar-brand">
-            <div class="navbar-item">
-                <i class="fa-solid fa-bars fa-2x" style="color: var(--white); cursor: pointer;"
+    <nav class="navbar" style="background-color: var(--light-blue); padding: 0.5rem 1.5rem; height: 20px;">
+
+        <div id="navbarMenu" class="navbar-menu">
+            <div class="navbar-menu">
+                <div class="navbar-item" style="padding-left: 0;">
+                    <i class="fa-solid fa-bars icon-css" style="color: var(--white); cursor: pointer;"
                     onclick="toggleSidebar()"></i>
+                </div>
             </div>
         </div>
+
+
         <div id="navbarMenu" class="navbar-menu">
             <div class="navbar-end">
                 <div class="navbar-item">
-                    <a class="is-size-4 has-text-white px-6" href="#">Bienvenid@</a>
-                    <i class="fa-solid fa-circle-user fa-2x has-text-white"></i>
+                    <i class="fa-solid fa-circle-user has-text-white icon-css"></i>
+                    <a class="is-size-5 has-text-white" href="#">Nombre_Usuario</a> <!-- TODO -->
                 </div>
             </div>
         </div>
@@ -47,13 +52,26 @@
 
     <!-- Sidebar -->
     <div id="sidebar" class="sidebar">
-        <img src="/SIVOC_LOGO.png" style="width: 80%; display: block; margin-left: auto; margin-right: auto;">
+        <img src="/SIVOC_LOGO.png" style="width: 80%; display: block; margin: auto; margin-bottom: 1rem;">
         <aside class="menu">
-            <ul class="menu-list" style="margin-right: 2rem;">
-                <a href="/stadistics/reporte_caritometro" class="has-text-white is-size-4 mt-2">Usuarios</a>
-                <a href="/stadistics/reporte_ausencias" class="has-text-white is-size-4 mt-2">Permisos</a>
-                <a href="/prestadores" class="has-text-white is-size-4 mt-4">Vacaciones</a>
-                <a href="/schools" class="has-text-white is-size-4 mt-2">Cursos</a>
+            <ul class="menu-list" style="margin: 0.5rem 0.5rem;">
+                <!-- Botón Usuarios -->
+                <a href="/usuarios" class="has-text-white is-size-5 mt-2">
+                    <i class="fa-solid fa-users icon-css"></i> Usuarios
+                </a>
+                <!-- Botón Permisos -->
+                <a href="/permisos" class="has-text-white is-size-5 mt-2">
+                    <i class="fa-solid fa-clipboard-user icon-css"></i> Permisos
+                </a>
+                <!-- Botón Vacaciones -->
+                <a href="/vacaciones" class="has-text-white is-size-5 mt-2">
+                    <i class="fa-solid fa-umbrella-beach icon-css"></i> Vacaciones
+                </a>
+                <!-- Botón Cursos -->
+                <a href="/cursos" class="has-text-white is-size-5 mt-2">
+                    <i class="fa-solid fa-person-chalkboard icon-css"></i> Cursos
+                </a>
+
                 <!-- <a href="#" onclick="signOut()" class="has-text-white is-size-4 mt-2">Cerrar Sesión</a> -->
             </ul>
         </aside>

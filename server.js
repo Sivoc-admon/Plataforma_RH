@@ -12,6 +12,7 @@ app.use(express.json());
 
 
 
+
 /* Middleware for parsing request bodies (used for login form or API request body) */
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -32,19 +33,19 @@ connnectDatabase(); // Call the function to connect to the database
 
 /* Rutas */
 const loginRoutes = require("./routes/login.routes");
-//const usuariosRoutes = require("./routes/usuarios.routes");
-//const permisosRoutes = require("./routes/permisos.routes");
-//const vacacionesRoutes = require("./routes/vacaciones.routes");
-//const cursosRoutes = require("./routes/cursos.routes");
+const usuariosRoutes = require("./routes/usuarios.routes");
+const permisosRoutes = require("./routes/permisos.routes");
+const vacacionesRoutes = require("./routes/vacaciones.routes");
+const cursosRoutes = require("./routes/cursos.routes");
 /*------------*/
 
 
 /* URLs */
 app.use("/login", loginRoutes);
-//app.use("/usuarios", usuariosRoutes);
-//app.use("/permisos", permisosRoutes);
-//app.use("/vacaciones", vacacionesRoutes);
-//app.use("/cursos", cursosRoutes);
+app.use("/usuarios", usuariosRoutes);
+app.use("/permisos", permisosRoutes);
+app.use("/vacaciones", vacacionesRoutes);
+app.use("/cursos", cursosRoutes);
 /*------------*/
 
 
@@ -61,7 +62,7 @@ app.set("view engine", "ejs");
 
 /* Ruta por defecto "/" previa a la ruta 404*/
 app.get("/", (req, res) => {
-  res.redirect("/login");  
+  res.redirect("/login");
 });
 /*-------------*/
 
