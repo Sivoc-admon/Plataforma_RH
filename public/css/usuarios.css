@@ -1,5 +1,6 @@
 .default-button-css {
-    background: linear-gradient(135deg, var(--light-blue), var(--dark-green));    color: var(--white);
+    background: linear-gradient(135deg, var(--light-blue), var(--dark-green));    
+    color: var(--white);
     border: none;
     border-radius: 5px;
     font-size: 1rem;
@@ -29,7 +30,6 @@
     height:15px;
     padding: 15px;
     background-color: transparent;
-    border: none;
     color: var(--white);
     cursor: pointer;
     font-size: 1.5rem;
@@ -78,13 +78,12 @@
 }
 
 .table thead th {
-    background-color: var(--cyan);
+    border: none;
     color: var(--white) !important;
     text-align: center;
     padding: 0.75rem;
     font-size: 1rem;
     font-family: var(--font);
-    border: 2px solid var(--cyan) ;
 }
 
 .table tbody tr {
@@ -92,6 +91,7 @@
 }
 
 .table tbody td {
+    font-weight: bold;
     text-align: center;
     padding: 0.5rem;
     vertical-align: middle; /* Asegura que el contenido quede alineado verticalmente */
@@ -99,32 +99,4 @@
 
 .table tbody tr:hover {
     background-color: white;
-}
-
-/* Pagination buttons */
-.pagination .default-button-css {
-    height: 3rem; /* Fixed height */
-    width: 6rem; /* Fixed width */
-    font-weight: bold; /* Bold text */
-    background: linear-gradient(135deg, var(--light-blue), var(--dark-green)); /* Gradient background */
-    color: var(--white);
-    border: none;
-    border-radius: 25px; /* Rounded buttons for a pill shape */
-    font-family: var(--font);
-    font-size: 1rem;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transitions */
-}
-
-.pagination .default-button-css:hover {
-    transform: translateY(-3px); /* Lift on hover */
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* More pronounced shadow on hover */
-    background: linear-gradient(135deg, var(--dark-green), var(--light-blue)); /* Reverse gradient */
-}
-
-.pagination .default-button-css:active {
-    transform: translateY(1px); /* Pressed down effect */
-    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2); /* Reduced shadow on press */
-    background: var(--dark-green); /* Solid color on click */
 }

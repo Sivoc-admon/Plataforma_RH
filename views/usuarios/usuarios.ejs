@@ -1,22 +1,23 @@
 <%- include('../navbar.ejs') %>
     <link rel="stylesheet" href="/css/usuarios.css">
+    <script src="/js/usuarios.js" defer></script>
 
     <div class="inside-content-css">
 
         <h1> Módulo Usuarios </h1>
 
         <div class="columns" style="margin-top: 1rem;">
-            <!-- newUser button : newUserButton --->
+            <!-- newUser button : newUserPopUp --->
             <div class="column is-centered" style="text-align: center;">
-                <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
+                <button class="default-button-css functionality-button-css" onclick="newUser()">
                     <i class="fa-solid fa-user-plus default-icon-button-css"></i>
                     <p>Nuevo Usuario</p>
                 </button>
             </div>
 
-            <!-- restoreUser button : restoreUserButton --->
+            <!-- restoreUser button : restoreUser --->
             <div class="column is-centered" style="text-align: center;">
-                <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
+                <button class="default-button-css functionality-button-css" onclick="restoreUser()">
                     <i class="fa-solid fa-rotate-right default-icon-button-css"></i>
                     <p>Restaurar Usuario</p>
                 </button>
@@ -24,7 +25,7 @@
 
             <!-- downloadPDF button : downloadPDFButton --->
             <div class="column is-centered" style="text-align: center;">
-                <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
+                <button class="default-button-css functionality-button-css" onclick="downloadPDF()">
                     <i class="fa-solid fa-download default-icon-button-css"></i>
                     <p>Descargar PDF</p>
                 </button>
@@ -32,7 +33,7 @@
 
             <!-- downloadExcel button : downloadExcelButton --->
             <div class="column is-centered" style="text-align: center;">
-                <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
+                <button class="default-button-css functionality-button-css" onclick="downloadExcel()">
                     <i class="fa-solid fa-download default-icon-button-css"></i>
                     <p>Descargar Excel</p>
                 </button>
@@ -41,13 +42,13 @@
 
         <div class="field">
             <div class="control">
-                <input class="input" type="text" id="searchInput" placeholder="Buscar por Nombe, Apellido ó Área" onkeyup="filterTable()">
+                <input class="input" type="text" id="searchInput" placeholder="Buscar por nombre, apellido o área" onkeyup="filterTable()">
             </div>
         </div>
 
         <table class="table is-fullwidth is-hoverable">
             <thead>
-                <tr>
+                <tr style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue));">
                     <th class="has-text-centered">Nombre</th>
                     <th class="has-text-centered">Apellido Paterno</th>
                     <th class="has-text-centered">Apellido Materno</th>
@@ -55,7 +56,7 @@
                     <th class="has-text-centered">Acciones</th>
                 </tr>
             </thead>
-            <tbody id="schools">
+            <tbody id="tableBody">
                 <% usersRows.forEach(user=> { %>
                     <tr>
                         <td class="is-centered">
@@ -107,7 +108,7 @@
             </tbody>
         </table>
         <div class="pagination" >
-            <button class="default-button-css" style="font-style: normal !important;" onclick="prevPage()">Anterior</button>
+            <button class="default-button-css" onclick="prevPage()">Anterior</button>
             <button class="default-button-css" onclick="nextPage()">Siguiente</button>
         </div>
 
@@ -115,10 +116,11 @@
     </div>
 
 
+    <!-- Pagination -->
     <script>
         let currentPage = 1;
         const rowsPerPage = 9;
-        const tableBody = document.getElementById('schools');
+        const tableBody = document.getElementById('tableBody');
         // Filter in DOM rather than requests to server
         const searchInput = document.getElementById("searchInput");
         function filterTable() {
@@ -162,6 +164,5 @@
             }
         }
         paginateTable();
-
     </script>
-    <script src="/js/usuarios.js"></script>
+    <!-- Pagination -->

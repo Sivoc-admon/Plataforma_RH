@@ -14,9 +14,6 @@ exports.getUsersView = async (req, res) => {
     try {
         // Fetch all users from the database
         const usersRows = await usersModel.find(); // Remove .populate('nombre') if 'nombre' is not a reference
-
-        console.log(usersRows); // Debugging: Log users to the console
-
         // Render the 'usuarios' view with the fetched users
         res.render('usuarios/usuarios.ejs', { usersRows });
 
