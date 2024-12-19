@@ -1,14 +1,168 @@
 <%- include('../navbar.ejs') %>
+    <link rel="stylesheet" href="/css/usuarios.css">
+
     <div class="inside-content-css">
 
+        <td class="has-text-centered">
+            <div class="columns">
 
-        <button class="add-button" onclick="handleRegisterModal()">
-            <i class="fa-solid fa-circle-plus fa-2x"></i>
-            <h1>Registrar Usuario to My Dark Green Page</h1>
+                <!-- newUser button : newUserButton --->
+                <div class="column is-centered" style="text-align: center;">
+                    <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
+                        <i class="fa-solid fa-user-plus default-icon-button-css"></i>
+                        <p>Nuevo Usuario</p>
+                    </button>
+                </div>
 
-        </button>
+                <!-- restoreUser button : restoreUserButton --->
+                <div class="column is-centered" style="text-align: center;">
+                    <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
+                        <i class="fa-solid fa-rotate-right default-icon-button-css"></i>
+                        <p>Restaurar Usuario</p>
+                    </button>
+                </div>
+
+                <!-- restoreUser button : restoreUserButton --->
+                <div class="column is-centered" style="text-align: center;">
+                    <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
+                        <i class="fa-solid fa-download default-icon-button-css"></i>
+                        <p>Descargar PDF</p>
+                    </button>
+                </div>
+
+                <!-- restoreUser button : restoreUserButton --->
+                <div class="column is-centered" style="text-align: center;">
+                    <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
+                        <i class="fa-solid fa-download default-icon-button-css"></i>
+                        <p>Descargar Excel</p>
+                    </button>
+                </div>
+
+            </div>
+        </td>
         
-        <p>This page has a dark green background with white text.</p>
+        <div class="field">
+            <div class="control">
+                <input class="input" type="text" id="searchInput" placeholder="Buscar Usuario" onkeyup="filterTable()">
+            </div>
+        </div>
+
+        <table class="table is-fullwidth is-hoverable">
+            <thead>
+                <tr>
+                    <th class="has-text-centered">Nombre</th>
+                    <th class="has-text-centered">Apellido Paterno</th>
+                    <th class="has-text-centered">Apellido Materno</th>
+                    <th class="has-text-centered">Área</th>
+                    <th class="has-text-centered">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="schools">
+                for item in databaseArray
+                <tr>
+                    <td class="has-text-centered">
+                        item.name
+                    </td>
+                    <td class="has-text-centered">
+                        item.address
+                    </td>
+                    <td class="has-text-centered">
+                        item.escolarity
+                    </td>
+                    <td class="has-text-centered">
+                        item.id_letter.name
+                    </td>
+                    <td class="has-text-centered">
+                        <div class="columns is-centered">
+
+                            <!-- 1 button : 1 --->
+                            <div class="column is-narrow">
+                                <button class="default-button-css table-button-css" data-index="item._id" data-name="item.name"
+                                    data-address="item.address" data-escolarity="item.escolarity">
+                                    <i class="fa-solid fa-circle-plus"></i>
+                                </button>
+                            </div>
+
+                            <!-- 2 button : 2 --->
+                            <div class="column is-narrow">
+                                <button class="default-button-css table-button-css" data-index="item._id" data-name="item.name"
+                                    data-address="item.address" data-escolarity="item.escolarity"
+                                    data-letter="item.id_letter.name">
+                                    <i class="fa-solid fa-circle-minus"></i>
+                                </button>
+                            </div>
+
+                            <!-- 3 button : 3 --->
+                            <div class="column is-narrow">
+                                <button class="default-button-css table-button-css" data-index="item._id" data-name="item.name"
+                                    data-address="item.address" data-escolarity="item.escolarity"
+                                    data-letter="item.id_letter.name">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+
+                        </div>
+                    </td>
+                </tr>
+                close_cicloFor
+            </tbody>
+        </table>
+        <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+            <button class="default-button-css" onclick="prevPage()"><i style="font-size: medium;">Anterior</i></button>
+            <button class="default-button-css" onclick="nextPage()"><i style="font-size: medium;">Siguiente</i></button>
+        </nav>
 
 
     </div>
+
+
+    <script>
+        let currentPage = 1;
+        const rowsPerPage = 9;
+        const tableBody = document.getElementById('schools');
+        // Filter in DOM rather than requests to server
+        const searchInput = document.getElementById("searchInput");
+        function filterTable() {
+            const query = searchInput.value.toLowerCase();
+            const rows = tableBody.getElementsByTagName("tr");
+
+            for (const row of rows) {
+                const cells = row.getElementsByTagName("td");
+                let match = false;
+
+                // Iterate over all cells to find matches
+                for (const cell of cells) {
+                    if (cell.innerText.toLowerCase().includes(query)) {
+                        match = true;
+                        break;
+                    }
+                }
+                // Show or hide row according to the coincidence
+                row.style.display = match ? '' : 'none';
+            }
+        }
+
+        function paginateTable() {
+            const rows = Array.from(tableBody.getElementsByTagName('tr'));
+            rows.forEach((row, index) => {
+                row.style.display = index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage ? '' : 'none';
+            });
+        }
+
+        function nextPage() {
+            if ((currentPage * rowsPerPage) < tableBody.getElementsByTagName('tr').length) {
+                currentPage++;
+                paginateTable();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                paginateTable();
+            }
+        }
+        paginateTable();
+
+    </script>
+    <script src="/js/usuarios.js"></script>

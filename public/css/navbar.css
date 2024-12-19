@@ -9,12 +9,18 @@
     width: var(--sidebar-width);
     height: 100%;
     padding-top: 1rem;
-    z-index: 10;
     background-color: var(--black);
 }
 
 .inside-content-css {
-    padding: 2rem;
+    padding: 1.5rem 2rem;
+    background: radial-gradient(at bottom right, var(--white), var(--light-blue) 300%);
+    transition: margin-left 0.3s ease;
+
+    /* Fills the remaining space */
+    position: fixed;
+    height: 100%;
+    width: 100%;
 }
 
 .icon-css {

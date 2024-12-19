@@ -1,0 +1,48 @@
+.default-button-css {
+    background-color: var(--dark-green);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    padding: 0.5rem 1rem;
+}
+
+.default-button-css:hover {
+    transform: scale(1.05);
+}
+
+.default-button-css:active {
+    transform: scale(0.95);
+}
+
+.default-icon-button-css {
+    padding: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.table-button-css {
+
+
+    width: 15px;
+    height: 15px;
+    padding: 15px;
+
+
+
+
+    display: flex;
+    /* Enable Flexbox */
+    justify-content: center;
+    /* Center icon horizontally */
+    align-items: center;
+}
+
+
+
+.functionality-button-css {
+    width: 10rem; 
+    height: 5rem;
+}
+
