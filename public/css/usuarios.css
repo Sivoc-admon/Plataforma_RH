@@ -1,6 +1,5 @@
 .default-button-css {
-    background-color: var(--dark-green);
-    color: white;
+    background: linear-gradient(135deg, var(--light-blue), var(--dark-green));    color: var(--white);
     border: none;
     border-radius: 5px;
     font-size: 1rem;
@@ -11,11 +10,12 @@
 }
 
 .default-button-css:hover {
-    transform: scale(1.05);
+    transform: scale(1.01);
+    background-color: var(--dark-green);
 }
 
 .default-button-css:active {
-    transform: scale(0.95);
+    transform: scale(0.99);
 }
 
 .default-icon-button-css {
@@ -28,6 +28,12 @@
     width:15px;
     height:15px;
     padding: 15px;
+    background-color: transparent;
+    border: none;
+    color: var(--white);
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 18px;
 
     display: flex;
     /* Enable Flexbox */
@@ -36,10 +42,89 @@
     align-items: center;
 }
 
+.table-button-css:hover {
+    background-color: transparent;
+    transform: scale(1.03);
+}
 
+.table-button-css:active {
+    transform: scale(0.97);
+}
 
 .functionality-button-css {
     width: 10rem; 
     height: 5rem;
 }
 
+.input {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 3px solid var(--light-blue) !important;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
+}
+
+.input:hover{
+    border: 3px solid var(--dark-green) !important;
+}
+
+.table {
+    border: 3px solid var(--light-blue) ;
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    background-color: var(--white);
+}
+
+.table thead th {
+    background-color: var(--cyan);
+    color: var(--white) !important;
+    text-align: center;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-family: var(--font);
+    border: 2px solid var(--cyan) ;
+}
+
+.table tbody tr {
+    height: 3rem; /* Altura fija para las filas */
+}
+
+.table tbody td {
+    text-align: center;
+    padding: 0.5rem;
+    vertical-align: middle; /* Asegura que el contenido quede alineado verticalmente */
+}
+
+.table tbody tr:hover {
+    background-color: white;
+}
+
+/* Pagination buttons */
+.pagination .default-button-css {
+    height: 3rem; /* Fixed height */
+    width: 6rem; /* Fixed width */
+    font-weight: bold; /* Bold text */
+    background: linear-gradient(135deg, var(--light-blue), var(--dark-green)); /* Gradient background */
+    color: var(--white);
+    border: none;
+    border-radius: 25px; /* Rounded buttons for a pill shape */
+    font-family: var(--font);
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transitions */
+}
+
+.pagination .default-button-css:hover {
+    transform: translateY(-3px); /* Lift on hover */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* More pronounced shadow on hover */
+    background: linear-gradient(135deg, var(--dark-green), var(--light-blue)); /* Reverse gradient */
+}
+
+.pagination .default-button-css:active {
+    transform: translateY(1px); /* Pressed down effect */
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2); /* Reduced shadow on press */
+    background: var(--dark-green); /* Solid color on click */
+}

@@ -10,7 +10,7 @@
     height: 100%;
     padding-top: 1rem;
     padding-right: 5px;
-    background-color: var(--black);
+    background: linear-gradient(135deg, var(--dark-green), var(--black));    color: var(--white);
     z-index: -1; /* Todo objeto se mostrará por encima de la sidebar */
 }
 
@@ -21,17 +21,30 @@ html, body {
     overflow: auto; /* Add scrollbars only when content overflows */
     background: radial-gradient(at bottom right, var(--white), var(--light-blue) 300%);
     transition: margin-left 0.3s ease;
+    font-family: var(--font);
+}
+
+h1 {
+    font-size: 2rem;
+    text-align: center;
+    color: var(--black);
+    margin-bottom: 1rem;
 }
 
 .inside-content-css {
-    padding: 1.5rem 2rem;
-    background-color: transparent;
+    padding: 2rem;
+    margin: auto;
+    border-radius: 8px;
+
+    background-color: var(--white);
     transition: margin-left 0.3s ease;
 
     /* Fills the remaining space */
     position: relative; /* Permite que la scrollbar funcione en base al contenido de la página */
     height: fit-content;
     width: 100%;
+    max-width: 1200px;
+
 }
 
 .icon-css {

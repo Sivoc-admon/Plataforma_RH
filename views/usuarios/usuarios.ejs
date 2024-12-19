@@ -3,49 +3,45 @@
 
     <div class="inside-content-css">
 
+        <h1> Módulo Usuarios </h1>
 
-        <td class="has-text-centered">
-            <h1> Modulo Usuarios </h1>
-
-            <div class="columns" style="margin-top: 1rem;">
-                <!-- newUser button : newUserButton --->
-                <div class="column is-centered" style="text-align: center;">
-                    <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
-                        <i class="fa-solid fa-user-plus default-icon-button-css"></i>
-                        <p>Nuevo Usuario</p>
-                    </button>
-                </div>
-
-                <!-- restoreUser button : restoreUserButton --->
-                <div class="column is-centered" style="text-align: center;">
-                    <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
-                        <i class="fa-solid fa-rotate-right default-icon-button-css"></i>
-                        <p>Restaurar Usuario</p>
-                    </button>
-                </div>
-
-                <!-- downloadPDF button : downloadPDFButton --->
-                <div class="column is-centered" style="text-align: center;">
-                    <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
-                        <i class="fa-solid fa-download default-icon-button-css"></i>
-                        <p>Descargar PDF</p>
-                    </button>
-                </div>
-
-                <!-- downloadExcel button : downloadExcelButton --->
-                <div class="column is-centered" style="text-align: center;">
-                    <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
-                        <i class="fa-solid fa-download default-icon-button-css"></i>
-                        <p>Descargar Excel</p>
-                    </button>
-                </div>
-
+        <div class="columns" style="margin-top: 1rem;">
+            <!-- newUser button : newUserButton --->
+            <div class="column is-centered" style="text-align: center;">
+                <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
+                    <i class="fa-solid fa-user-plus default-icon-button-css"></i>
+                    <p>Nuevo Usuario</p>
+                </button>
             </div>
-        </td>
+
+            <!-- restoreUser button : restoreUserButton --->
+            <div class="column is-centered" style="text-align: center;">
+                <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
+                    <i class="fa-solid fa-rotate-right default-icon-button-css"></i>
+                    <p>Restaurar Usuario</p>
+                </button>
+            </div>
+
+            <!-- downloadPDF button : downloadPDFButton --->
+            <div class="column is-centered" style="text-align: center;">
+                <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
+                    <i class="fa-solid fa-download default-icon-button-css"></i>
+                    <p>Descargar PDF</p>
+                </button>
+            </div>
+
+            <!-- downloadExcel button : downloadExcelButton --->
+            <div class="column is-centered" style="text-align: center;">
+                <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
+                    <i class="fa-solid fa-download default-icon-button-css"></i>
+                    <p>Descargar Excel</p>
+                </button>
+            </div>
+        </div>
 
         <div class="field">
             <div class="control">
-                <input class="input" type="text" id="searchInput" placeholder="Buscar Usuario" onkeyup="filterTable()">
+                <input class="input" type="text" id="searchInput" placeholder="Buscar por Nombe, Apellido ó Área" onkeyup="filterTable()">
             </div>
         </div>
 
@@ -62,19 +58,19 @@
             <tbody id="schools">
                 <% usersRows.forEach(user=> { %>
                     <tr>
-                        <td class="has-text-centered">
+                        <td class="is-centered">
                             <%= user.nombre %>
                         </td>
-                        <td class="has-text-centered">
+                        <td class="is-centered">
                             <%= user.apellidoP %>
                         </td>
-                        <td class="has-text-centered">
+                        <td class="is-centered">
                             <%= user.apellidoM %>
                         </td>
-                        <td class="has-text-centered">
+                        <td class="is-centered">
                             <%= user.area %>
                         </td>
-                        <td class="has-text-centered">
+                        <td class="is-centered">
                             <div class="columns is-centered">
 
                                 <!-- 1 button : 1 --->
@@ -110,10 +106,10 @@
                     <% }); %>
             </tbody>
         </table>
-        <nav class="pagination is-centered" role="navigation" aria-label="pagination">
-            <button class="default-button-css" onclick="prevPage()"><i style="font-size: medium;">Anterior</i></button>
-            <button class="default-button-css" onclick="nextPage()"><i style="font-size: medium;">Siguiente</i></button>
-        </nav>
+        <div class="pagination" >
+            <button class="default-button-css" style="font-style: normal !important;" onclick="prevPage()">Anterior</button>
+            <button class="default-button-css" onclick="nextPage()">Siguiente</button>
+        </div>
 
 
     </div>
