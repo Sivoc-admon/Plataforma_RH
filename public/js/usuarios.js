@@ -1,152 +1,108 @@
 function newUser() {
     Swal.fire({
         html: `
-                <div>
-                    <div class="add-provider-container" style="margin-top: 0px;">
-                    <h1>Agregar nuevo usuario</h1>
-                    </div>
+            <div>
+                <h2>DATOS DEL COLABORADOR</h2>
+            </div>
+
+            <div class="columns is-vcentered">
+                <div class="column">
+                    <label>Nombre</label><br>
+                    <input class="input" id="nombre" required></input>
                 </div>
+                <div class="column">
+                    <label>Apellido Paterno</label><br>
+                    <input class="input" id="apellidoP" required></input>
+                </div>
+                <div class="column">
+                    <label>Apellido Materno</label><br>
+                    <input class="input" id="apellidoM" required></input>
+                </div>
+            </div>
 
-                <form>
+            <div class="columns is-vcentered">
+                <div class="column">
+                    <label>Email</label><br>
+                    <input class="input" id="email" required></input>
+                </div>
+                <div class="column">
+                    <label>Contraseña</label><br>
+                    <input class="input" id="password" required></input>
+                </div>
+                <div class="column">
+                    <label>Fecha de ingreso</label><br>
+                    <input class="input" id="fechaIngreso" required></input>
+                </div>
+            </div>
 
-                    <label style="font-size: x-large;text-align: left;">Nombre</label> <br>
-                    <div class="field">
-                        <div class="control">
-                            <input type="text" id="name" class="input" required> 
-                            <br><br><br>
-                        </div>
-                    </div>
+            <div class="columns is-vcentered">
+                <div class="column">
+                    <label>Área</label><br>
+                    <input class="input" id="area" required></input>
+                </div>
+                <div class="column">
+                    <label>Puesto</label><br>
+                    <input class="input" id="puesto" required></input>
+                </div>
+                <div class="column">
+                    <label>Jefe Inmediato</label><br>
+                    <input class="input" id="jefeInmediato" required></input>
+                </div>
+            </div>
 
-                   <label style="font-size: x-large;text-align: left;">Dirección</label> <br>
-                    <div class="field">
-                        <div class="control">
-                            <input type="text" id="address" class="input" required> 
-                            <br><br><br>
-                        </div>
-                    </div>
+            <div class="columns is-vcentered">
+                <div class="column">
+                    <label>Fecha de baja</label><br>
+                    <input class="input" id="fechaBaja" required></input>
+                </div>
+                <div class="column">
+                    <label>Foto</label><br>
+                    <input class="input" id="foto" required></input>
+                </div>
+            </div>
 
-                    <label style="font-size: x-large;text-align: left;">Escolaridad</label> <br>
-                    <div class="field">
-                        <div class="control">
-                            <select id="escolarity" class="select is-fullwidth input">
-                            <option>Selecciona una escolaridad</option>
-                            <option>Preescolar</option>
-                            <option>Primaria</option>
-                            <option>Secundaria</option>
-                            </select> 
-                            <br><br><br>
-                        </div>
-                    </div>
-    
-                    <label style="font-size: x-large;text-align: left;">Carta Descriptiva</label> <br>
-                    <div class="field">
-                        <div class="control">
-                            <select id="carta" class="select is-fullwidth input">
-                            </select>
-                        </div>
-                    </div>
-                </form>
-            `,
+`,
         confirmButtonText: 'Guardar',
         cancelButtonText: 'Cancelar',
-        showCancelButton: true,
-        showConfirmButton: true,
         cancelButtonColor: '#f0466e',
+        showCancelButton: true,
+        allowOutsideClick: false,
+        width: '1000px',
+        customClass: {
+            confirmButton: 'default-button-css', 
+            cancelButton: 'default-button-css',   
+          },
+
         preConfirm: () => {
-            let name = $('#name').val();
-            let address = $('#address').val();
-            let escolarity = $('#escolarity').val(); // Valor del dropdown
-            let letter = $('#carta').val();
+            // Recoge los datos del formulario antes de enviarlos o guardarlos
+            let nombre = $('#nombre').val();
+            let apellidoP = $('#apellidoP').val();
+            let apellidoM = $('#apellidoM').val();
+            let email = $('#email').val();
 
-            if (!name || !address || !escolarity) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: "Todos los campos son requeridos.",
-                    confirmButtonText: "Aceptar",
-                    showConfirmButton: true,
-                    width: "500px",
-                })
-                return false;
-            }
-            // Filter out special characters
-            else if (/[\{\}\:\$\=\'\*\[\]]/.test(name) ||
-                /[\{\}\:\$\=\'\*\[\]]/.test(address) ||
-                /[\{\}\:\$\=\'\*\[\]]/.test(escolarity)) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: "Uno o más campos contienen caracteres no permitidos: {} $ : = '' * [] ",
-                    confirmButtonText: "Aceptar",
-                    showConfirmButton: true,
-                    width: "500px",
-                })
-                return false;
+            let password = $('#password').val();
+            let area = $('#area').val();
 
-            } else if (letter === "") {
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: "Selecciona una carta descriptiva.",
-                    confirmButtonText: "Aceptar",
-                    showConfirmButton: true,
-                    width: "500px",
-                })
+            let fechaBaja = $('#fechaBaja').val();
+            let fechaIngreso = $('#fechaIngreso').val();
+            let foto = $('#foto').val();
+
+            let jefeInmediato = $('#jefeInmediato').val();
+
+            let puesto = $('#puesto').val();  // puesto can only be sent if its not disabled
+
+            if (/[\{\}\:\$\=\'\*\[\]]/.test(nombre) ||
+                /[\{\}\:\$\=\'\*\[\]]/.test(area) || /[\{\}\:\$\=\'\*\[\]]/.test(fechaBaja) || /[\{\}\:\$\=\'\*\[\]]/.test(fechaIngreso) ||
+                /[\{\}\:\$\=\'\*\[\]]/.test(foto) || /[\{\}\:\$\=\'\*\[\]]/.test(jefeInmediato)) {
+                Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
                 return false;
-            } else if (escolarity === "Selecciona una escolaridad") {
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: "Selecciona una escolaridad.",
-                    confirmButtonText: "Aceptar",
-                    showConfirmButton: true,
-                    width: "500px",
-                })
+            } else if (!nombre || !apellidoP || !apellidoM || !email || !password || !area || !fechaBaja || !fechaIngreso || !foto || !jefeInmediato || !puesto) {
+                Swal.showValidationMessage('Todos los campos son requeridos.');
                 return false;
             }
 
-            // Continúa con el fetch si todo está validado.
-            fetch('/schools/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: name,
-                    address: address,
-                    escolarity: escolarity,
-                    id_letter: letter
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            title: '¡Escuela agregada!',
-                            icon: 'success',
-                            width: "500px",
-                            text: data.message
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Error',
-                            icon: 'error',
-                            width: "500px",
-                            text: data.message
-                        });
-                    }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        title: 'Error',
-                        icon: 'error',
-                        width: "500px",
-                        text: 'Ocurrió un problema al agregar la escuela.'
-                    });
-                    console.error('Error al enviar los datos:', error);
-                });
+            //updateNewUser(nombre, apellidoP, apellidoM, email, nombre, area, fechaBaja, fechaIngreso, foto, jefeInmediato)
+            // updateNewHour
         }
-    });
+    })
 };
