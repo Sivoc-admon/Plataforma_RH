@@ -3,9 +3,11 @@
 
     <div class="inside-content-css">
 
-        <td class="has-text-centered">
-            <div class="columns">
 
+        <td class="has-text-centered">
+            <h1> Modulo Usuarios </h1>
+
+            <div class="columns" style="margin-top: 1rem;">
                 <!-- newUser button : newUserButton --->
                 <div class="column is-centered" style="text-align: center;">
                     <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
@@ -22,7 +24,7 @@
                     </button>
                 </div>
 
-                <!-- restoreUser button : restoreUserButton --->
+                <!-- downloadPDF button : downloadPDFButton --->
                 <div class="column is-centered" style="text-align: center;">
                     <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
                         <i class="fa-solid fa-download default-icon-button-css"></i>
@@ -30,7 +32,7 @@
                     </button>
                 </div>
 
-                <!-- restoreUser button : restoreUserButton --->
+                <!-- downloadExcel button : downloadExcelButton --->
                 <div class="column is-centered" style="text-align: center;">
                     <button class="default-button-css functionality-button-css" onclick="handleRegisterModal()">
                         <i class="fa-solid fa-download default-icon-button-css"></i>
@@ -40,7 +42,7 @@
 
             </div>
         </td>
-        
+
         <div class="field">
             <div class="control">
                 <input class="input" type="text" id="searchInput" placeholder="Buscar Usuario" onkeyup="filterTable()">
@@ -58,53 +60,54 @@
                 </tr>
             </thead>
             <tbody id="schools">
-                for item in databaseArray
-                <tr>
-                    <td class="has-text-centered">
-                        item.name
-                    </td>
-                    <td class="has-text-centered">
-                        item.address
-                    </td>
-                    <td class="has-text-centered">
-                        item.escolarity
-                    </td>
-                    <td class="has-text-centered">
-                        item.id_letter.name
-                    </td>
-                    <td class="has-text-centered">
-                        <div class="columns is-centered">
+                <% usersRows.forEach(user=> { %>
+                    <tr>
+                        <td class="has-text-centered">
+                            <%= user.nombre %>
+                        </td>
+                        <td class="has-text-centered">
+                            <%= user.apellidoP %>
+                        </td>
+                        <td class="has-text-centered">
+                            <%= user.apellidoM %>
+                        </td>
+                        <td class="has-text-centered">
+                            <%= user.area %>
+                        </td>
+                        <td class="has-text-centered">
+                            <div class="columns is-centered">
 
-                            <!-- 1 button : 1 --->
-                            <div class="column is-narrow">
-                                <button class="default-button-css table-button-css" data-index="item._id" data-name="item.name"
-                                    data-address="item.address" data-escolarity="item.escolarity">
-                                    <i class="fa-solid fa-circle-plus"></i>
-                                </button>
+                                <!-- 1 button : 1 --->
+                                <div class="column is-narrow">
+                                    <button class="default-button-css table-button-css" data-index="item._id"
+                                        data-name="item.name" data-address="item.address"
+                                        data-escolarity="item.escolarity">
+                                        <i class="fa-solid fa-circle-plus"></i>
+                                    </button>
+                                </div>
+
+                                <!-- 2 button : 2 --->
+                                <div class="column is-narrow">
+                                    <button class="default-button-css table-button-css" data-index="item._id"
+                                        data-name="item.name" data-address="item.address"
+                                        data-escolarity="item.escolarity" data-letter="item.id_letter.name">
+                                        <i class="fa-solid fa-circle-minus"></i>
+                                    </button>
+                                </div>
+
+                                <!-- 3 button : 3 --->
+                                <div class="column is-narrow">
+                                    <button class="default-button-css table-button-css" data-index="item._id"
+                                        data-name="item.name" data-address="item.address"
+                                        data-escolarity="item.escolarity" data-letter="item.id_letter.name">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+
                             </div>
-
-                            <!-- 2 button : 2 --->
-                            <div class="column is-narrow">
-                                <button class="default-button-css table-button-css" data-index="item._id" data-name="item.name"
-                                    data-address="item.address" data-escolarity="item.escolarity"
-                                    data-letter="item.id_letter.name">
-                                    <i class="fa-solid fa-circle-minus"></i>
-                                </button>
-                            </div>
-
-                            <!-- 3 button : 3 --->
-                            <div class="column is-narrow">
-                                <button class="default-button-css table-button-css" data-index="item._id" data-name="item.name"
-                                    data-address="item.address" data-escolarity="item.escolarity"
-                                    data-letter="item.id_letter.name">
-                                    <i class="fa-solid fa-eye"></i>
-                                </button>
-                            </div>
-
-                        </div>
-                    </td>
-                </tr>
-                close_cicloFor
+                        </td>
+                    </tr>
+                    <% }); %>
             </tbody>
         </table>
         <nav class="pagination is-centered" role="navigation" aria-label="pagination">

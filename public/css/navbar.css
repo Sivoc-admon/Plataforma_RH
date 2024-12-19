@@ -12,14 +12,21 @@
     background-color: var(--black);
 }
 
+html, body {
+    height: 100%; /* Ensure the elements take up the full viewport height */
+    margin: 0; /* Remove default margins */
+    padding: 0; /* Remove default padding */
+    overflow: auto; /* Add scrollbars only when content overflows */
+}
+
 .inside-content-css {
     padding: 1.5rem 2rem;
     background: radial-gradient(at bottom right, var(--white), var(--light-blue) 300%);
     transition: margin-left 0.3s ease;
 
     /* Fills the remaining space */
-    position: fixed;
-    height: 100%;
+    position: relative; /* Permite que la scrollbar funcione en base al contenido de la página */
+    height: fit-content;
     width: 100%;
 }
 
@@ -49,7 +56,7 @@
 /* Desplazamiento cuando el sidebar está activo */
 .content.shifted {
     margin-left: var(--sidebar-width);
-    height: 100px;
+    height: fit-content;
 }
 
 .menu-list a {

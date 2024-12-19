@@ -1,5 +1,5 @@
 // Importar el modelo para utilizarlo
-const loginModel = require('../models/login.model.js');
+const loginModel = require('../models/usuarios.model.js');
 
 
 
