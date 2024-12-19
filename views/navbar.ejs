@@ -78,10 +78,11 @@
     </div>
     
     <script>
+        sidebar.classList.toggle('active'); // Keep the sidebar always active, just hide it 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const content = document.getElementById('content');
-            sidebar.classList.toggle('active');
+            
             content.classList.toggle('shifted');
         }
 
