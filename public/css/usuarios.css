@@ -1,3 +1,5 @@
+/* TODO: Fix popUp usage 2nd page pagination */
+
 .default-button-css {
     background: linear-gradient(135deg, var(--light-blue), var(--dark-green));    
     color: var(--white);
@@ -32,7 +34,7 @@
     background-color: transparent;
     color: var(--white);
     cursor: pointer;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     padding: 18px;
 
     display: flex;

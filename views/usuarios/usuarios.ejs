@@ -7,7 +7,7 @@
         <h1> Módulo Usuarios </h1>
 
         <div class="columns" style="margin-top: 1rem;">
-            <!-- newUser button : newUserPopUp --->
+            <!-- newUser button : newUser --->
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="newUser()">
                     <i class="fa-solid fa-user-plus default-icon-button-css"></i>
@@ -23,7 +23,7 @@
                 </button>
             </div>
 
-            <!-- downloadPDF button : downloadPDFButton --->
+            <!-- downloadPDF button : downloadPDF --->
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="downloadPDF()">
                     <i class="fa-solid fa-download default-icon-button-css"></i>
@@ -31,7 +31,7 @@
                 </button>
             </div>
 
-            <!-- downloadExcel button : downloadExcelButton --->
+            <!-- downloadExcel button : downloadExcel --->
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="downloadExcel()">
                     <i class="fa-solid fa-download default-icon-button-css"></i>
@@ -74,30 +74,17 @@
                         <td class="is-centered">
                             <div class="columns is-centered">
 
-                                <!-- 1 button : 1 --->
+                                <!-- viewAndEditUser button : viewAndEditUser --->
                                 <div class="column is-narrow">
-                                    <button class="default-button-css table-button-css" data-index="item._id"
-                                        data-name="item.name" data-address="item.address"
-                                        data-escolarity="item.escolarity">
-                                        <i class="fa-solid fa-circle-plus"></i>
+                                    <button class="default-button-css table-button-css" onclick="viewAndEditUser()">
+                                        <i class="fa-solid fa-user-pen"></i>
                                     </button>
                                 </div>
 
-                                <!-- 2 button : 2 --->
+                                <!-- disableUser button : disableUser --->
                                 <div class="column is-narrow">
-                                    <button class="default-button-css table-button-css" data-index="item._id"
-                                        data-name="item.name" data-address="item.address"
-                                        data-escolarity="item.escolarity" data-letter="item.id_letter.name">
-                                        <i class="fa-solid fa-circle-minus"></i>
-                                    </button>
-                                </div>
-
-                                <!-- 3 button : 3 --->
-                                <div class="column is-narrow">
-                                    <button class="default-button-css table-button-css" data-index="item._id"
-                                        data-name="item.name" data-address="item.address"
-                                        data-escolarity="item.escolarity" data-letter="item.id_letter.name">
-                                        <i class="fa-solid fa-eye"></i>
+                                    <button class="default-button-css table-button-css" onclick="disableUser()">
+                                        <i class="fa-solid fa-user-minus"></i>
                                     </button>
                                 </div>
 

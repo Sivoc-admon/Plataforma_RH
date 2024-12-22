@@ -7,61 +7,72 @@ function newUser() {
 
             <div class="columns is-vcentered">
                 <div class="column">
-                    <label>Nombre</label><br>
-                    <input class="input" id="nombre" required></input>
+                    <label>Nombre<br>
+                        <input class="input" id="nombre" required>
+                    </label>
                 </div>
                 <div class="column">
-                    <label>Apellido Paterno</label><br>
-                    <input class="input" id="apellidoP" required></input>
+                    <label>Apellido Paterno<br>
+                        <input class="input" id="apellidoP" required>
+                    </label>
                 </div>
                 <div class="column">
-                    <label>Apellido Materno</label><br>
-                    <input class="input" id="apellidoM" required></input>
+                    <label>Apellido Materno<br>
+                        <input class="input" id="apellidoM" required>
+                    </label>
                 </div>
             </div>
 
             <div class="columns is-vcentered">
                 <div class="column">
-                    <label>Email</label><br>
-                    <input class="input" id="email" required></input>
+                    <label>Email<br>
+                        <input class="input" id="email" required>
+                    </label>
                 </div>
                 <div class="column">
-                    <label>Contraseña</label><br>
-                    <input class="input" id="password" required></input>
+                    <label>Contraseña<br>
+                        <input class="input" id="password" required>
+                    </label>
                 </div>
                 <div class="column">
-                    <label>Fecha de ingreso</label><br>
-                    <input class="input" id="fechaIngreso" required></input>
+                    <label>Fecha de ingreso<br>
+                        <input type="date" class="input" id="fechaIngreso" required>
+                    </label>
                 </div>
             </div>
 
             <div class="columns is-vcentered">
                 <div class="column">
-                    <label>Área</label><br>
-                    <input class="input" id="area" required></input>
+                    <label>Área<br>
+                        <input class="input" id="area" required>
+                    </label>
                 </div>
                 <div class="column">
-                    <label>Puesto</label><br>
-                    <input class="input" id="puesto" required></input>
+                    <label>Puesto<br>
+                        <input class="input" id="puesto" required>
+                    </label>
                 </div>
                 <div class="column">
-                    <label>Jefe Inmediato</label><br>
-                    <input class="input" id="jefeInmediato" required></input>
+                    <label>Jefe Inmediato<br>
+                        <input class="input" id="jefeInmediato" required>
+                    </label>
                 </div>
             </div>
 
             <div class="columns is-vcentered">
                 <div class="column">
-                    <label>Fecha de baja</label><br>
-                    <input class="input" id="fechaBaja" required></input>
+                    <label>Fecha de baja<br>
+                        <input type="date" class="input" id="fechaBaja" required>
+                    </label>
                 </div>
                 <div class="column">
-                    <label>Foto</label><br>
-                    <input class="input" id="foto" required></input>
+                    <label>Foto<br>
+                        <input class="input" id="foto" required>
+                    </label>
                 </div>
             </div>
 
-`,
+        `,
         confirmButtonText: 'Guardar',
         cancelButtonText: 'Cancelar',
         cancelButtonColor: '#f0466e',
@@ -69,9 +80,9 @@ function newUser() {
         allowOutsideClick: false,
         width: '1000px',
         customClass: {
-            confirmButton: 'default-button-css', 
-            cancelButton: 'default-button-css',   
-          },
+            confirmButton: 'default-button-css',
+            cancelButton: 'default-button-css',
+        },
 
         preConfirm: () => {
             // Recoge los datos del formulario antes de enviarlos o guardarlos
@@ -91,9 +102,9 @@ function newUser() {
 
             let puesto = $('#puesto').val();  // puesto can only be sent if its not disabled
 
-            if (/[\{\}\:\$\=\'\*\[\]]/.test(nombre) ||
-                /[\{\}\:\$\=\'\*\[\]]/.test(area) || /[\{\}\:\$\=\'\*\[\]]/.test(fechaBaja) || /[\{\}\:\$\=\'\*\[\]]/.test(fechaIngreso) ||
-                /[\{\}\:\$\=\'\*\[\]]/.test(foto) || /[\{\}\:\$\=\'\*\[\]]/.test(jefeInmediato)) {
+            if (/[\{\}\:\$\=\'\*\[\]]/.test(nombre) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoP) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoM) ||
+                /[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password) || /[\{\}\:\$\=\'\*\[\]]/.test(area) ||
+                /[\{\}\:\$\=\'\*\[\]]/.test(jefeInmediato) || /[\{\}\:\$\=\'\*\[\]]/.test(puesto)) {
                 Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
                 return false;
             } else if (!nombre || !apellidoP || !apellidoM || !email || !password || !area || !fechaBaja || !fechaIngreso || !foto || !jefeInmediato || !puesto) {
@@ -101,8 +112,56 @@ function newUser() {
                 return false;
             }
 
-            //updateNewUser(nombre, apellidoP, apellidoM, email, nombre, area, fechaBaja, fechaIngreso, foto, jefeInmediato)
-            // updateNewHour
+            // Continúa con el fetch si todo está validado.
+            fetch('/usuarios/añadir-usuario', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nombre: nombre,
+                    apellidoP: apellidoP,
+                    apellidoM: apellidoM,
+                    email: email,
+                    password: password,
+                    area: area,
+                    fechaBaja: fechaBaja,
+                    fechaIngreso: fechaIngreso,
+                    foto: foto,
+                    jefeInmediato: jefeInmediato,
+                    puesto: puesto,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Se añadió el usuario correctamente.',
+                        icon: 'success',
+                        width: "300px",
+                        text: data.message
+                    }).then(() => {
+                        location.reload(); // es más limpio recargar la página por aquí
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error al añadir el usuario.',
+                        icon: 'error',
+                        width: "300px",
+                        text: data.message
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error al añadir el usuario.',
+                    icon: 'error',
+                    width: "300px",
+                });
+                console.error("", error);
+            });
+
+
         }
     })
 };
