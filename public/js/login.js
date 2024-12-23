@@ -1,5 +1,5 @@
-/* --- <script> for login.ejs --- */
-
+// TODO, ADD SWAL FIRE HERE
+ 
 // Event listener : Formulario Login
 document.getElementById("idFormularioLogin").addEventListener("submit", async function (e) {
     // Preparar la información

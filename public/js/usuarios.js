@@ -7,17 +7,17 @@ function newUser() {
 
             <div class="columns is-vcentered">
                 <div class="column">
-                    <label>Nombre<br>
+                    <label>Nombre
                         <input class="input" id="nombre" required>
                     </label>
                 </div>
                 <div class="column">
-                    <label>Apellido Paterno<br>
+                    <label>Apellido Paterno
                         <input class="input" id="apellidoP" required>
                     </label>
                 </div>
                 <div class="column">
-                    <label>Apellido Materno<br>
+                    <label>Apellido Materno
                         <input class="input" id="apellidoM" required>
                     </label>
                 </div>
@@ -25,17 +25,17 @@ function newUser() {
 
             <div class="columns is-vcentered">
                 <div class="column">
-                    <label>Email<br>
+                    <label>Email
                         <input class="input" id="email" required>
                     </label>
                 </div>
                 <div class="column">
-                    <label>Contraseña<br>
+                    <label>Contraseña
                         <input class="input" id="password" required>
                     </label>
                 </div>
                 <div class="column">
-                    <label>Fecha de ingreso<br>
+                    <label>Fecha de ingreso
                         <input type="date" class="input" id="fechaIngreso" required>
                     </label>
                 </div>
@@ -43,17 +43,17 @@ function newUser() {
 
             <div class="columns is-vcentered">
                 <div class="column">
-                    <label>Área<br>
+                    <label>Área
                         <input class="input" id="area" required>
                     </label>
                 </div>
                 <div class="column">
-                    <label>Puesto<br>
+                    <label>Puesto
                         <input class="input" id="puesto" required>
                     </label>
                 </div>
                 <div class="column">
-                    <label>Jefe Inmediato<br>
+                    <label>Jefe Inmediato
                         <input class="input" id="jefeInmediato" required>
                     </label>
                 </div>
@@ -61,12 +61,12 @@ function newUser() {
 
             <div class="columns is-vcentered">
                 <div class="column">
-                    <label>Fecha de baja<br>
+                    <label>Fecha de baja
                         <input type="date" class="input" id="fechaBaja" required>
                     </label>
                 </div>
                 <div class="column">
-                    <label>Foto<br>
+                    <label>Foto
                         <input class="input" id="foto" required>
                     </label>
                 </div>
@@ -113,7 +113,7 @@ function newUser() {
             }
 
             // Continúa con el fetch si todo está validado.
-            fetch('/usuarios/añadir-usuario', {
+            fetch('/usuarios/anadir-usuario', { // No usar caracteres especiales en las rutas
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ function newUser() {
                     Swal.fire({
                         title: 'Se añadió el usuario correctamente.',
                         icon: 'success',
-                        width: "300px",
+                        width: "500px",
                         text: data.message
                     }).then(() => {
                         location.reload(); // es más limpio recargar la página por aquí
@@ -147,7 +147,7 @@ function newUser() {
                     Swal.fire({
                         title: 'Error al añadir el usuario.',
                         icon: 'error',
-                        width: "300px",
+                        width: "500px",
                         text: data.message
                     });
                 }
@@ -156,9 +156,9 @@ function newUser() {
                 Swal.fire({
                     title: 'Error al añadir el usuario.',
                     icon: 'error',
-                    width: "300px",
+                    width: "500px",
                 });
-                console.error("", error);
+                console.error('Error:', error);
             });
 
 

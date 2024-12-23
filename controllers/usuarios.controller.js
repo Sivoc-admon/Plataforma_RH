@@ -6,20 +6,12 @@ const usersModel = require("../models/usuarios.model"); // TODO
 
 exports.postNewUser = async (req, res) => {
     try {
-        // Fetch all users from the database
-        console.log(req.body.nombre);
-
-        //const answerIdk = usersModel.create()
-
-        // Render the 'usuarios' view with the fetched users
-        //console.log(answerIdk);
-
-
+        const response = await usersModel.create(req.body); // always use await when model.action();
+        res.status(200).json({ success: true, message: "Usuario creado con éxito", response });
     } catch (error) {
         console.error(error);
-        res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
+        res.status(500).json({ success: false, message: "Algo salió mal. Favor de contactar a soporte técnico." });
     }
-    
 }
 
 
