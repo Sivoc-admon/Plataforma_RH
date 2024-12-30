@@ -25,10 +25,6 @@ function uploadPhoto() {
         },
 
         preConfirm: () => {
-
-            // aqui debes preprocesar el middleware de multer upload.single y luego mandar la respuesta success
-            // FILES = FORMDATA, no es string ni nada, es form-data
-
             const fileInput = document.getElementById('foto');
 
             if (!fileInput.files[0]) {
@@ -37,15 +33,16 @@ function uploadPhoto() {
             }
 
             const formData = new FormData(); 
-            formData.append('profile_picture', fileInput.files[0]);
-
+            formData.append('file', fileInput.files[0]); // Postman "Key" = "file"
 
             // Continúa con el fetch si todo está validado.
-            fetch('/usuarios/upload', { // No usar caracteres especiales en las rutas
+            fetch('/permisos/miPrimerArchivo?file', {
                 method: 'POST',
                 body: formData, // No necesitas agregar headers manualmente con FormData
             })
+
             .then(response => response.json())
+            .then(data => console.log(data))
             .then(data => {
                 if (data.success) {
                     Swal.fire({
@@ -67,7 +64,7 @@ function uploadPhoto() {
             })
             .catch(error => {
                 Swal.fire({
-                    title: 'Error técnico.',
+                    title: 'Error técnico. Por favor contactar a Soporte Técnico.',
                     icon: 'error',
                     width: "500px",
                 });

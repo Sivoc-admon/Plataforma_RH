@@ -1,13 +1,18 @@
 // Importar el modelo para utilizarlo
-// const xxx = require('../models/usuarios.model.js');
-
+const filesModel = require("../models/files.model");
 
 
 /* --- MODEL LOGIC --- */
-exports.postFirstFile = (req, res) => {
-    res.send("Se subió el archivo con éxito.");
-}
+exports.postFirstFile = async (req, res) => {
+    try {
+        const response = await filesModel.create(req.file); // always use await when model.action();
+        res.status(200);
+    } catch (error) {
+        console.error(error);
+        res.status(500);
+    }
 
+}
 
 /* --- VIEWS LOGIC --- */
 

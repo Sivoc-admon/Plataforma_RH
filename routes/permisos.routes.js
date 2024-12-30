@@ -11,5 +11,7 @@ const upload = multer({dest: 'public/uploads/permisos'}); // Module specified mu
 // Rutas
 router.get("/", controller.getPermitsView);
 router.post("/miPrimerArchivo", upload.single('file'), controller.postFirstFile);
+// el subir el archivo debe ser en binario, y el json de respuesta
+// peso máximo de archivos 10MB
 
 module.exports = router;

@@ -1,12 +1,12 @@
 // Importar el modelo para utilizarlo
-const usersModel = require("../models/usuarios.model"); // TODO
+const usersModel = require("../models/usuarios.model");
 
 
 /* --- MODEL LOGIC --- */
 
 exports.postNewUser = async (req, res) => {
     try {
-        const response = await usersModel.create(req.body); // always use await when model.action();
+        const response = await usersModel.create(req.body);
         res.status(200).json({ success: true, message: "Usuario creado con éxito", response });
     } catch (error) {
         console.error(error);
