@@ -1,9 +1,10 @@
 function newUser() {
     Swal.fire({
         html: `
-            <div>
+            <div style="padding: 0.5rem; margin: 1rem 0.5rem">
                 <h2>DATOS DEL COLABORADOR</h2>
             </div>
+
 
             <div class="columns is-vcentered">
                 <div class="column">

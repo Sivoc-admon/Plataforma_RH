@@ -2,8 +2,11 @@
 // const xxx = require('../models/usuarios.model.js');
 
 
-/* --- MODEL LOGIC --- */
 
+/* --- MODEL LOGIC --- */
+exports.postFirstFile = (req, res) => {
+    res.send("Se subió el archivo con éxito.");
+}
 
 
 /* --- VIEWS LOGIC --- */
