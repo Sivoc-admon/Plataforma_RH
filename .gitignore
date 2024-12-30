@@ -15,3 +15,9 @@ logs/
 # Compiled output
 dist/
 build/
+
+# Storage
+cursos/*
+permisos/*
+usuarios/*
+vacaciones/*
