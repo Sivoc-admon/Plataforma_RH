@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     fechaBaja: Date,
     fechaIngreso: Date,
     area: String,
-    foto: String, // MULTER IMPLEMENTATION TODO, also works for documents,
+    foto: String, // ObjectID from the file entry 
     puesto: String,
     jefeInmediato: String,
 });

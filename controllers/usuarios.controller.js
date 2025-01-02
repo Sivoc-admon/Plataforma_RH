@@ -1,5 +1,6 @@
 // Importar el modelo para utilizarlo
 const usersModel = require("../models/usuarios.model");
+const filesModel = require("../models/files.model");
 
 
 /* --- MODEL LOGIC --- */
@@ -13,6 +14,17 @@ exports.postNewUser = async (req, res) => {
         res.status(500).json({ success: false, message: "Algo salió mal. Favor de contactar a soporte técnico." });
     }
 }
+
+exports.postFirstFile = async (req, res) => {
+    try {
+        // Guarda el archivo en la base de datos
+        const response = await filesModel.create(req.file); 
+        res.status(200).json({success: true});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({success: false});
+    }
+};
 
 
 /* --- VIEWS LOGIC --- */

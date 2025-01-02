@@ -68,7 +68,7 @@ function newUser() {
                 </div>
                 <div class="column">
                     <label>Foto
-                        <input class="input" id="foto" required>
+                        <input type="file" name="foto" class="input" id="foto">
                     </label>
                 </div>
             </div>
@@ -91,27 +91,55 @@ function newUser() {
             let apellidoP = $('#apellidoP').val();
             let apellidoM = $('#apellidoM').val();
             let email = $('#email').val();
-
             let password = $('#password').val();
             let area = $('#area').val();
-
             let fechaBaja = $('#fechaBaja').val();
             let fechaIngreso = $('#fechaIngreso').val();
-            let foto = $('#foto').val();
-
             let jefeInmediato = $('#jefeInmediato').val();
-
             let puesto = $('#puesto').val();  // puesto can only be sent if its not disabled
+
+            const fileInput = document.getElementById('foto');
 
             if (/[\{\}\:\$\=\'\*\[\]]/.test(nombre) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoP) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoM) ||
                 /[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password) || /[\{\}\:\$\=\'\*\[\]]/.test(area) ||
                 /[\{\}\:\$\=\'\*\[\]]/.test(jefeInmediato) || /[\{\}\:\$\=\'\*\[\]]/.test(puesto)) {
                 Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
                 return false;
-            } else if (!nombre || !apellidoP || !apellidoM || !email || !password || !area || !fechaBaja || !fechaIngreso || !foto || !jefeInmediato || !puesto) {
+            } 
+            
+            else if (!nombre || !apellidoP || !apellidoM || !email || !password || !area || !fechaBaja || !fechaIngreso || !jefeInmediato 
+                || !puesto || !fileInput.files[0]) {
                 Swal.showValidationMessage('Todos los campos son requeridos.');
                 return false;
             }
+            
+
+            const formData = new FormData(); 
+            formData.append('file', fileInput.files[0]); // Postman "Key" = "file"
+
+            // Continúa con el fetch si todo está validado.
+            fetch('/usuarios/miPrimerArchivo', {
+                method: 'POST',
+                body: formData, // No necesitas agregar headers manualmente con FormData
+            })
+            .then(response => response.json())
+            .then(response => {
+                if (!response.success) {
+                    Swal.fire({
+                        title: 'Error al subir fotografía del usuario.',
+                        icon: 'error',
+                        width: "500px",
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error técnico. Por favor contactar a Soporte Técnico.',
+                    icon: 'error',
+                    width: "500px",
+                });
+                console.error('Error:', error);
+            });
 
             // Continúa con el fetch si todo está validado.
             fetch('/usuarios/anadir-usuario', { // No usar caracteres especiales en las rutas
@@ -128,34 +156,34 @@ function newUser() {
                     area: area,
                     fechaBaja: fechaBaja,
                     fechaIngreso: fechaIngreso,
-                    foto: foto,
+                    foto: fileInput.files[0].name,
                     jefeInmediato: jefeInmediato,
                     puesto: puesto,
                 })
             })
             .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+            .then(response => {
+                if (response.success) {
                     Swal.fire({
                         title: 'Se añadió el usuario correctamente.',
                         icon: 'success',
                         width: "500px",
-                        text: data.message
+                        text: response.message
                     }).then(() => {
                         location.reload(); // es más limpio recargar la página por aquí
                     });
                 } else {
                     Swal.fire({
-                        title: 'Error al añadir el usuario.',
+                        title: 'Error al añadir el usuario #1.',
                         icon: 'error',
                         width: "500px",
-                        text: data.message
+                        text: response.message
                     });
                 }
             })
             .catch(error => {
                 Swal.fire({
-                    title: 'Error al añadir el usuario.',
+                    title: 'Error al añadir el usuario #2.',
                     icon: 'error',
                     width: "500px",
                 });

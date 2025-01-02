@@ -17,7 +17,9 @@ dist/
 build/
 
 # Storage
-cursos/*
-permisos/*
-usuarios/*
-vacaciones/*
+# Ignorar todos los archivos dentro de las carpetas especificadas
+uploads/cursos/*
+uploads/permisos/*
+uploads/usuarios/*
+uploads/vacaciones/*
+
