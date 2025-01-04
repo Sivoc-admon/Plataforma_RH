@@ -86,7 +86,6 @@ function newUser() {
         },
 
         preConfirm: () => {
-            // Recoge los datos del formulario antes de enviarlos o guardarlos
             let nombre = $('#nombre').val();
             let apellidoP = $('#apellidoP').val();
             let apellidoM = $('#apellidoM').val();
@@ -106,21 +105,19 @@ function newUser() {
                 Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
                 return false;
             } 
-            
             else if (!nombre || !apellidoP || !apellidoM || !email || !password || !area || !fechaBaja || !fechaIngreso || !jefeInmediato 
                 || !puesto || !fileInput.files[0]) {
                 Swal.showValidationMessage('Todos los campos son requeridos.');
                 return false;
             }
             
-
             const formData = new FormData(); 
             formData.append('file', fileInput.files[0]); // Postman "Key" = "file"
 
-            // Continúa con el fetch si todo está validado.
-            fetch('/usuarios/miPrimerArchivo', {
+            // Fetch #01 - File upload (profile picture)
+            fetch('/usuarios/procesar-achivo', {
                 method: 'POST',
-                body: formData, // No necesitas agregar headers manualmente con FormData
+                body: formData, 
             })
             .then(response => response.json())
             .then(response => {
@@ -141,8 +138,8 @@ function newUser() {
                 console.error('Error:', error);
             });
 
-            // Continúa con el fetch si todo está validado.
-            fetch('/usuarios/anadir-usuario', { // No usar caracteres especiales en las rutas
+            // Fetch #02 - User information (json object)
+            fetch('/usuarios/anadir-usuario', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -174,7 +171,7 @@ function newUser() {
                     });
                 } else {
                     Swal.fire({
-                        title: 'Error al añadir el usuario #1.',
+                        title: 'Error al añadir el usuario.',
                         icon: 'error',
                         width: "500px",
                         text: response.message
@@ -183,7 +180,7 @@ function newUser() {
             })
             .catch(error => {
                 Swal.fire({
-                    title: 'Error al añadir el usuario #2.',
+                    title: 'Algo salió mal. Favor de contactar a soporte técnico.',
                     icon: 'error',
                     width: "500px",
                 });
