@@ -22,9 +22,8 @@ public/uploads/permisos/*
 public/uploads/usuarios/*
 public/uploads/vacaciones/*
 
-# No ignorar las carpetas vacías
-!public/uploads/
-!public/uploads/cursos/
-!public/uploads/permisos/
-!public/uploads/usuarios/
-!public/uploads/vacaciones/
+# No ignorar el archivo .gitkeep
+!public/uploads/cursos/.gitkeep
+!public/uploads/permisos/.gitkeep
+!public/uploads/usuarios/.gitkeep
+!public/uploads/vacaciones/.gitkeep
