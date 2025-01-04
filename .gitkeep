@@ -1,0 +1,4 @@
+touch public/uploads/cursos/.gitkeep
+touch public/uploads/permisos/.gitkeep
+touch public/uploads/usuarios/.gitkeep
+touch public/uploads/vacaciones/.gitkeep
