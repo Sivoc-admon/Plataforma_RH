@@ -16,15 +16,15 @@ logs/
 dist/
 build/
 
-# Ignorar archivos dentro de las subcarpetas de uploads
-uploads/cursos/*
-uploads/permisos/*
-uploads/usuarios/*
-uploads/vacaciones/*
+# Ignorar todos los archivos dentro de las subcarpetas de uploads
+public/uploads/cursos/*
+public/uploads/permisos/*
+public/uploads/usuarios/*
+public/uploads/vacaciones/*
 
-# No ignorar las carpetas
-!uploads/
-!uploads/cursos/
-!uploads/permisos/
-!uploads/usuarios/
-!uploads/vacaciones/
+# No ignorar las carpetas vacías
+!public/uploads/
+!public/uploads/cursos/
+!public/uploads/permisos/
+!public/uploads/usuarios/
+!public/uploads/vacaciones/
