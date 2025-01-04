@@ -23,6 +23,7 @@ uploads/usuarios/*
 uploads/vacaciones/*
 
 # Storage (keep folders)
+!public/uploads
 !uploads/cursos/
 !uploads/permisos/
 !uploads/usuarios/
