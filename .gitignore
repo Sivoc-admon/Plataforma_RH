@@ -16,14 +16,14 @@ logs/
 dist/
 build/
 
-# Storage (ignore files)
+# Ignorar archivos dentro de las subcarpetas de uploads
 uploads/cursos/*
 uploads/permisos/*
 uploads/usuarios/*
 uploads/vacaciones/*
 
-# Storage (keep folders)
-!public/uploads
+# No ignorar las carpetas
+!uploads/
 !uploads/cursos/
 !uploads/permisos/
 !uploads/usuarios/
