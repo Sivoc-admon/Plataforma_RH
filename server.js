@@ -69,7 +69,6 @@ app.get("/", (req, res) => {
 
 /* Ruta 404 */
 app.use((req, res) => {
-  console.log("Invalid URL");
   res.status(404).send("404 - Not Found"); // TODO 
 });
 /*-------------*/

@@ -1,4 +1,4 @@
-// TODO, ADD SWAL FIRE HERE
+// TODO, ADD token verification and token access FIRE HERE
  
 // Event listener : Formulario Login
 document.getElementById("idFormularioLogin").addEventListener("submit", async function (e) {

@@ -3,18 +3,25 @@ const express = require("express");
 const router = express.Router();
 const controller = require('../controllers/usuarios.controller');
 
-// Storage directory
+// Storage directory (critical)
 const multer = require('multer');
-const upload = multer({dest: 'public/uploads/usuarios'});
+const path = require('path');
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/uploads/usuarios'); // Destination folder
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9); // Collision avoidance
+    const extension = path.extname(file.originalname);
+    const newName = file.fieldname + '-' + uniqueSuffix + extension;
+    cb(null, newName);
+  }
+});
+const upload = multer({ storage }); // Compacted into 'upload'
 
-
-// Rutas
+// Routes
 router.get("/", controller.getUsersView);
 router.post("/anadir-usuario", controller.postNewUser); 
-
-router.post("/procesar-achivo", upload.single('file'), controller.postFirstFile);
-// el subir el archivo debe ser en binario, y el json de respuesta
-// peso máximo de archivos 10MB
-
+router.post("/subir-archivo", upload.single('file'), controller.postFileUpload);
 
 module.exports = router;

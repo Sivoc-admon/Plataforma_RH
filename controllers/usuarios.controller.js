@@ -8,21 +8,20 @@ const filesModel = require("../models/files.model");
 exports.postNewUser = async (req, res) => {
     try {
         const response = await usersModel.create(req.body);
-        res.status(200).json({ success: true, message: "Usuario creado con éxito", response });
+        res.status(200).json({ success: true, message: response });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: "Algo salió mal. Favor de contactar a soporte técnico." });
+        res.status(500).json({ success: false, message: "" });
     }
 }
 
-exports.postFirstFile = async (req, res) => {
+exports.postFileUpload = async (req, res) => {
     try {
-        // Guarda el archivo en la base de datos
-        const response = await filesModel.create(req.file); 
-        res.status(200).json({success: true});
+        const response = await filesModel.create(req.file);
+        res.status(200).json({success: true, message: response}); // response.path = file location
     } catch (error) {
         console.error(error);
-        res.status(500).json({success: false});
+        res.status(500).json({success: false, message: "" });
     }
 };
 

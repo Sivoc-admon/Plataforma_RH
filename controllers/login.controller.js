@@ -1,7 +1,7 @@
 // Importar el modelo para utilizarlo
 const loginModel = require('../models/usuarios.model.js');
 
-
+// TODO, estandarizar respuestas en formato json {success: true/false, message: ""}
 
 /* --- MODEL LOGIC --- */
 

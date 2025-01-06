@@ -1,10 +1,9 @@
-function newUser() {
+async function newUser() { // async function to perform fetch chain
     Swal.fire({
         html: `
             <div style="padding: 0.5rem; margin: 1rem 0.5rem">
                 <h2>DATOS DEL COLABORADOR</h2>
             </div>
-
 
             <div class="columns is-vcentered">
                 <div class="column">
@@ -85,109 +84,120 @@ function newUser() {
             cancelButton: 'default-button-css',
         },
 
-        preConfirm: () => {
-            let nombre = $('#nombre').val();
-            let apellidoP = $('#apellidoP').val();
-            let apellidoM = $('#apellidoM').val();
-            let email = $('#email').val();
-            let password = $('#password').val();
-            let area = $('#area').val();
-            let fechaBaja = $('#fechaBaja').val();
-            let fechaIngreso = $('#fechaIngreso').val();
-            let jefeInmediato = $('#jefeInmediato').val();
-            let puesto = $('#puesto').val();  // puesto can only be sent if its not disabled
-
+        preConfirm: async () => { // allows to perform fetch chain
+            const nombre = $('#nombre').val();
+            const apellidoP = $('#apellidoP').val();
+            const apellidoM = $('#apellidoM').val();
+            const email = $('#email').val();
+            const password = $('#password').val();
+            const area = $('#area').val();
+            const fechaBaja = $('#fechaBaja').val();
+            const fechaIngreso = $('#fechaIngreso').val();
+            const jefeInmediato = $('#jefeInmediato').val();
+            const puesto = $('#puesto').val();  // TODO puesto can only be sent if its not disabled
             const fileInput = document.getElementById('foto');
 
             if (/[\{\}\:\$\=\'\*\[\]]/.test(nombre) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoP) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoM) ||
                 /[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password) || /[\{\}\:\$\=\'\*\[\]]/.test(area) ||
                 /[\{\}\:\$\=\'\*\[\]]/.test(jefeInmediato) || /[\{\}\:\$\=\'\*\[\]]/.test(puesto)) {
                 Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
-                return false;
+                return;
             } 
             else if (!nombre || !apellidoP || !apellidoM || !email || !password || !area || !fechaBaja || !fechaIngreso || !jefeInmediato 
                 || !puesto || !fileInput.files[0]) {
                 Swal.showValidationMessage('Todos los campos son requeridos.');
-                return false;
+                return;
             }
             
             const formData = new FormData(); 
             formData.append('file', fileInput.files[0]); // Postman "Key" = "file"
 
             // Fetch #01 - File upload (profile picture)
-            fetch('/usuarios/procesar-achivo', {
-                method: 'POST',
-                body: formData, 
-            })
-            .then(response => response.json())
-            .then(response => {
-                if (!response.success) {
+            try {
+                const responseFile = await fetch('/usuarios/subir-archivo', {
+                    method: 'POST',
+                    body: formData, 
+                });
+                const dataFile = await responseFile.json();
+                
+                // Catch from Controller "/usuarios/subir-archivo"
+                if (!dataFile.success) {
                     Swal.fire({
-                        title: 'Error al subir fotografía del usuario.',
+                        title: 'Algo salió mal :(',
                         icon: 'error',
                         width: "500px",
+                        text: 'Favor de contactar a Soporte Técnico. (Error #001)'
                     });
-                }
-            })
-            .catch(error => {
-                Swal.fire({
-                    title: 'Error técnico. Por favor contactar a Soporte Técnico.',
-                    icon: 'error',
-                    width: "500px",
-                });
-                console.error('Error:', error);
-            });
-
-            // Fetch #02 - User information (json object)
-            fetch('/usuarios/anadir-usuario', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    nombre: nombre,
-                    apellidoP: apellidoP,
-                    apellidoM: apellidoM,
-                    email: email,
-                    password: password,
-                    area: area,
-                    fechaBaja: fechaBaja,
-                    fechaIngreso: fechaIngreso,
-                    foto: fileInput.files[0].name,
-                    jefeInmediato: jefeInmediato,
-                    puesto: puesto,
-                })
-            })
-            .then(response => response.json())
-            .then(response => {
-                if (response.success) {
-                    Swal.fire({
-                        title: 'Se añadió el usuario correctamente.',
-                        icon: 'success',
-                        width: "500px",
-                        text: response.message
-                    }).then(() => {
-                        location.reload(); // es más limpio recargar la página por aquí
-                    });
+                    return; // newUser() failed execution
                 } else {
-                    Swal.fire({
-                        title: 'Error al añadir el usuario.',
-                        icon: 'error',
-                        width: "500px",
-                        text: response.message
-                    });
+
+                    // (CHAINED) Fetch #02 - User information (json object)
+                    try {            
+                        const responseUser = await fetch('/usuarios/anadir-usuario', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                nombre: nombre,
+                                apellidoP: apellidoP,
+                                apellidoM: apellidoM,
+                                email: email,
+                                password: password,
+                                area: area,
+                                fechaBaja: fechaBaja,
+                                fechaIngreso: fechaIngreso,
+                                foto: dataFile.message.path,
+                                jefeInmediato: jefeInmediato,
+                                puesto: puesto,
+                            })
+                        });
+                        const dataUser = await responseUser.json();
+                        if (dataUser.success) { 
+                            Swal.fire({
+                                title: 'Usuario añadido', 
+                                icon: 'success',
+                                width: "500px",
+                                text: 'Se añadió el usuario correctamente.'
+                            })
+                            return; // newUser() successful execution
+
+                        // Catch from Controller "/usuarios/anadir-usuario"
+                        } else {
+                            Swal.fire({
+                                title: 'Algo salió mal :(',
+                                icon: 'error',
+                                width: "500px",
+                                text: 'Favor de contactar a Soporte Técnico. (Error #004)'
+                            });
+                            return; // newUser() failed execution
+                        }
+ 
+                    // Catch from Fetch #02
+                    } catch (error) {
+                        Swal.fire({
+                            title: 'Algo salió mal :(',
+                            icon: 'error',
+                            width: "500px",
+                            text: 'Favor de contactar a Soporte Técnico. (Error #003)'
+                        });
+                        console.error('Hubo un error:', error);
+                        return; // newUser() failed execution
+                    }
                 }
-            })
-            .catch(error => {
+
+            // Catch from Fetch #01
+            } catch (error) {
                 Swal.fire({
-                    title: 'Algo salió mal. Favor de contactar a soporte técnico.',
+                    title: 'Algo salió mal :(',
                     icon: 'error',
                     width: "500px",
+                    text: 'Favor de contactar a Soporte Técnico. (Error #002)'
                 });
-                console.error('Error:', error);
-            });
-
-
+                console.error('Hubo un error:', error);
+                return; // newUser() failed execution
+            }
+           
         }
     })
 };
