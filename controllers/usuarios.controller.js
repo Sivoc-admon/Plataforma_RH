@@ -25,6 +25,53 @@ exports.postFileUpload = async (req, res) => {
     }
 };
 
+exports.postUserDeactivation = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+
+        // Execute findByIdAndUpdate
+        const response = await usersModel.findByIdAndUpdate(
+            userId, 
+            { $set: { estaActivo: false } }, // Change attribute
+            { new: true } 
+        );
+
+        // If for some reason user not found, send 404
+        if (!response) {
+            res.status(404).json({success: false, message: "" });
+            return;
+        }
+
+        res.status(200).json({success: true, message: response});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({success: false, message: "" });
+    }
+};
+
+exports.postUserActivation = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+
+        // Execute findByIdAndUpdate
+        const response = await usersModel.findByIdAndUpdate(
+            userId, 
+            { $set: { estaActivo: true } }, // Change attribute
+            { new: true } 
+        );
+
+        // If for some reason user not found, send 404
+        if (!response) {
+            res.status(404).json({success: false, message: "" });
+            return;
+        }
+
+        res.status(200).json({success: true, message: response});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({success: false, message: "" });
+    }
+};
 
 /* --- VIEWS LOGIC --- */
 

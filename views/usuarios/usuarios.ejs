@@ -2,7 +2,6 @@
     <link rel="stylesheet" href="/css/usuarios.css">
     <script src="/js/usuarios.js" defer></script>
 
-
     <div class="inside-content-css">
 
         <h1> Módulo Usuarios </h1>
@@ -16,7 +15,7 @@
                 </button>
             </div>
 
-            <!-- restoreUser button : restoreUser --->
+            <!-- restoreUser button : restoreUser TODO --->
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="restoreUser()">
                     <i class="fa-solid fa-rotate-right default-icon-button-css"></i>
@@ -24,7 +23,7 @@
                 </button>
             </div>
 
-            <!-- downloadPDF button : downloadPDF --->
+            <!-- downloadPDF button : downloadPDF TODO --->
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="downloadPDF()">
                     <i class="fa-solid fa-download default-icon-button-css"></i>
@@ -32,7 +31,7 @@
                 </button>
             </div>
 
-            <!-- downloadExcel button : downloadExcel --->
+            <!-- downloadExcel button : downloadExcel TODO --->
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="downloadExcel()">
                     <i class="fa-solid fa-download default-icon-button-css"></i>
@@ -75,16 +74,28 @@
                         <td class="is-centered">
                             <div class="columns is-centered">
 
-                                <!-- viewAndEditUser button : viewAndEditUser --->
+                                <!-- viewAndEditUser button : viewAndEditUser TODO --->
                                 <div class="column is-narrow">
-                                    <button class="default-button-css table-button-css" onclick="viewAndEditUser()">
+                                    <button class="default-button-css table-button-css"  id="viewAndEditUser" 
+                                    email = "<%= user.email %>"
+                                    password = "<%= user.password %>"
+                                    nombre = "<%= user.nombre %>"
+                                    apellidoP = "<%= user.apellidoP %>"
+                                    apellidoM = "<%= user.apellidoM %>"
+                                    fechaBaja = "<%= user.fechaBaja %>"
+                                    fechaIngreso = "<%= user.fechaIngreso %>"
+                                    area = "<%= user.area %>"
+                                    foto = "<%= user.foto %>"
+                                    puesto = "<%= user.puesto %>"
+                                    jefeInmediato = "<%= user.jefeInmediato %>"
+                                    onclick="viewAndEditUser(this)">
                                         <i class="fa-solid fa-user-pen"></i>
                                     </button>
                                 </div>
 
                                 <!-- disableUser button : disableUser --->
                                 <div class="column is-narrow">
-                                    <button class="default-button-css table-button-css" onclick="disableUser()">
+                                    <button id="disableUser" class="default-button-css table-button-css" userId="<%= user._id %>" onclick="disableUser(this)">
                                         <i class="fa-solid fa-user-minus"></i>
                                     </button>
                                 </div>

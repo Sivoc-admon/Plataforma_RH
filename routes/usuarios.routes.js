@@ -23,5 +23,8 @@ const upload = multer({ storage }); // Compacted into 'upload'
 router.get("/", controller.getUsersView);
 router.post("/anadir-usuario", controller.postNewUser); 
 router.post("/subir-archivo", upload.single('file'), controller.postFileUpload);
+router.post("/desactivar-usuario", controller.postUserDeactivation);
+router.post("/activar-usuario", controller.postUserActivation);
+
 
 module.exports = router;

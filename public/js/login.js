@@ -1,4 +1,5 @@
 // TODO, ADD token verification and token access FIRE HERE
+// TODO, complete remake
  
 // Event listener : Formulario Login
 document.getElementById("idFormularioLogin").addEventListener("submit", async function (e) {

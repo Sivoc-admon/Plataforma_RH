@@ -2,6 +2,7 @@
 const loginModel = require('../models/usuarios.model.js');
 
 // TODO, estandarizar respuestas en formato json {success: true/false, message: ""}
+// TODO, complete remake of the login
 
 /* --- MODEL LOGIC --- */
 
