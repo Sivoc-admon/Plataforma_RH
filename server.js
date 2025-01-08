@@ -14,6 +14,7 @@ app.use(express.json());
 
 
 /* Middleware for parsing request bodies (used for login form or API request body) */
+app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 /*-------------*/
@@ -79,4 +80,10 @@ const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
-/*-------------*/
+/*----
+
+https.createServer(credentials, app).listen(port, () => {
+  console.log(`Servidor seguro corriendo en https://localhost:${port}`);
+});
+
+---------*/

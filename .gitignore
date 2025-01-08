@@ -11,6 +11,7 @@ logs/
 .idea/
 .vscode/
 *.swp
+request.rest
 
 # Compiled output
 dist/

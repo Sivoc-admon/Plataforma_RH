@@ -112,7 +112,7 @@ async function newUser() { // async function to perform fetch chain
             }
             
             // TODO REMOVE WHITESPACES Before / After STRINGS
-
+            // TODO cannot add email being used
 
             const formData = new FormData(); 
             formData.append('file', fileInput.files[0]); // Postman "Key" = "file"
@@ -166,6 +166,7 @@ async function newUser() { // async function to perform fetch chain
                                 width: "500px",
                                 text: 'Se añadió el usuario correctamente.'
                             })
+                            location.reload();
                             return; // newUser() successful execution
 
                         // Catch from Controller "/usuarios/anadir-usuario"
@@ -277,10 +278,12 @@ async function disableUser() { // async function to perform fetch chain
     })
 };
 
-// viewAndEditUser button (TODO, REQUIRES PFP VISIBILITY AND newUser FRONT END )
+// viewAndEditUser button (TODO, REQUIRES PFP VISIBILITY AND newUser FRONT END)
+// TODO, do not add a new user, rather set again with moongose
+// TODO, password decryption only when editing
+// TODO, this variable not working properly, only loading the 1st one.
 async function viewAndEditUser() { // async function to perform fetch chain
     const thisButton = document.getElementById('viewAndEditUser');
-
     const email = thisButton.getAttribute('email');
     const password = thisButton.getAttribute('password');
     const nombre = thisButton.getAttribute('nombre');
@@ -404,8 +407,9 @@ async function viewAndEditUser() { // async function to perform fetch chain
                 return;
             }
             
-            // TODO REMOVE WHITESPACES Before / After STRINGS
 
+            // TODO REMOVE WHITESPACES Before / After STRINGS
+            // TODO cannot add email being used
 
             const formData = new FormData(); 
             formData.append('file', fileInput.files[0]); // Postman "Key" = "file"
