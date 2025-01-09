@@ -3,7 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <title> Recursos Humanos Sivoc </title>
+    <title>SIVOC Recursos Humanos</title>
+
+    <!-- Scripts JS Libraries -->
+    <script src="/js/scripts/swalFire.js" defer></script>
+    <script src="/js/login.js" defer></script>
 
     <!-- Frontend Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -21,10 +25,9 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap">
 
-    <script src="/js/login.js" defer></script>
 </head>
 
-<body class="login-page">
+<body class="login-page" style="position: fixed; width: 100%;">
     <div class="login-box">
         <!-- Logo Section -->
         <div class="login-logo">
@@ -36,13 +39,10 @@
             <div class="card-header bg-gradient-info">
                 <h3 class="card-title float-none text-center">Sign in to start your session</h3>
             </div>
-            <div class="card-body login-card-body">
-                <!-- Backend Form Handling -->
-                <form id="idFormularioLogin" method="POST" action="/login/POSTAUTH">
-
+            <div class="card-body login-card-body">     
                     <!-- Email Input -->
                     <div class="input-group mb-3">
-                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                        <input id="email" name="email" class="form-control" placeholder="Email">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope fa-lg text-info"></span>
@@ -52,7 +52,7 @@
 
                     <!-- Password Input -->
                     <div class="input-group mb-3">
-                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        <input id="password" type="password" name="password" class="form-control" placeholder="Password">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock fa-lg text-info"></span>
@@ -60,7 +60,7 @@
                         </div>
                     </div>
 
-                    <!-- Remember Me Checkbox -->
+                    <!-- Remember Me Checkbox TODO, yeah token storage here (they yes token storage, but autodelete after 15 days) -->
                     <div class="row">
                         <div class="col-7">
                             <div class="icheck-primary">
@@ -71,13 +71,12 @@
 
                         <!-- Submit Button -->
                         <div class="col-5">
-                            <button type="submit" class="btn btn-block btn-flat btn-primary">
+                            <button class="btn btn-block btn-flat btn-primary" onclick="logIn()">
                                 <span class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></span>
                                 Sign In
                             </button>
                         </div>
                     </div>
-                </form>
             </div>
         </div>
     </div>

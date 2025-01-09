@@ -1,3 +1,5 @@
+/* ---- script from login.ejs ---- */
+
 // addUser button
 async function addUser() { // async function to perform fetch chain
     hideSidebar(); // sidebar frontend
@@ -124,7 +126,6 @@ async function addUser() { // async function to perform fetch chain
                     })
                 });
                 const dataEmail = await responseEmail.json();
-                
                 if (dataEmail.success) {
                     if (dataEmail.exists){
                         Swal.showValidationMessage('Email existente. Ese email ya está ocupado por un usuario.');
@@ -135,7 +136,7 @@ async function addUser() { // async function to perform fetch chain
                         title: 'Algo salió mal :(',
                         icon: 'error',
                         width: "500px",
-                        text: 'Favor de contactar a Soporte Técnico. (Error #001)'
+                        text: 'Favor de contactar a Soporte Técnico. (Error #007)'
                     });
                     return; // addUser() failed execution
                 }
@@ -146,7 +147,7 @@ async function addUser() { // async function to perform fetch chain
                     title: 'Algo salió mal :(',
                     icon: 'error',
                     width: "500px",
-                    text: 'Favor de contactar a Soporte Técnico. (Error #003)'
+                    text: 'Favor de contactar a Soporte Técnico. (Error #008)'
                 });
                 console.error('Hubo un error:', error);
                 return; // addUser() failed execution 
@@ -437,7 +438,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
             const puesto = $('#puesto').val();  // TODO puesto can only be sent if its not disabled
             const fileInput = document.getElementById('foto');
             const estaActivo = true;
-            const rol = "TODO"; // Default role applied
+            const rol = "empty"; // TODO, since editing, this field must be read
 
             if (/[\{\}\:\$\=\'\*\[\]]/.test(nombre) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoP) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoM) ||
                 /[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password) || /[\{\}\:\$\=\'\*\[\]]/.test(area) ||
@@ -472,7 +473,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
                         title: 'Algo salió mal :(',
                         icon: 'error',
                         width: "500px",
-                        text: 'Favor de contactar a Soporte Técnico. (Error #001)'
+                        text: 'Favor de contactar a Soporte Técnico. (Error #000)'
                     });
                     return; // addUser() failed execution
                 } else {
@@ -497,6 +498,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
                                 jefeInmediato: jefeInmediato,
                                 puesto: puesto,
                                 estaActivo: estaActivo,
+                                rol: "empty"
                             })
                         });
                         const dataUser = await responseUser.json();
@@ -515,7 +517,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
                                 title: 'Algo salió mal :(',
                                 icon: 'error',
                                 width: "500px",
-                                text: 'Favor de contactar a Soporte Técnico. (Error #004)'
+                                text: 'Favor de contactar a Soporte Técnico. (Error #000)'
                             });
                             return; // addUser() failed execution
                         }
@@ -526,7 +528,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
                             title: 'Algo salió mal :(',
                             icon: 'error',
                             width: "500px",
-                            text: 'Favor de contactar a Soporte Técnico. (Error #003)'
+                            text: 'Favor de contactar a Soporte Técnico. (Error #000)'
                         });
                         console.error('Hubo un error:', error);
                         return; // addUser() failed execution
@@ -539,7 +541,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
                     title: 'Algo salió mal :(',
                     icon: 'error',
                     width: "500px",
-                    text: 'Favor de contactar a Soporte Técnico. (Error #002)'
+                    text: 'Favor de contactar a Soporte Técnico. (Error #000)'
                 });
                 console.error('Hubo un error:', error);
                 return; // addUser() failed execution

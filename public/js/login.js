@@ -1,36 +1,83 @@
-// TODO, ADD token verification and token access FIRE HERE
-// TODO, complete remake
+/* ---- script from login.ejs ---- */
 
+// TODO (1) They want token storage, they do remember me thingy
+
+// TODO, ADD token verification and token access FIRE HERE
 // TODO, la cookie que se genere o la autenticación basada en un TOKEN debe estar enlazada a un valor httpOnly que diga el rol al que se pertenece
 // Debe existir una cookie por defecto, esta cookie debe tener enlazado el rol "unauthorized" 
 
-// Event listener : Formulario Login
-document.getElementById("idFormularioLogin").addEventListener("submit", async function (e) {
-    // Preparar la información
-    e.preventDefault();
+// addUser button
+async function logIn() {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
 
-    // Obtener los valores de los campos email y password
-    const email = document.querySelector('input[name="email"]').value;
-    const password = document.querySelector('input[name="password"]').value;
+        // nosql injection protection
+        if (/[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password)) {
+            Swal.fire({
+                title: 'Campos incorrectos.',
+                icon: 'warning',
+                width: "500px",
+                text: 'Uno o más campos contienen caracteres no permitidos.'
+            });
+            return;
+        } 
+        else if (!email || !password) {
+            Swal.fire({
+                title: 'Campos vacíos.',
+                icon: 'warning',
+                width: "500px",
+                height: "100px",
+                text: 'Todos los campos son requeridos.'
+            });
+            return;
+        }
 
-    // Ejecutar POST en "/login/POSTAUTH"
     try {
         const response = await fetch("/login/POSTAUTH", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ email, password }) // Enviar los valores correctamente
+            body: JSON.stringify({ 
+                email: email, 
+                password: password,
+            })
         });
-
-        // Redirigir al usuario si las credenciales son correctas
         const data = await response.json();
+
         if (data.success) {
-            window.location.href = data.redirectUrl;
+            if (data.authorized) {
+                window.location.href = data.redirectUrl;
+            } else {
+                Swal.fire({
+                    title: 'Credenciales incorrectas.',
+                    icon: 'warning',
+                    width: "500px",
+                    text: data.message,
+                });
+                return; // logIn() failed execution
+            }
+
+        // Catch login controller
         } else {
-            alert(data.message);  // Mostrar un mensaje de error si las credenciales son incorrectas
+            Swal.fire({
+                title: 'Algo salió mal :(',
+                icon: 'error',
+                width: "500px",
+                text: 'Favor de contactar a Soporte Técnico. (Error #010)'
+            });
+            return; // logIn() failed execution
         }
+    
+    // Catch Fetch "/login/POSTAUTH"
     } catch (error) {
+        Swal.fire({
+            title: 'Algo salió mal :(',
+            icon: 'error',
+            width: "500px",
+            text: 'Favor de contactar a Soporte Técnico. (Error #009)'
+        });
         console.error("Error al enviar la solicitud", error);
+        return; // logIn() failed execution
     }
-});
+};
