@@ -14,21 +14,24 @@
             "downloadExcel":  "allow",
             "viewPermitsTeam" : "allow",
             "createPermitRequest": "allow",
-            "authorizePermitRequest": "allow"
+            "authorizePermitRequest": "allow",
+            "viewPermitsSelf": "allow"
         },
         "vacaciones" : {
             "downloadPDF": "allow",
             "downloadExcel":  "allow",
             "createVacationRequest": "allow",
             "authorizeVacationRequest": "allow",
-            "viewVacationsTable": "allow"
+            "viewVacationsTable": "allow",
+            "viewVacationsSelf": "allow"
         },
         "cursos": {
             "downloadPDF": "allow",
             "downloadExcel":  "allow",
             "createCourseRequest": "allow",
             "authorizeCourseRequest": "allow",
-            "viewCoursesTable": "allow"
+            "viewCoursesTable": "allow",
+            "viewCoursesSelf": "allow"
         }
     },
 
@@ -47,21 +50,24 @@
             "downloadExcel":  "deny",
             "viewPermitsTeam" : "deny",
             "createPermitRequest": "deny",
-            "authorizePermitRequest": "deny"
+            "authorizePermitRequest": "deny",
+            "viewPermitsSelf": "deny"
         },
         "vacaciones" : {
             "downloadPDF": "deny",
             "downloadExcel":  "deny",
             "createVacationRequest": "deny",
             "authorizeVacationRequest": "deny",
-            "viewVacationsTable": "deny"
+            "viewVacationsTable": "deny",
+            "viewVacationsSelf": "deny"
         },
         "cursos": {
             "downloadPDF": "deny",
             "downloadExcel":  "deny",
             "createCourseRequest": "deny",
             "authorizeCourseRequest": "allow",
-            "viewCoursesTable": "deny"
+            "viewCoursesTable": "deny",
+            "viewCoursesSelf": "deny"
         }
     },
 
@@ -78,23 +84,26 @@
             "viewPermitsAll" : "deny",
             "downloadPDF": "deny",
             "downloadExcel":  "deny",
-            "viewPermitsTeam" : "deny",
+            "viewPermitsTeam" : "allow",
             "createPermitRequest": "deny",
-            "authorizePermitRequest": "allow"
+            "authorizePermitRequest": "allow",
+            "viewPermitsSelf": "deny"
         },
         "vacaciones" : {
             "downloadPDF": "deny",
             "downloadExcel":  "deny",
             "createVacationRequest": "deny",
             "authorizeVacationRequest": "allow",
-            "viewVacationsTable": "deny"
+            "viewVacationsTable": "deny",
+            "viewVacationsSelf": "deny"
         },
         "cursos": {
             "downloadPDF": "deny",
             "downloadExcel":  "deny",
             "createCourseRequest": "deny",
             "authorizeCourseRequest": "allow",
-            "viewCoursesTable": "deny"
+            "viewCoursesTable": "deny",
+            "viewCoursesSelf": "deny"
         }
     },
 
@@ -108,26 +117,29 @@
             "userTableActions": "allow"
         },
         "permisos": {
-            "viewPermitsAll" : "deny",
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
+            "viewPermitsAll" : "allow",
+            "downloadPDF": "allow",
+            "downloadExcel":  "allow",
             "viewPermitsTeam" : "deny",
             "createPermitRequest": "deny",
-            "authorizePermitRequest": "deny"
+            "authorizePermitRequest": "deny",
+            "viewPermitsSelf": "deny"
         },
         "vacaciones" : {
             "downloadPDF": "deny",
             "downloadExcel":  "deny",
             "createVacationRequest": "deny",
             "authorizeVacationRequest": "deny",
-            "viewVacationsTable": "deny"
+            "viewVacationsTable": "allow",
+            "viewVacationsSelf": "deny"
         },
         "cursos": {
             "downloadPDF": "deny",
             "downloadExcel":  "deny",
             "createCourseRequest": "deny",
             "authorizeCourseRequest": "deny",
-            "viewCoursesTable": "deny"
+            "viewCoursesTable": "allow",
+            "viewCoursesSelf": "deny"
         }
     },
 
@@ -145,22 +157,25 @@
             "downloadPDF": "deny",
             "downloadExcel":  "deny",
             "viewPermitsTeam" : "deny",
-            "createPermitRequest": "deny",
-            "authorizePermitRequest": "deny"
+            "createPermitRequest": "allow",
+            "authorizePermitRequest": "deny",
+            "viewPermitsSelf": "deny"
         },
         "vacaciones" : {
             "downloadPDF": "deny",
             "downloadExcel":  "deny",
-            "createVacationRequest": "deny",
+            "createVacationRequest": "allow",
             "authorizeVacationRequest": "deny",
-            "viewVacationsTable": "deny"
+            "viewVacationsTable": "deny",
+            "viewVacationsSelf": "deny"
         },
         "cursos": {
             "downloadPDF": "deny",
             "downloadExcel":  "deny",
-            "createCourseRequest": "deny",
+            "createCourseRequest": "allow",
             "authorizeCourseRequest": "deny",
-            "viewCoursesTable": "deny"
+            "viewCoursesTable": "deny",
+            "viewCoursesSelf": "deny"
         }
     },
 
@@ -179,21 +194,24 @@
             "downloadExcel":  "deny",
             "viewPermitsTeam" : "deny",
             "createPermitRequest": "deny",
-            "authorizePermitRequest": "deny"
+            "authorizePermitRequest": "deny",
+            "viewPermitsSelf": "deny"
         },
         "vacaciones" : {
             "downloadPDF": "deny",
             "downloadExcel":  "deny",
             "createVacationRequest": "deny",
             "authorizeVacationRequest": "deny",
-            "viewVacationsTable": "deny"
+            "viewVacationsTable": "deny",
+            "viewVacationsSelf": "deny"
         },
         "cursos": {
             "downloadPDF": "deny",
             "downloadExcel":  "deny",
             "createCourseRequest": "deny",
             "authorizeCourseRequest": "deny",
-            "viewCoursesTable": "deny"
+            "viewCoursesTable": "deny",
+            "viewCoursesSelf": "deny"
         }
     }
 }
