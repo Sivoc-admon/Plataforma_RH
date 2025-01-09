@@ -3,6 +3,7 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const bodyParser = require("body-parser");
+require('dotenv').config();
 /*-------------*/
 
 
@@ -10,21 +11,14 @@ const bodyParser = require("body-parser");
 app.use(express.json());
 /*-------------*/
 
-
-
+// TODO, implewmetn CRSF token as UUID silently 
+//global.asdasdToken = 100;
+// access only on backed, like this: console.log(global.asdasdToken);
 
 /* Middleware for parsing request bodies (used for login form or API request body) */
-app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 /*-------------*/
-
-
-/* Extacción .env */
-const dotenv = require("dotenv");
-dotenv.config(); // Load environment variables from the .env file
-/*-------------*/
-
 
 /* Conexión con base de datos */
 const connnectDatabase = require("./utils/database");
