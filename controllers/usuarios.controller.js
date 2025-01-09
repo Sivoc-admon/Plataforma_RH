@@ -4,6 +4,8 @@ const filesModel = require("../models/files.model");
 const bcrypt = require("bcryptjs");
 
 
+// TODO, rbac implementation to this module
+
 /* --- MODEL LOGIC --- */
 
 exports.postAddUser = async (req, res) => {

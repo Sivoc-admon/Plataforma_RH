@@ -47,7 +47,7 @@
             <div class="navbar-end">
                 <div class="navbar-item">
                     <i class="fa-solid fa-circle-user has-text-white icon-css"></i>
-                    <a class="is-size-5 has-text-white" href="#">Nombre_Usuario</a> <!-- TODO (needs token verification)-->
+                    <a class="is-size-5 has-text-white">Nombre_Usuario</a> <!-- TODO (locked because needs token verification to achieve this)-->
                 </div>
             </div>
         </div>
@@ -81,12 +81,18 @@
     </div>
     
     <script>
-        sidebar.classList.toggle('active'); // Keep the sidebar always active, just hide it 
+        const sidebar = document.getElementById('sidebar');
+        const content = document.getElementById('content');
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const content = document.getElementById('content');
-            
+            if (!sidebar.classList.contains('active')){
+                sidebar.classList.toggle('active');
+            }
             content.classList.toggle('shifted');
+        }
+        function hideSidebar() {
+            if (!content.classList.contains('shifted')){
+                sidebar.classList.remove('active');
+            }
         }
 
         document.querySelectorAll('.menu-list a').forEach(item => {

@@ -12,7 +12,7 @@
     padding-right: 5px;
     background: linear-gradient(360deg, var(--dark-green), var(--black));    
     color: var(--white);
-    z-index: -1; /* Todo objeto se mostrará por encima de la sidebar */
+    z-index: -10; /* Todo objeto se mostrará por encima de la sidebar */
 }
 
 html, body {

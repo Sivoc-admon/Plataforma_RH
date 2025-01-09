@@ -5,7 +5,6 @@ const bcrypt = require("bcryptjs");
 
 // TODO, estandarizar respuestas en formato json {success: true/false, message: ""}
 // TODO, complete remake of the login
-// TODO 
 
 /* --- MODEL LOGIC --- */
 
