@@ -8,6 +8,19 @@ const bcrypt = require("bcryptjs");
 
 /* --- MODEL LOGIC --- */
 
+exports.postEmailExists = async (req, res) => {
+    try {
+        const response = await usersModel.findOne({ email: req.body.email });
+        if (!response) {
+            return res.status(200).json({ success: true, exists: false });
+        }
+        return res.status(200).json({ success: true, exists: true });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, exists: false });
+    }
+}
+
 exports.postAddUser = async (req, res) => {
     try {
         req.body.password = await bcrypt.hash(req.body.password, 10); // password encryption          

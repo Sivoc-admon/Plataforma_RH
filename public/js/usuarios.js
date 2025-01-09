@@ -86,19 +86,18 @@ async function addUser() { // async function to perform fetch chain
             cancelButton: 'default-button-css',
         },
         preConfirm: async () => { // allows to perform fetch chain
-            const nombre = $('#nombre').val();
-            const apellidoP = $('#apellidoP').val();
-            const apellidoM = $('#apellidoM').val();
-            const email = $('#email').val();
-            const password = $('#password').val();
-            const area = $('#area').val();
+            const nombre = $('#nombre').val().trim();
+            const apellidoP = $('#apellidoP').val().trim();
+            const apellidoM = $('#apellidoM').val().trim();
+            const email = $('#email').val().trim();
+            const password = $('#password').val().trim();
+            const area = $('#area').val().trim();
             const fechaBaja = $('#fechaBaja').val();
             const fechaIngreso = $('#fechaIngreso').val();
-            const jefeInmediato = $('#jefeInmediato').val();
-            const puesto = $('#puesto').val();  // TODO puesto can only be sent if its not disabled
+            const jefeInmediato = $('#jefeInmediato').val().trim();
+            const puesto = $('#puesto').val().trim();
             const fileInput = document.getElementById('foto');
             const estaActivo = true;
-            const rol = "Colaborador"; // Default role applied
 
             if (/[\{\}\:\$\=\'\*\[\]]/.test(nombre) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoP) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoM) ||
                 /[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password) || /[\{\}\:\$\=\'\*\[\]]/.test(area) ||
@@ -112,8 +111,47 @@ async function addUser() { // async function to perform fetch chain
                 return;
             }
             
-            // TODO REMOVE WHITESPACES Before / After STRINGS
-            // TODO cannot add email being used
+            
+            // Preconfirm Fetch #01 - verify email collision
+            try {
+                const responseEmail = await fetch('/usuarios/existe-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                    })
+                });
+                const dataEmail = await responseEmail.json();
+                
+                if (dataEmail.success) {
+                    if (dataEmail.exists){
+                        Swal.showValidationMessage('Email existente. Ese email ya está ocupado por un usuario.');
+                        return; // email collision detected
+                    } // else, continue execution
+                } else {
+                    Swal.fire({
+                        title: 'Algo salió mal :(',
+                        icon: 'error',
+                        width: "500px",
+                        text: 'Favor de contactar a Soporte Técnico. (Error #001)'
+                    });
+                    return; // addUser() failed execution
+                }
+
+            // Catch from Preconfirm Fetch #01
+            } catch (error) {
+                Swal.fire({
+                    title: 'Algo salió mal :(',
+                    icon: 'error',
+                    width: "500px",
+                    text: 'Favor de contactar a Soporte Técnico. (Error #003)'
+                });
+                console.error('Hubo un error:', error);
+                return; // addUser() failed execution 
+            }
+
 
             const formData = new FormData(); 
             formData.append('file', fileInput.files[0]); // Postman "Key" = "file"
@@ -157,6 +195,7 @@ async function addUser() { // async function to perform fetch chain
                                 jefeInmediato: jefeInmediato,
                                 puesto: puesto,
                                 estaActivo: estaActivo,
+                                rol: "Colaborador", // default role applied
                             })
                         });
                         const dataUser = await responseUser.json();
@@ -166,8 +205,9 @@ async function addUser() { // async function to perform fetch chain
                                 icon: 'success',
                                 width: "500px",
                                 text: 'Se añadió el usuario correctamente.'
-                            })
-                            location.reload();
+                            }).then(() => {
+                                location.reload(); // reload after popup
+                            });
                             return; // addUser() successful execution
 
                         // Catch from Controller "/usuarios/anadir-usuario"
@@ -211,6 +251,7 @@ async function addUser() { // async function to perform fetch chain
 
 // disableUser button
 async function disableUser() { // async function to perform fetch chain
+    hideSidebar(); // sidebar frontend
     Swal.fire({
         html: `
             <div style="padding: 0.5rem; margin: 1rem 0.5rem">
@@ -284,6 +325,7 @@ async function disableUser() { // async function to perform fetch chain
 // TODO, password decryption only when editing
 // TODO, this variable not working properly, only loading the 1st one.
 async function viewAndEditUser() { // async function to perform fetch chain
+    hideSidebar(); // sidebar frontend
     const thisButton = document.getElementById('viewAndEditUser');
     const email = thisButton.getAttribute('email');
     const password = thisButton.getAttribute('password');

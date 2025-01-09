@@ -25,6 +25,7 @@ router.post("/anadir-usuario", controller.postAddUser);
 router.post("/subir-archivo", upload.single('file'), controller.postFileUpload);
 router.post("/desactivar-usuario", controller.postUserDeactivation);
 router.post("/activar-usuario", controller.postUserActivation);
+router.post("/existe-email", controller.postEmailExists);
 
 
 module.exports = router;
