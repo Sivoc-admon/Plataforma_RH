@@ -7,11 +7,11 @@
         <h1> Módulo Usuarios </h1>
 
         <div class="columns" style="margin-top: 1rem;">
-            <!-- newUser button : newUser --->
+            <!-- addUser button : addUser --->
             <div class="column is-centered" style="text-align: center;">
-                <button class="default-button-css functionality-button-css" onclick="newUser()">
+                <button class="default-button-css functionality-button-css" onclick="addUser()">
                     <i class="fa-solid fa-user-plus default-icon-button-css"></i>
-                    <p>Nuevo Usuario</p>
+                    <p>Añadir Usuarios</p>
                 </button>
             </div>
 
@@ -19,7 +19,7 @@
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="restoreUser()">
                     <i class="fa-solid fa-rotate-right default-icon-button-css"></i>
-                    <p>Restaurar Usuario</p>
+                    <p>Restaurar Usuarios</p>
                 </button>
             </div>
 
@@ -53,10 +53,11 @@
                     <th class="has-text-centered">Apellido Paterno</th>
                     <th class="has-text-centered">Apellido Materno</th>
                     <th class="has-text-centered">Área</th>
+                    <th class="has-text-centered">Rol</th>
                     <th class="has-text-centered">Acciones</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
+            <tbody id="tableBody"> <!-- TODO Cap Display info at 50chars idk --->
                 <% usersRows.forEach(user=> { %>
                     <tr>
                         <td class="is-centered">
@@ -70,6 +71,9 @@
                         </td>
                         <td class="is-centered">
                             <%= user.area %>
+                        </td>
+                        <td class="is-centered">
+                            <%= user.rol %>
                         </td>
                         <td class="is-centered">
                             <div class="columns is-centered">
@@ -97,6 +101,13 @@
                                 <div class="column is-narrow">
                                     <button id="disableUser" class="default-button-css table-button-css" userId="<%= user._id %>" onclick="disableUser(this)">
                                         <i class="fa-solid fa-user-minus"></i>
+                                    </button>
+                                </div>
+
+                                <!-- editRolbutton : editRol --->
+                                <div class="column is-narrow">
+                                    <button id="disableUser" class="default-button-css table-button-css" userId="<%= user._id %>" onclick="changeRol(this)">
+                                        <i class="fa-solid fa-user-tag"></i>
                                     </button>
                                 </div>
 

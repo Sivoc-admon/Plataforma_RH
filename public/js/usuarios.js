@@ -1,5 +1,5 @@
-// newUser button
-async function newUser() { // async function to perform fetch chain
+// addUser button
+async function addUser() { // async function to perform fetch chain
     Swal.fire({
         html: `
             <div style="padding: 0.5rem; margin: 1rem 0.5rem">
@@ -98,6 +98,7 @@ async function newUser() { // async function to perform fetch chain
             const puesto = $('#puesto').val();  // TODO puesto can only be sent if its not disabled
             const fileInput = document.getElementById('foto');
             const estaActivo = true;
+            const rol = "Colaborador"; // Default role applied
 
             if (/[\{\}\:\$\=\'\*\[\]]/.test(nombre) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoP) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoM) ||
                 /[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password) || /[\{\}\:\$\=\'\*\[\]]/.test(area) ||
@@ -133,7 +134,7 @@ async function newUser() { // async function to perform fetch chain
                         width: "500px",
                         text: 'Favor de contactar a Soporte Técnico. (Error #001)'
                     });
-                    return; // newUser() failed execution
+                    return; // addUser() failed execution
                 } else {
 
                     // (CHAINED) Fetch #02 - User information (json object)
@@ -167,7 +168,7 @@ async function newUser() { // async function to perform fetch chain
                                 text: 'Se añadió el usuario correctamente.'
                             })
                             location.reload();
-                            return; // newUser() successful execution
+                            return; // addUser() successful execution
 
                         // Catch from Controller "/usuarios/anadir-usuario"
                         } else {
@@ -177,7 +178,7 @@ async function newUser() { // async function to perform fetch chain
                                 width: "500px",
                                 text: 'Favor de contactar a Soporte Técnico. (Error #004)'
                             });
-                            return; // newUser() failed execution
+                            return; // addUser() failed execution
                         }
  
                     // Catch from Fetch #02
@@ -189,7 +190,7 @@ async function newUser() { // async function to perform fetch chain
                             text: 'Favor de contactar a Soporte Técnico. (Error #003)'
                         });
                         console.error('Hubo un error:', error);
-                        return; // newUser() failed execution
+                        return; // addUser() failed execution
                     }
                 }
 
@@ -202,7 +203,7 @@ async function newUser() { // async function to perform fetch chain
                     text: 'Favor de contactar a Soporte Técnico. (Error #002)'
                 });
                 console.error('Hubo un error:', error);
-                return; // newUser() failed execution
+                return; // addUser() failed execution
             }
         }
     })
@@ -278,7 +279,7 @@ async function disableUser() { // async function to perform fetch chain
     })
 };
 
-// viewAndEditUser button (TODO, REQUIRES PFP VISIBILITY AND newUser FRONT END)
+// viewAndEditUser button (TODO, REQUIRES PFP VISIBILITY AND addUser FRONT END)
 // TODO, do not add a new user, rather set again with moongose
 // TODO, password decryption only when editing
 // TODO, this variable not working properly, only loading the 1st one.
@@ -394,6 +395,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
             const puesto = $('#puesto').val();  // TODO puesto can only be sent if its not disabled
             const fileInput = document.getElementById('foto');
             const estaActivo = true;
+            const rol = "TODO"; // Default role applied
 
             if (/[\{\}\:\$\=\'\*\[\]]/.test(nombre) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoP) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoM) ||
                 /[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password) || /[\{\}\:\$\=\'\*\[\]]/.test(area) ||
@@ -430,7 +432,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
                         width: "500px",
                         text: 'Favor de contactar a Soporte Técnico. (Error #001)'
                     });
-                    return; // newUser() failed execution
+                    return; // addUser() failed execution
                 } else {
 
                     // (CHAINED) Fetch #02 - User information (json object)
@@ -463,7 +465,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
                                 width: "500px",
                                 text: 'Se añadió el usuario correctamente.'
                             })
-                            return; // newUser() successful execution
+                            return; // addUser() successful execution
 
                         // Catch from Controller "/usuarios/anadir-usuario"
                         } else {
@@ -473,7 +475,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
                                 width: "500px",
                                 text: 'Favor de contactar a Soporte Técnico. (Error #004)'
                             });
-                            return; // newUser() failed execution
+                            return; // addUser() failed execution
                         }
  
                     // Catch from Fetch #02
@@ -485,7 +487,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
                             text: 'Favor de contactar a Soporte Técnico. (Error #003)'
                         });
                         console.error('Hubo un error:', error);
-                        return; // newUser() failed execution
+                        return; // addUser() failed execution
                     }
                 }
 
@@ -498,7 +500,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
                     text: 'Favor de contactar a Soporte Técnico. (Error #002)'
                 });
                 console.error('Hubo un error:', error);
-                return; // newUser() failed execution
+                return; // addUser() failed execution
             }
         }
     })

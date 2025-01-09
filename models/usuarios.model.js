@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-// Establecer Esquema // TODO CONMSTRALEÑA??
 const userSchema = new mongoose.Schema({
     email: String,
-    password: String, //TODO alguna manera de guardarala encriptada pq si es posible
+    password: String,
+    rol: String,
     nombre: String,
     apellidoP: String,
     apellidoM: String,
@@ -16,6 +16,6 @@ const userSchema = new mongoose.Schema({
     estaActivo: Boolean,
 });
 
-// Crear model ('usuarios' = collection name)
+// mongoose.model('usuarios' = collection name)
 module.exports = mongoose.model('usuarios', userSchema);
 

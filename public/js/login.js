@@ -1,6 +1,9 @@
 // TODO, ADD token verification and token access FIRE HERE
 // TODO, complete remake
- 
+
+// TODO, la cookie que se genere o la autenticación basada en un TOKEN debe estar enlazada a un valor httpOnly que diga el rol al que se pertenece
+// Debe existir una cookie por defecto, esta cookie debe tener enlazado el rol "unauthorized" 
+
 // Event listener : Formulario Login
 document.getElementById("idFormularioLogin").addEventListener("submit", async function (e) {
     // Preparar la información

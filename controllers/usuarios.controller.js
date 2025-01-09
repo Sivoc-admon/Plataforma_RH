@@ -6,7 +6,7 @@ const bcrypt = require("bcryptjs");
 
 /* --- MODEL LOGIC --- */
 
-exports.postNewUser = async (req, res) => {
+exports.postAddUser = async (req, res) => {
     try {
         req.body.password = await bcrypt.hash(req.body.password, 10); // password encryption          
         const response = await usersModel.create(req.body);

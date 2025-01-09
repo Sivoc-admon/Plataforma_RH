@@ -13,12 +13,12 @@
 }
 
 .default-button-css:hover {
-    transform: scale(1.01);
+    transform: scale(1.05);
     background-color: var(--dark-green);
 }
 
 .default-button-css:active {
-    transform: scale(0.99);
+    transform: scale(0.95);
 }
 
 .default-icon-button-css {
@@ -46,15 +46,15 @@
 
 .table-button-css:hover {
     background-color: transparent;
-    transform: scale(1.03);
+    transform: scale(1.05);
 }
 
 .table-button-css:active {
-    transform: scale(0.97);
+    transform: scale(0.95);
 }
 
 .functionality-button-css {
-    width: 10rem; 
+    width: 11rem; 
     height: 5rem;
 }
 
