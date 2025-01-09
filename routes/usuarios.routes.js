@@ -21,11 +21,12 @@ const upload = multer({ storage }); // Compacted into 'upload'
 
 // Routes
 router.get("/", controller.getUsersView);
+router.get("/restaurar-usuarios", controller.getRestoreUsersView);
 router.post("/anadir-usuario", controller.postAddUser); 
 router.post("/subir-archivo", upload.single('file'), controller.postFileUpload);
 router.post("/desactivar-usuario", controller.postUserDeactivation);
 router.post("/activar-usuario", controller.postUserActivation);
 router.post("/existe-email", controller.postEmailExists);
-
+router.post("/cambiar-rol", controller.postUserChangeRol);
 
 module.exports = router;

@@ -106,14 +106,14 @@ async function addUser() { // async function to perform fetch chain
                 /[\{\}\:\$\=\'\*\[\]]/.test(jefeInmediato) || /[\{\}\:\$\=\'\*\[\]]/.test(puesto)) {
                 Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
                 return;
-            } 
-            else if (!nombre || !apellidoP || !apellidoM || !email || !password || !area || !fechaBaja || !fechaIngreso || !jefeInmediato 
+            }
+            else if (!nombre || !apellidoP || !apellidoM || !email || !password || !area || !fechaBaja || !fechaIngreso || !jefeInmediato
                 || !puesto || !fileInput.files[0]) {
                 Swal.showValidationMessage('Todos los campos son requeridos.');
                 return;
             }
-            
-            
+
+
             // Preconfirm Fetch #01 - verify email collision
             try {
                 const responseEmail = await fetch('/usuarios/existe-email', {
@@ -127,7 +127,7 @@ async function addUser() { // async function to perform fetch chain
                 });
                 const dataEmail = await responseEmail.json();
                 if (dataEmail.success) {
-                    if (dataEmail.exists){
+                    if (dataEmail.exists) {
                         Swal.showValidationMessage('Email existente. Ese email ya está ocupado por un usuario.');
                         return; // email collision detected
                     } // else, continue execution
@@ -141,7 +141,7 @@ async function addUser() { // async function to perform fetch chain
                     return; // addUser() failed execution
                 }
 
-            // Catch from Preconfirm Fetch #01
+                // Catch from Preconfirm Fetch #01
             } catch (error) {
                 Swal.fire({
                     title: 'Algo salió mal :(',
@@ -154,14 +154,14 @@ async function addUser() { // async function to perform fetch chain
             }
 
 
-            const formData = new FormData(); 
+            const formData = new FormData();
             formData.append('file', fileInput.files[0]); // Postman "Key" = "file"
 
             // Fetch #01 - File upload (profile picture)
             try {
                 const responseFile = await fetch('/usuarios/subir-archivo', {
                     method: 'POST',
-                    body: formData, 
+                    body: formData,
                 });
                 const dataFile = await responseFile.json();
 
@@ -177,7 +177,7 @@ async function addUser() { // async function to perform fetch chain
                 } else {
 
                     // (CHAINED) Fetch #02 - User information (json object)
-                    try {            
+                    try {
                         const responseUser = await fetch('/usuarios/anadir-usuario', {
                             method: 'POST',
                             headers: {
@@ -200,9 +200,9 @@ async function addUser() { // async function to perform fetch chain
                             })
                         });
                         const dataUser = await responseUser.json();
-                        if (dataUser.success) { 
+                        if (dataUser.success) {
                             Swal.fire({
-                                title: 'Usuario añadido', 
+                                title: 'Usuario añadido',
                                 icon: 'success',
                                 width: "500px",
                                 text: 'Se añadió el usuario correctamente.'
@@ -211,7 +211,7 @@ async function addUser() { // async function to perform fetch chain
                             });
                             return; // addUser() successful execution
 
-                        // Catch from Controller "/usuarios/anadir-usuario"
+                            // Catch from Controller "/usuarios/anadir-usuario"
                         } else {
                             Swal.fire({
                                 title: 'Algo salió mal :(',
@@ -221,8 +221,8 @@ async function addUser() { // async function to perform fetch chain
                             });
                             return; // addUser() failed execution
                         }
- 
-                    // Catch from Fetch #02
+
+                        // Catch from Fetch #02
                     } catch (error) {
                         Swal.fire({
                             title: 'Algo salió mal :(',
@@ -235,7 +235,7 @@ async function addUser() { // async function to perform fetch chain
                     }
                 }
 
-            // Catch from Fetch #01
+                // Catch from Fetch #01
             } catch (error) {
                 Swal.fire({
                     title: 'Algo salió mal :(',
@@ -251,7 +251,8 @@ async function addUser() { // async function to perform fetch chain
 };
 
 // disableUser button
-async function disableUser() { // async function to perform fetch chain
+// TODO, grant that user "role: unauthorized" (maybe save the previous role somewhere else?)
+async function disableUser(button) { // async function to perform fetch chain
     hideSidebar(); // sidebar frontend
     Swal.fire({
         html: `
@@ -272,8 +273,7 @@ async function disableUser() { // async function to perform fetch chain
         },
 
         preConfirm: async () => {
-            const thisButton = document.getElementById('disableUser');
-            const userId = thisButton.getAttribute('userId');
+            const userId = button.getAttribute('userId');
             // Fetch #01 - Execute user deactivation
             try {
                 const response = await fetch('/usuarios/desactivar-usuario', {
@@ -281,7 +281,7 @@ async function disableUser() { // async function to perform fetch chain
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         userId: userId,
                     })
                 });
@@ -302,11 +302,13 @@ async function disableUser() { // async function to perform fetch chain
                         icon: 'success',
                         width: "500px",
                         text: 'Se ha desactivado el usuario correctamente.'
+                    }).then(() => {
+                        location.reload(); // reload after popup
                     });
                     return; // disableUser() successful execution
                 }
 
-            // Catch from Fetch #01
+                // Catch from Fetch #01
             } catch (error) {
                 Swal.fire({
                     title: 'Algo salió mal :(',
@@ -325,20 +327,23 @@ async function disableUser() { // async function to perform fetch chain
 // TODO, do not add a new user, rather set again with moongose
 // TODO, password decryption only when editing
 // TODO, this variable not working properly, only loading the 1st one.
-async function viewAndEditUser() { // async function to perform fetch chain
+// TODO, change field type to PASSWORD when edtining password (easier)
+async function viewAndEditUser(button) { // async function to perform fetch chain
     hideSidebar(); // sidebar frontend
-    const thisButton = document.getElementById('viewAndEditUser');
-    const email = thisButton.getAttribute('email');
-    const password = thisButton.getAttribute('password');
-    const nombre = thisButton.getAttribute('nombre');
-    const apellidoP = thisButton.getAttribute('apellidoP');
-    const apellidoM = thisButton.getAttribute('apellidoM');
-    const fechaBaja = thisButton.getAttribute('fechaBaja');
-    const fechaIngreso = thisButton.getAttribute('fechaIngreso');
-    const area = thisButton.getAttribute('area');
-    const foto = thisButton.getAttribute('foto');
-    const puesto = thisButton.getAttribute('puesto');
-    const jefeInmediato = thisButton.getAttribute('jefeInmediato');
+
+    const userId = button.getAttribute('userId');
+    // TODO esto no va aaqui, pasalo al preconfirm y formatealo como el userId
+    const email = button.getAttribute('email');
+    const password = button.getAttribute('password');
+    const nombre = button.getAttribute('nombre');
+    const apellidoP = button.getAttribute('apellidoP');
+    const apellidoM = button.getAttribute('apellidoM');
+    const fechaBaja = button.getAttribute('fechaBaja');
+    const fechaIngreso = button.getAttribute('fechaIngreso');
+    const area = button.getAttribute('area');
+    const foto = button.getAttribute('foto');
+    const puesto = button.getAttribute('puesto');
+    const jefeInmediato = button.getAttribute('jefeInmediato');
 
     Swal.fire({
         html: `
@@ -372,7 +377,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
                 </div>
                 <div class="column">
                     <label>Contraseña
-                        <input class="input" id="password" value=${password} required>
+                        <input type="password" class="input" id="password" value=${password} onfocus="this.value = ''" required>
                     </label>
                 </div>
                 <div class="column">
@@ -445,25 +450,25 @@ async function viewAndEditUser() { // async function to perform fetch chain
                 /[\{\}\:\$\=\'\*\[\]]/.test(jefeInmediato) || /[\{\}\:\$\=\'\*\[\]]/.test(puesto)) {
                 Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
                 return;
-            } 
-            else if (!nombre || !apellidoP || !apellidoM || !email || !password || !area || !fechaBaja || !fechaIngreso || !jefeInmediato 
+            }
+            else if (!nombre || !apellidoP || !apellidoM || !email || !password || !area || !fechaBaja || !fechaIngreso || !jefeInmediato
                 || !puesto || !fileInput.files[0]) {
                 Swal.showValidationMessage('Todos los campos son requeridos.');
                 return;
             }
-            
+
 
             // TODO REMOVE WHITESPACES Before / After STRINGS
             // TODO cannot add email being used
 
-            const formData = new FormData(); 
+            const formData = new FormData();
             formData.append('file', fileInput.files[0]); // Postman "Key" = "file"
 
             // Fetch #01 - File upload (profile picture)
             try {
                 const responseFile = await fetch('/usuarios/subir-archivo', {
                     method: 'POST',
-                    body: formData, 
+                    body: formData,
                 });
                 const dataFile = await responseFile.json();
 
@@ -479,7 +484,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
                 } else {
 
                     // (CHAINED) Fetch #02 - User information (json object)
-                    try {            
+                    try {
                         const responseUser = await fetch('/usuarios/anadir-usuario', {
                             method: 'POST',
                             headers: {
@@ -502,16 +507,16 @@ async function viewAndEditUser() { // async function to perform fetch chain
                             })
                         });
                         const dataUser = await responseUser.json();
-                        if (dataUser.success) { 
+                        if (dataUser.success) {
                             Swal.fire({
-                                title: 'Usuario añadido', 
+                                title: 'Usuario añadido',
                                 icon: 'success',
                                 width: "500px",
                                 text: 'Se añadió el usuario correctamente.'
                             })
                             return; // addUser() successful execution
 
-                        // Catch from Controller "/usuarios/anadir-usuario"
+                            // Catch from Controller "/usuarios/anadir-usuario"
                         } else {
                             Swal.fire({
                                 title: 'Algo salió mal :(',
@@ -521,8 +526,8 @@ async function viewAndEditUser() { // async function to perform fetch chain
                             });
                             return; // addUser() failed execution
                         }
- 
-                    // Catch from Fetch #02
+
+                        // Catch from Fetch #02
                     } catch (error) {
                         Swal.fire({
                             title: 'Algo salió mal :(',
@@ -535,7 +540,7 @@ async function viewAndEditUser() { // async function to perform fetch chain
                     }
                 }
 
-            // Catch from Fetch #01
+                // Catch from Fetch #01
             } catch (error) {
                 Swal.fire({
                     title: 'Algo salió mal :(',
@@ -545,6 +550,204 @@ async function viewAndEditUser() { // async function to perform fetch chain
                 });
                 console.error('Hubo un error:', error);
                 return; // addUser() failed execution
+            }
+        }
+    })
+};
+
+// disabledUsersTable button
+async function disabledUsersTable() {
+    try {
+        const response = await fetch('/usuarios/restaurar-usuarios', {
+            method: 'GET',
+        });
+
+        // Catch from Controller "/usuarios/restaurar-usuarios"
+        if (!response.ok) {
+            Swal.fire({
+                title: 'Algo salió mal :(',
+                icon: 'error',
+                width: "500px",
+                text: 'Favor de contactar a Soporte Técnico. (Error #012)'
+            });
+            return; // disableUser() failed execution
+        } else {
+            window.location.href = '/usuarios/restaurar-usuarios';
+            return; // disableUser() successful execution
+        }
+
+    // Catch from Fetch #01
+    } catch (error) {
+        Swal.fire({
+            title: 'Algo salió mal :(',
+            icon: 'error',
+            width: "500px",
+            text: 'Favor de contactar a Soporte Técnico. (Error #011)'
+        });
+        console.error('Hubo un error:', error);
+        return; // disableUser() failed execution
+    }
+};
+
+function returnMainTable() {
+    window.location.href = '/usuarios';
+}
+
+// enableUser button
+// TODO, grant that user "role: unauthorized" (maybe save the previous role somewhere else?)
+async function enableUser(button) { // async function to perform fetch chain
+    hideSidebar(); // sidebar frontend
+    Swal.fire({
+        html: `
+            <div style="padding: 0.5rem; margin: 1rem 0.5rem">
+                <h2>¿Deseas volver a activar este usuario?</h2>
+                <h2>Este usuario volverá a acceder a la plataforma.<h2>
+            </div>
+        `,
+        confirmButtonText: 'Activar usuario',
+        cancelButtonText: 'Cancelar',
+        cancelButtonColor: '#f0466e',
+        showCancelButton: true,
+        allowOutsideClick: false,
+        width: '1000px',
+        customClass: {
+            confirmButton: 'default-button-css',
+            cancelButton: 'default-button-css',
+        },
+
+        preConfirm: async () => {
+            const userId = button.getAttribute('userId');
+            // Fetch #01 - Execute user activation
+            try {
+                const response = await fetch('/usuarios/activar-usuario', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                    })
+                });
+                const data = await response.json();
+
+                // Catch from Controller "/activar-usuario"
+                if (!data.success) {
+                    Swal.fire({
+                        title: 'Algo salió mal :(',
+                        icon: 'error',
+                        width: "500px",
+                        text: 'Favor de contactar a Soporte Técnico. (Error #014)'
+                    });
+                    return; // enableUser() failed execution
+                } else {
+                    Swal.fire({
+                        title: 'Usuario activado',
+                        icon: 'success',
+                        width: "500px",
+                        text: 'Se ha activado el usuario correctamente.'
+                    }).then(() => {
+                        location.reload(); // reload after popup
+                    });
+                    return; // enableUser() successful execution
+                }
+
+                // Catch from Fetch #01
+            } catch (error) {
+                Swal.fire({
+                    title: 'Algo salió mal :(',
+                    icon: 'error',
+                    width: "500px",
+                    text: 'Favor de contactar a Soporte Técnico. (Error #013)'
+                });
+                console.error('Hubo un error:', error);
+                return; // enableUser() failed execution
+            }
+        }
+    })
+};
+
+// changeRol button
+// TODO, grant that user "role: unauthorized" (maybe save the previous role somewhere else?)
+async function changeRol(button) { // async function to perform fetch chain
+    hideSidebar(); // sidebar frontend
+    Swal.fire({
+        html: `
+            <div style="padding: 0.5rem; margin: 1rem 0.5rem">
+                <h2>Cambiar el rol del usuario</h2>
+                    <div class="field">
+                        <div class="control">
+                            <select id="newRole" class="select is-fullwidth input">
+                            <option>Selecciona un rol</option>
+                            <option>Colaborador</option>
+                            <option>Recursos Humanos</option>
+                            <option>Jefe Inmediato</option>
+                            <option>Dirección</option>
+                            </select> 
+                        </div>
+                    </div>
+                    
+            </div>
+        `,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
+        cancelButtonColor: '#f0466e',
+        showCancelButton: true,
+        allowOutsideClick: false,
+        width: '1000px',
+        customClass: {
+            confirmButton: 'default-button-css',
+            cancelButton: 'default-button-css',
+        },
+
+        preConfirm: async () => {
+            const userId = button.getAttribute('userId');
+            const newRole = $('#newRole').val();
+
+            // Fetch #01 - Execute changeRol
+            try {
+                const response = await fetch('/usuarios/cambiar-rol', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        newRole: newRole,
+                    })
+                });
+                const data = await response.json();
+
+                // Catch from Controller "/activar-usuario"
+                if (!data.success) {
+                    Swal.fire({
+                        title: 'Algo salió mal :(',
+                        icon: 'error',
+                        width: "500px",
+                        text: 'Favor de contactar a Soporte Técnico. (Error #015)'
+                    });
+                    return; // changeRol() failed execution
+                } else {
+                    Swal.fire({
+                        title: 'Rol configurado',
+                        icon: 'success',
+                        width: "500px",
+                        text: 'Se ha cambiado el rol del usuario correctamente.'
+                    }).then(() => {
+                        location.reload(); // reload after popup
+                    });
+                    return; // changeRol() successful execution
+                }
+
+                // Catch from Fetch #01
+            } catch (error) {
+                Swal.fire({
+                    title: 'Algo salió mal :(',
+                    icon: 'error',
+                    width: "500px",
+                    text: 'Favor de contactar a Soporte Técnico. (Error #016)'
+                });
+                console.error('Hubo un error:', error);
+                return; // changeRol() failed execution
             }
         }
     })

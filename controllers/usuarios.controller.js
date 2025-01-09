@@ -58,7 +58,7 @@ exports.postUserDeactivation = async (req, res) => {
             return res.status(404).json({success: false, message: "" });
         }
 
-        return res.status(200).json({success: true, message: response});
+        return res.status(200).json({success: true, message: ""});
     } catch (error) {
         console.error(error);
         return res.status(500).json({success: false, message: "" });
@@ -81,7 +81,31 @@ exports.postUserActivation = async (req, res) => {
             return res.status(404).json({success: false, message: "" });
         }
 
-        return res.status(200).json({success: true, message: response});
+        return res.status(200).json({success: true, message: ""});
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({success: false, message: "" });
+    }
+};
+
+exports.postUserChangeRol = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+        const newRole = req.body.newRole
+
+        // Execute findByIdAndUpdate
+        const response = await usersModel.findByIdAndUpdate(
+            userId, 
+            { $set: { rol: newRole } }, // Change attribute
+            { new: true } 
+        );
+
+        // If for some reason user not found, send 404
+        if (!response) {
+            return res.status(404).json({success: false, message: "" });
+        }
+
+        return res.status(200).json({success: true, message: ""});
     } catch (error) {
         console.error(error);
         return res.status(500).json({success: false, message: "" });
@@ -89,13 +113,23 @@ exports.postUserActivation = async (req, res) => {
 };
 
 /* --- VIEWS LOGIC --- */
-// Main view users module
 exports.getUsersView = async (req, res) => {
     try {
-        const usersRows = await usersModel.find();
+        const usersRows = await usersModel.find({ estaActivo: true });
         return res.render('usuarios/usuarios.ejs', { usersRows });
+        
     } catch (error) {
         console.error(error);
         return res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
 };
+
+exports.getRestoreUsersView = async (req, res) => {
+    try {
+        const usersRows = await usersModel.find({ estaActivo: false });
+        return res.render('usuarios/restaurar-usuarios.ejs', { usersRows });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
+    }
+}

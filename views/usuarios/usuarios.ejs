@@ -15,10 +15,10 @@
                 </button>
             </div>
 
-            <!-- restoreUser button : restoreUser TODO --->
+            <!-- disabledUsersTable button : disabledUsersTable --->
             <div class="column is-centered" style="text-align: center;">
-                <button class="default-button-css functionality-button-css" onclick="restoreUser()">
-                    <i class="fa-solid fa-rotate-right default-icon-button-css"></i>
+                <button class="default-button-css functionality-button-css" onclick="disabledUsersTable()">
+                    <i class="fa-solid fa-boxes-packing default-icon-button-css"></i>
                     <p>Restaurar Usuarios</p>
                 </button>
             </div>
@@ -80,7 +80,7 @@
 
                                 <!-- viewAndEditUser button : viewAndEditUser TODO --->
                                 <div class="column is-narrow">
-                                    <button class="default-button-css table-button-css"  id="viewAndEditUser" 
+                                    <button class="default-button-css table-button-css"
                                     email = "<%= user.email %>"
                                     password = "<%= user.password %>"
                                     nombre = "<%= user.nombre %>"
@@ -92,21 +92,21 @@
                                     foto = "<%= user.foto %>"
                                     puesto = "<%= user.puesto %>"
                                     jefeInmediato = "<%= user.jefeInmediato %>"
-                                    onclick="viewAndEditUser()">
+                                    onclick="viewAndEditUser(this)">
                                         <i class="fa-solid fa-user-pen"></i>
                                     </button>
                                 </div>
 
                                 <!-- disableUser button : disableUser --->
                                 <div class="column is-narrow">
-                                    <button id="disableUser" class="default-button-css table-button-css" userId="<%= user._id %>" onclick="disableUser(this)">
-                                        <i class="fa-solid fa-user-minus"></i>
+                                    <button class="default-button-css table-button-css" userId="<%= user._id %>" onclick="disableUser(this)">
+                                        <i class="fa-solid fa-user-xmark"></i>
                                     </button>
                                 </div>
 
                                 <!-- editRolbutton : editRol --->
                                 <div class="column is-narrow">
-                                    <button id="disableUser" class="default-button-css table-button-css" userId="<%= user._id %>" onclick="changeRol(this)">
+                                    <button class="default-button-css table-button-css" userId="<%= user._id %>" onclick="changeRol(this)">
                                         <i class="fa-solid fa-user-tag"></i>
                                     </button>
                                 </div>
