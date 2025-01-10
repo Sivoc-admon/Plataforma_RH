@@ -27,6 +27,6 @@ router.post("/subir-archivo", upload.single('file'), controller.postFileUpload);
 router.post("/desactivar-usuario", controller.postUserDeactivation);
 router.post("/activar-usuario", controller.postUserActivation);
 router.post("/existe-email", controller.postEmailExists);
-router.post("/cambiar-rol", controller.postUserChangeRol);
+router.post("/cambiar-privilegio", controller.postUserChangePrivilege);
 
 module.exports = router;

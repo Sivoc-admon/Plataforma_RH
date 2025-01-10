@@ -1,5 +1,11 @@
 <%- include('../navbar.ejs') %>
+    <!-- TODO, frontend 100% --->
     <link rel="stylesheet" href="/css/usuarios.css">
+
+    <script>
+        const usersRows = <%- JSON.stringify(usersRows) %>;
+    </script>
+
     <script src="/js/usuarios.js" defer></script>
 
     <div class="inside-content-css">
@@ -53,7 +59,8 @@
                     <th class="has-text-centered">Apellido Paterno</th>
                     <th class="has-text-centered">Apellido Materno</th>
                     <th class="has-text-centered">Área</th>
-                    <th class="has-text-centered">Rol</th>
+                    <th class="has-text-centered">Puesto</th>
+                    <th class="has-text-centered">Privilegio</th>
                     <th class="has-text-centered">Acciones</th>
                 </tr>
             </thead>
@@ -73,12 +80,15 @@
                             <%= user.area %>
                         </td>
                         <td class="is-centered">
-                            <%= user.rol %>
+                            <%= user.puesto %>
+                        </td>
+                        <td class="is-centered">
+                            <%= user.privilegio %>
                         </td>
                         <td class="is-centered">
                             <div class="columns is-centered">
 
-                                <!-- viewAndEditUser button : viewAndEditUser TODO --->
+                                <!-- viewAndEditUser button : viewAndEditUser TODO (remake with only userId + global.usersRows --->
                                 <div class="column is-narrow">
                                     <button class="default-button-css table-button-css"
                                     email = "<%= user.email %>"
@@ -104,9 +114,9 @@
                                     </button>
                                 </div>
 
-                                <!-- editRolbutton : editRol --->
+                                <!-- changPrivilegebutton : changePrivilege --->
                                 <div class="column is-narrow">
-                                    <button class="default-button-css table-button-css" userId="<%= user._id %>" onclick="changeRol(this)">
+                                    <button class="default-button-css table-button-css" userId="<%= user._id %>" onclick="changePrivilege(this)">
                                         <i class="fa-solid fa-user-tag"></i>
                                     </button>
                                 </div>

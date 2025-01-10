@@ -88,15 +88,15 @@ exports.postUserActivation = async (req, res) => {
     }
 };
 
-exports.postUserChangeRol = async (req, res) => {
+exports.postUserChangePrivilege = async (req, res) => {
     try {
         const userId = req.body.userId;
-        const newRole = req.body.newRole
+        const newPrivilege = req.body.newPrivilege
 
         // Execute findByIdAndUpdate
         const response = await usersModel.findByIdAndUpdate(
             userId, 
-            { $set: { rol: newRole } }, // Change attribute
+            { $set: { privilegio: newPrivilege } }, // Change attribute
             { new: true } 
         );
 

@@ -3,8 +3,8 @@
 // TODO (1) They want token storage, they do remember me thingy
 
 // TODO, ADD token verification and token access FIRE HERE
-// TODO, la cookie que se genere o la autenticación basada en un TOKEN debe estar enlazada a un valor httpOnly que diga el rol al que se pertenece
-// Debe existir una cookie por defecto, esta cookie debe tener enlazado el rol "unauthorized" 
+// TODO, la cookie que se genere o la autenticación basada en un TOKEN debe estar enlazada a un valor httpOnly que diga el privilegio al que se pertenece
+// Debe existir una cookie por defecto, esta cookie debe tener enlazado el privilegio "unauthorized" 
 
 // addUser button
 async function logIn() {

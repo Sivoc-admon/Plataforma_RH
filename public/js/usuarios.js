@@ -1,8 +1,17 @@
-/* ---- script from login.ejs ---- */
+/* ---- script from usuarios.ejs ---- */
 
 // addUser button
 async function addUser() { // async function to perform fetch chain
     hideSidebar(); // sidebar frontend
+
+    // dynamic html to show available "Jefe Inmediatos"
+    let optionsJefeInmediato = ' <option class="placeholder" value="" hidden>Selecciona un Jefe Inmediato</option>';
+    for (let user of usersRows) {
+        if (user.privilegio === "Jefe Inmediato") {
+            optionsJefeInmediato += `<option value="${user._id}">${user.nombre} ${user.apellidoP} ${user.apellidoM}</option>`;
+        }
+    }
+            
     Swal.fire({
         html: `
             <div style="padding: 0.5rem; margin: 1rem 0.5rem">
@@ -56,11 +65,18 @@ async function addUser() { // async function to perform fetch chain
                         <input class="input" id="puesto" required>
                     </label>
                 </div>
+
+
+
+
                 <div class="column">
                     <label>Jefe Inmediato
-                        <input class="input" id="jefeInmediato" required>
+                        <select class="select is-fullwidth input" id="jefeInmediato" required>
+                        ${optionsJefeInmediato}
+                        </select> 
                     </label>
                 </div>
+
             </div>
 
             <div class="columns is-vcentered">
@@ -196,7 +212,7 @@ async function addUser() { // async function to perform fetch chain
                                 jefeInmediato: jefeInmediato,
                                 puesto: puesto,
                                 estaActivo: estaActivo,
-                                rol: "Colaborador", // default role applied
+                                privilegio: "Por definir", // default priviliges applied
                             })
                         });
                         const dataUser = await responseUser.json();
@@ -251,7 +267,7 @@ async function addUser() { // async function to perform fetch chain
 };
 
 // disableUser button
-// TODO, grant that user "role: unauthorized" (maybe save the previous role somewhere else?)
+// TODO, grant that user "privilegio: unauthorized" (maybe save the previous privilegio somewhere else?)
 async function disableUser(button) { // async function to perform fetch chain
     hideSidebar(); // sidebar frontend
     Swal.fire({
@@ -328,6 +344,7 @@ async function disableUser(button) { // async function to perform fetch chain
 // TODO, password decryption only when editing
 // TODO, this variable not working properly, only loading the 1st one.
 // TODO, change field type to PASSWORD when edtining password (easier)
+// TODO, use userId instead
 async function viewAndEditUser(button) { // async function to perform fetch chain
     hideSidebar(); // sidebar frontend
 
@@ -443,7 +460,7 @@ async function viewAndEditUser(button) { // async function to perform fetch chai
             const puesto = $('#puesto').val();  // TODO puesto can only be sent if its not disabled
             const fileInput = document.getElementById('foto');
             const estaActivo = true;
-            const rol = "empty"; // TODO, since editing, this field must be read
+            const privilegio = "empty"; // TODO, since editing, this field must be read
 
             if (/[\{\}\:\$\=\'\*\[\]]/.test(nombre) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoP) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoM) ||
                 /[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password) || /[\{\}\:\$\=\'\*\[\]]/.test(area) ||
@@ -503,7 +520,7 @@ async function viewAndEditUser(button) { // async function to perform fetch chai
                                 jefeInmediato: jefeInmediato,
                                 puesto: puesto,
                                 estaActivo: estaActivo,
-                                rol: "empty"
+                                privilegio: "empty"
                             })
                         });
                         const dataUser = await responseUser.json();
@@ -594,7 +611,7 @@ function returnMainTable() {
 }
 
 // enableUser button
-// TODO, grant that user "role: unauthorized" (maybe save the previous role somewhere else?)
+// TODO, grant that user "privilegio: unauthorized" (maybe save the previous privilegio somewhere else?)
 async function enableUser(button) { // async function to perform fetch chain
     hideSidebar(); // sidebar frontend
     Swal.fire({
@@ -666,26 +683,28 @@ async function enableUser(button) { // async function to perform fetch chain
     })
 };
 
-// changeRol button
-// TODO, grant that user "role: unauthorized" (maybe save the previous role somewhere else?)
-async function changeRol(button) { // async function to perform fetch chain
+// changePrivilege button
+// TODO, grant that user "privilegio: unauthorized" (maybe save the previous privilegio somewhere else?)
+// TODO, deny "empty field" addUser() already does this with his Jefe Inmediato field
+async function changePrivilege(button) { // async function to perform fetch chain
     hideSidebar(); // sidebar frontend
     Swal.fire({
         html: `
             <div style="padding: 0.5rem; margin: 1rem 0.5rem">
-                <h2>Cambiar el rol del usuario</h2>
+                <h2>Cambiar el privilegio del usuario</h2>
+                <br><br>
                     <div class="field">
                         <div class="control">
-                            <select id="newRole" class="select is-fullwidth input">
-                            <option>Selecciona un rol</option>
+                            <select id="newPrivilege" class="select is-fullwidth input">
+                            <option class="placeholder" value="" hidden>Selecciona un privilegio</option>
                             <option>Colaborador</option>
                             <option>Recursos Humanos</option>
                             <option>Jefe Inmediato</option>
                             <option>Dirección</option>
+                            <option>Por definir</option>
                             </select> 
                         </div>
                     </div>
-                    
             </div>
         `,
         confirmButtonText: 'Confirmar',
@@ -701,18 +720,18 @@ async function changeRol(button) { // async function to perform fetch chain
 
         preConfirm: async () => {
             const userId = button.getAttribute('userId');
-            const newRole = $('#newRole').val();
+            const newPrivilege = $('#newPrivilege').val();
 
-            // Fetch #01 - Execute changeRol
+            // Fetch #01 - Execute changePrivilege
             try {
-                const response = await fetch('/usuarios/cambiar-rol', {
+                const response = await fetch('/usuarios/cambiar-privilegio', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         userId: userId,
-                        newRole: newRole,
+                        newPrivilege: newPrivilege,
                     })
                 });
                 const data = await response.json();
@@ -725,17 +744,17 @@ async function changeRol(button) { // async function to perform fetch chain
                         width: "500px",
                         text: 'Favor de contactar a Soporte Técnico. (Error #015)'
                     });
-                    return; // changeRol() failed execution
+                    return; // changePrivilege() failed execution
                 } else {
                     Swal.fire({
-                        title: 'Rol configurado',
+                        title: 'Privilegio configurado',
                         icon: 'success',
                         width: "500px",
-                        text: 'Se ha cambiado el rol del usuario correctamente.'
+                        text: 'Se ha cambiado el privilegio del usuario correctamente.'
                     }).then(() => {
                         location.reload(); // reload after popup
                     });
-                    return; // changeRol() successful execution
+                    return; // changePrivilege() successful execution
                 }
 
                 // Catch from Fetch #01
@@ -747,7 +766,7 @@ async function changeRol(button) { // async function to perform fetch chain
                     text: 'Favor de contactar a Soporte Técnico. (Error #016)'
                 });
                 console.error('Hubo un error:', error);
-                return; // changeRol() failed execution
+                return; // changePrivilege() failed execution
             }
         }
     })
