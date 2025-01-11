@@ -10,6 +10,7 @@
 async function logIn() {
         const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value.trim();
+        const remember = document.getElementById("remember").checked;
 
         // nosql injection protection
         if (/[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password)) {
@@ -26,7 +27,6 @@ async function logIn() {
                 title: 'Campos vacíos.',
                 icon: 'warning',
                 width: "500px",
-                height: "100px",
                 text: 'Todos los campos son requeridos.'
             });
             return;
@@ -41,6 +41,7 @@ async function logIn() {
             body: JSON.stringify({ 
                 email: email, 
                 password: password,
+                remember: remember,
             })
         });
         const data = await response.json();

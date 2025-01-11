@@ -115,7 +115,7 @@ exports.postUserChangePrivilege = async (req, res) => {
 /* --- VIEWS LOGIC --- */
 exports.getUsersView = async (req, res) => {
     try {
-        const usersRows = await usersModel.find({ estaActivo: true });
+        const usersRows = await usersModel.find({ estaActivo: true }).select('-email -foto -password');
         return res.render('usuarios/usuarios.ejs', { usersRows });
         
     } catch (error) {
@@ -126,7 +126,7 @@ exports.getUsersView = async (req, res) => {
 
 exports.getRestoreUsersView = async (req, res) => {
     try {
-        const usersRows = await usersModel.find({ estaActivo: false });
+        const usersRows = await usersModel.find({ estaActivo: true }).select('-email -foto -password');
         return res.render('usuarios/restaurar-usuarios.ejs', { usersRows });
     } catch (error) {
         console.error(error);

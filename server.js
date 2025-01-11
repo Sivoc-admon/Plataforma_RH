@@ -3,6 +3,7 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 /*-------------*/
 
@@ -12,8 +13,10 @@ app.use(express.json());
 /*-------------*/
 
 // TODO, implewmetn CRSF token as UUID silently 
-//global.asdasdToken = 100;
+global.csrfUUID = 100;
+app.use(cookieParser());
 // access only on backed, like this: console.log(global.asdasdToken);
+// all the source of truth for validation must happen backend (here)
 
 /* Middleware for parsing request bodies (used for login form or API request body) */
 app.use(bodyParser.json());
