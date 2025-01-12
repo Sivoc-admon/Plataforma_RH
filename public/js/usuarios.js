@@ -339,7 +339,8 @@ async function disableUser(button) { // async function to perform fetch chain
     })
 };
 
-// viewAndEditUser button (TODO, REQUIRES PFP VISIBILITY AND addUser FRONT END)
+// viewAndEditUser button
+// TODO, REQUIRES PFP VISIBILITY AND addUser FRONT END)
 // TODO, do not add a new user, rather set again with moongose
 // TODO, password decryption only when editing
 // TODO, this variable not working properly, only loading the 1st one.
@@ -457,10 +458,10 @@ async function viewAndEditUser(button) { // async function to perform fetch chai
             const fechaBaja = $('#fechaBaja').val();
             const fechaIngreso = $('#fechaIngreso').val();
             const jefeInmediato = $('#jefeInmediato').val();
-            const puesto = $('#puesto').val();  // TODO puesto can only be sent if its not disabled
+            const puesto = $('#puesto').val(); 
             const fileInput = document.getElementById('foto');
             const estaActivo = true;
-            const privilegio = "empty"; // TODO, since editing, this field must be read
+            const privilegio = "empty"; 
 
             if (/[\{\}\:\$\=\'\*\[\]]/.test(nombre) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoP) || /[\{\}\:\$\=\'\*\[\]]/.test(apellidoM) ||
                 /[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password) || /[\{\}\:\$\=\'\*\[\]]/.test(area) ||
@@ -475,8 +476,8 @@ async function viewAndEditUser(button) { // async function to perform fetch chai
             }
 
 
-            // TODO REMOVE WHITESPACES Before / After STRINGS
-            // TODO cannot add email being used
+            // TODO REMOVE WHITESPACES Before / After STRINGS .trim();
+            // TODO cannot add email being used 
 
             const formData = new FormData();
             formData.append('file', fileInput.files[0]); // Postman "Key" = "file"

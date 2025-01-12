@@ -28,7 +28,7 @@ exports.postAuthentication = async (req, res) => {
             res.cookie('__psmxoflxpspgolxps_mid', isGenerated.accessToken, { httpOnly: true, secure: true, sameSite: 'Strict' });        
         }
 
-        return res.status(200).json({ success: true, authorized: true, redirectUrl: "/usuarios", accessToken: isGenerated.accessToken});
+        return res.status(200).json({ success: true, authorized: true, redirectUrl: "/login/inicio", accessToken: isGenerated.accessToken});
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "" });
@@ -43,9 +43,9 @@ async function genTokenOnValidAuthentication (user, jwtSent, remember) {
             if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError' || error.name === 'NotBeforeError') {
                 let timeExpiration = process.env.SESSION_LIFETIME;
                 if (remember) { 
-                    timeExpiration = "1m"; // TODO 
+                    timeExpiration = "10m"; // TODO 
                 } else { 
-                    timeExpiration = "25";
+                    timeExpiration = "10m";
                 };
 
                 const newAccessToken = jwt.sign(
@@ -67,6 +67,16 @@ async function genTokenOnValidAuthentication (user, jwtSent, remember) {
 exports.getLoginView = (req, res) => {
     try {
         return res.render('login/login.ejs');
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
+    }
+};
+
+// Renderizar página de inicio
+exports.getInicioView = (req, res) => {
+    try {
+        return res.render('login/inicio.ejs');
     } catch (error) {
         console.error(error);
         return res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');

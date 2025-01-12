@@ -4,8 +4,6 @@ const filesModel = require("../models/files.model");
 const bcrypt = require("bcryptjs");
 
 
-// TODO, rbac implementation to this module
-
 /* --- MODEL LOGIC --- */
 
 exports.postEmailExists = async (req, res) => {
@@ -126,7 +124,7 @@ exports.getUsersView = async (req, res) => {
 
 exports.getRestoreUsersView = async (req, res) => {
     try {
-        const usersRows = await usersModel.find({ estaActivo: true }).select('-email -foto -password');
+        const usersRows = await usersModel.find({ estaActivo: false }).select('-email -foto -password');
         return res.render('usuarios/restaurar-usuarios.ejs', { usersRows });
     } catch (error) {
         console.error(error);
