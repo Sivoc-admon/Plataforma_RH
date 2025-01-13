@@ -30,28 +30,19 @@
 </head>
 
 <body id="content" class="content">
-    <nav class="navbar" style=" background: linear-gradient(135deg, var(--dark-green), var(--light-blue));
- padding: 0.5rem; height: 20px;">
-
-        <div id="navbarMenu" class="navbar-menu">
-            <div class="navbar-menu">
-                <div class="navbar-item" style="padding-left: 0;">
-                    <i class="fa-solid fa-bars icon-css" style="color: var(--white); cursor: pointer;"
-                    onclick="toggleSidebar()"></i>
-                </div>
-            </div>
-        </div>
-
-
-        <div id="navbarMenu" class="navbar-menu">
-            <div class="navbar-end">
-                <div class="navbar-item">
-                    <i class="fa-solid fa-circle-user has-text-white icon-css"></i>
-                    <i class="is-size-5 has-text-white">Nombre</i> <!-- TODO (locked because needs token verification to achieve this)-->
-                </div>
-            </div>
+    <nav class="navbar" style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue)); 
+    padding: 0.5rem; height: 45px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    
+        <!-- Sidebar toggle icon -->
+        <i class="fa-solid fa-bars icon-css" style="color: var(--white); cursor: pointer; margin: 0rem 1rem;" onclick="toggleSidebar()"></i>
+    
+        <!-- User information -->
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <i class="fa-solid fa-circle-user has-text-white icon-css" style="margin: 0rem 0.3rem;"></i>
+            <i class="is-size-5 has-text-white" style="margin: 0rem 1rem;">NombreNombreNombreNombreNombreNombre</i>
         </div>
     </nav>
+    
 
     <!-- Sidebar -->
     <div id="sidebar" class="sidebar">

@@ -105,3 +105,16 @@ h1 {
     width: 24px;
     height: 24px;
 }
+
+
+/* Estilos 404 */
+.fourOfour {
+    background: var(--black);   
+    color: var(--white);
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0rem 1rem;
+    position: relative;
+}

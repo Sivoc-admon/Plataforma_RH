@@ -26,10 +26,10 @@ app.set("view engine", "ejs");
 
 /* Database connection */
 const connectDatabase = require("./utils/database");
-connectDatabase(); // Call the function to connect to the database
+connectDatabase();
 /*-------------*/
 
-/* Crafted middlewares */
+/* Crafted middlewares (CRITICAL, must be right before routes) */
 app.use(authorize);
 /*-------------*/
 
@@ -41,7 +41,6 @@ const vacacionesRoutes = require("./routes/vacaciones.routes");
 const cursosRoutes = require("./routes/cursos.routes");
 /*------------*/
 
-
 /* URLs */
 app.use("/login", loginRoutes);
 app.use("/usuarios", usuariosRoutes);
@@ -50,13 +49,23 @@ app.use("/vacaciones", vacacionesRoutes);
 app.use("/cursos", cursosRoutes);
 /*------------*/
 
-/* Ruta por defecto "/" previa a la ruta 404*/
+/* Route "/" */
 app.get("/", (req, res) => {
   res.redirect("/login");
 });
+/* Route 404 */
 app.use((req, res) => {
-  res.status(404).send("404 - Not Found");
+  res.status(404).render("404.ejs");  // Catch 404 before middlewares
 });
+/*-------------*/
+
+/* Client-side temporal token storage */
+global.activeUsers = new Set();
+// console.log(stringArray.includes("id2")); // Output: true
+// stringArray.push("id4");
+//global.activeUsers.delete(user._id.toString());
+
+// lets conduct the dual test, two users, one working and then i change the rol
 /*-------------*/
 
 /* Start server */

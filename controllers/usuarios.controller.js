@@ -17,7 +17,7 @@ exports.postEmailExists = async (req, res) => {
         console.error(error);
         return res.status(500).json({ success: false, exists: false });
     }
-}
+};
 
 exports.postAddUser = async (req, res) => {
     try {
@@ -56,6 +56,7 @@ exports.postUserDeactivation = async (req, res) => {
             return res.status(404).json({success: false, message: "" });
         }
 
+        activeUsers.delete(userId); // log him out 
         return res.status(200).json({success: true, message: ""});
     } catch (error) {
         console.error(error);
@@ -98,11 +99,13 @@ exports.postUserChangePrivilege = async (req, res) => {
             { new: true } 
         );
 
-        // If for some reason user not found, send 404
+        // if for some reason user not found, send 404
         if (!response) {
             return res.status(404).json({success: false, message: "" });
         }
 
+        // send correct execution
+        activeUsers.delete(userId); // log him out 
         return res.status(200).json({success: true, message: ""});
     } catch (error) {
         console.error(error);
@@ -130,4 +133,6 @@ exports.getRestoreUsersView = async (req, res) => {
         console.error(error);
         return res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
-}
+};
+
+

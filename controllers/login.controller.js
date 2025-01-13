@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 /* --- MODEL LOGIC --- */
 
 // POST Endpoint para '/POSTAUTH'
+// TODO, deny estaActivo: false users on login!!
 exports.postAuthentication = async (req, res) => {
     try {
 
@@ -20,15 +21,16 @@ exports.postAuthentication = async (req, res) => {
             return res.status(401).json({ success: true, authorized: false, message: "La contraseña ingresada es incorrecta." });
         }
 
-        // set cookie back here
+        // set cookie back here, dont let this token out of here
         const isGenerated = await genTokenOnValidAuthentication(user, req.cookies.__psmxoflxpspgolxps_mid, req.body.remember);
         if (!isGenerated.success) {
             return res.status(500).json({ success: false, message: "" });
         } else if (isGenerated.accessToken !== ""){
-            res.cookie('__psmxoflxpspgolxps_mid', isGenerated.accessToken, { httpOnly: true, secure: true, sameSite: 'Strict' });        
+            res.cookie('__psmxoflxpspgolxps_mid', isGenerated.accessToken, { httpOnly: true, secure: true, sameSite: 'Strict' });  
         }
-
-        return res.status(200).json({ success: true, authorized: true, redirectUrl: "/login/inicio", accessToken: isGenerated.accessToken});
+        global.activeUsers.add(user._id.toString()); // user set to ensure unique ids
+        return res.status(200).json({ success: true, authorized: true, redirectUrl: "/login/inicio"});
+        
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "" });
@@ -41,15 +43,12 @@ async function genTokenOnValidAuthentication (user, jwtSent, remember) {
             return { success: true, accessToken: "" };
         } catch (error) {
             if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError' || error.name === 'NotBeforeError') {
-                let timeExpiration = process.env.SESSION_LIFETIME;
+                let timeExpiration = "33h";
                 if (remember) { 
-                    timeExpiration = "10m"; // TODO 
-                } else { 
-                    timeExpiration = "10m";
+                    timeExpiration = process.env.SESSION_LIFETIME;
                 };
-
                 const newAccessToken = jwt.sign(
-                    { foto: user.foto, name: user.name, email: user.email,  privilegio: user.privilegio },
+                    { foto: user.foto, name: user.name, userId: user._id.toString(), email: user.email,  privilegio: user.privilegio },
                     process.env.ACCESS_TOKEN_SECRET,
                     { expiresIn: timeExpiration } 
                 );

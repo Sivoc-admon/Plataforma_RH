@@ -1,5 +1,7 @@
 /* ---- script from usuarios.ejs ---- */
 
+// TODO ON ANY USER EDITION, REMOVE THE ENTRY OF THAT USER ON myMap.
+
 // addUser button
 async function addUser() { // async function to perform fetch chain
     hideSidebar(); // sidebar frontend
@@ -321,6 +323,7 @@ async function disableUser(button) { // async function to perform fetch chain
                     }).then(() => {
                         location.reload(); // reload after popup
                     });
+                    activeUsers.delete(userId);
                     return; // disableUser() successful execution
                 }
 
@@ -346,6 +349,7 @@ async function disableUser(button) { // async function to perform fetch chain
 // TODO, this variable not working properly, only loading the 1st one.
 // TODO, change field type to PASSWORD when edtining password (easier)
 // TODO, use userId instead
+// TODO, add activeUsers.delete(userId); // log him out inside the controller function
 async function viewAndEditUser(button) { // async function to perform fetch chain
     hideSidebar(); // sidebar frontend
 
@@ -531,7 +535,8 @@ async function viewAndEditUser(button) { // async function to perform fetch chai
                                 icon: 'success',
                                 width: "500px",
                                 text: 'Se añadió el usuario correctamente.'
-                            })
+                            });
+                            activeUsers.delete(userId);
                             return; // addUser() successful execution
 
                             // Catch from Controller "/usuarios/anadir-usuario"
@@ -588,10 +593,10 @@ async function disabledUsersTable() {
                 width: "500px",
                 text: 'Favor de contactar a Soporte Técnico. (Error #012)'
             });
-            return; // disableUser() failed execution
+            return; // disabledUsersTable() failed execution
         } else {
             window.location.href = '/usuarios/restaurar-usuarios';
-            return; // disableUser() successful execution
+            return; // disabledUsersTable() successful execution
         }
 
     // Catch from Fetch #01
@@ -603,7 +608,7 @@ async function disabledUsersTable() {
             text: 'Favor de contactar a Soporte Técnico. (Error #011)'
         });
         console.error('Hubo un error:', error);
-        return; // disableUser() failed execution
+        return; // disabledUsersTable() failed execution
     }
 };
 
