@@ -49,23 +49,23 @@ app.use("/vacaciones", vacacionesRoutes);
 app.use("/cursos", cursosRoutes);
 /*------------*/
 
-/* Route "/" */
+/* Global routes */
 app.get("/", (req, res) => {
   res.redirect("/login");
 });
-/* Route 404 */
+
+app.get("/logout", (req, res) => {
+  res.clearCookie('__psmxoflxpspgolxps_mid');
+  res.redirect("/login");
+});
+
 app.use((req, res) => {
   res.status(404).render("404.ejs");  // Catch 404 before middlewares
 });
 /*-------------*/
 
-/* Client-side temporal token storage */
+/* Client-side active sessions tracker */
 global.activeUsers = new Set();
-// console.log(stringArray.includes("id2")); // Output: true
-// stringArray.push("id4");
-//global.activeUsers.delete(user._id.toString());
-
-// lets conduct the dual test, two users, one working and then i change the rol
 /*-------------*/
 
 /* Start server */
