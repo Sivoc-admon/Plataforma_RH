@@ -1,7 +1,5 @@
 /* ---- script from usuarios.ejs ---- */
 
-// TODO ON ANY USER EDITION, REMOVE THE ENTRY OF THAT USER ON myMap.
-
 // addUser button
 async function addUser() { // async function to perform fetch chain
     hideSidebar(); // sidebar frontend
@@ -13,6 +11,15 @@ async function addUser() { // async function to perform fetch chain
             optionsJefeInmediato += `<option value="${user._id}">${user.nombre} ${user.apellidoP} ${user.apellidoM}</option>`;
         }
     }
+
+    // map out relationships to generate "dynamic" html
+    const areaToPuestos = {
+        "ADMINISTRACIÓN": ["Director General", "Coordinador de Finanzas", "Gestor Tesorería", "Coordinador de Recursos Humanos", "Gestor Recursos Humanos", "Analista Recursos Humanos"],
+        "VENTAS": ["Coordinador Comercial", "Gestor ventas", "Analista Ventas"],
+        "CALIDAD": ["Coordinador de  Calidad", "Gestor Calidad", "Analista Calidad"],
+        "OPERATIVO": ["Coordinador Operacional", "Gestor Ingeniería", "Analista Ingeniería", "Gestor Compras", "Analista Compras", "Gestor de Manufactura", "Analista de Manufactura", "Analista de Almacén"],
+        "PRUEBAS": ["Gestor de Pruebas", "Ingeniero de servicio A", "Ingeniero de servicio B", "Ingeniero de servicio C"]
+    };
             
     Swal.fire({
         html: `
@@ -59,17 +66,20 @@ async function addUser() { // async function to perform fetch chain
             <div class="columns is-vcentered">
                 <div class="column">
                     <label>Área
-                        <input class="input" id="area" required>
+                        <select id="area" class="select is-fullwidth input">
+                        <option class="placeholder" value="" hidden>Selecciona un área</option>
+                        ${Object.keys(areaToPuestos).map(area => `<option value="${area}">${area}</option>`).join('')}
+                        </select> 
                     </label>
                 </div>
+
                 <div class="column">
                     <label>Puesto
-                        <input class="input" id="puesto" required>
+                        <select id="puesto" class="select is-fullwidth input">
+                        <option class="placeholder" value="" hidden>(Selecciona un área primero)</option>
+                        </select> 
                     </label>
                 </div>
-
-
-
 
                 <div class="column">
                     <label>Jefe Inmediato
@@ -105,6 +115,21 @@ async function addUser() { // async function to perform fetch chain
             confirmButton: 'default-button-css',
             cancelButton: 'default-button-css',
         },
+        didOpen: () => {
+            const areaSelect = document.getElementById("area");
+            const puestoSelect = document.getElementById("puesto");
+            areaSelect.addEventListener("change", () => {
+                const selectedArea = areaSelect.value; 
+                const puestos = areaToPuestos[selectedArea] || []; 
+                puestoSelect.innerHTML = '<option class="placeholder" value="" hidden>Selecciona un puesto</option>';
+                puestos.forEach(puesto => {
+                    const option = document.createElement("option");
+                    option.value = puesto;
+                    option.textContent = puesto;
+                    puestoSelect.appendChild(option);
+                });
+            });
+        },
         preConfirm: async () => { // allows to perform fetch chain
             const nombre = $('#nombre').val().trim();
             const apellidoP = $('#apellidoP').val().trim();
@@ -130,7 +155,6 @@ async function addUser() { // async function to perform fetch chain
                 Swal.showValidationMessage('Todos los campos son requeridos.');
                 return;
             }
-
 
             // Preconfirm Fetch #01 - verify email collision
             try {
@@ -159,7 +183,7 @@ async function addUser() { // async function to perform fetch chain
                     return; // addUser() failed execution
                 }
 
-                // Catch from Preconfirm Fetch #01
+            // Catch from Preconfirm Fetch #01
             } catch (error) {
                 Swal.fire({
                     title: 'Algo salió mal :(',
@@ -170,7 +194,6 @@ async function addUser() { // async function to perform fetch chain
                 console.error('Hubo un error:', error);
                 return; // addUser() failed execution 
             }
-
 
             const formData = new FormData();
             formData.append('file', fileInput.files[0]); // Postman "Key" = "file"

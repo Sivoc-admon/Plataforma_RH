@@ -9,6 +9,7 @@
     <!-- Global Scripts JS Libraries -->
     <script src="/js/scripts/swalFire.js" defer></script>
     <script src="/js/scripts/pagination.js" defer></script>
+    <script src="/js/scripts/sidebar.js" defer></script>
 
     <!-- External CSS Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -38,8 +39,8 @@
     
         <!-- User information -->
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <i class="fa-solid fa-circle-user has-text-white icon-css" style="margin: 0rem 0.3rem;"></i>
-            <i class="is-size-5 has-text-white" style="margin: 0rem 1rem;">NombreNombreNombreNombreNombreNombre</i>
+            <i class="fa-solid fa-circle-user has-text-white icon-css" style="margin: 0rem;"></i>
+            <i class="is-size-5 has-text-white" style="margin: 0rem 1.5rem;"><%= userName %></i>
         </div>
     </nav>
     
@@ -76,38 +77,5 @@
             </ul>
         </aside>
     </div>
-    
-    <script>
-        const sidebar = document.getElementById('sidebar');
-        const content = document.getElementById('content');
-        function toggleSidebar() {
-            if (!sidebar.classList.contains('active')){
-                sidebar.classList.toggle('active');
-            }
-            content.classList.toggle('shifted');
-        }
-        function hideSidebar() {
-            if (!content.classList.contains('shifted')){
-                sidebar.classList.remove('active');
-            }
-        }
-
-        document.querySelectorAll('.menu-list a').forEach(item => {
-            item.addEventListener('click', () => {
-                document.querySelectorAll('.menu-list a').forEach(link => link.classList.remove('active'));
-                item.classList.add('active');
-            });
-        });
-
-        function signOut() {
-            fetch('/logout', { method: 'POST', credentials: 'include' })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.href = "/";  // Redirect to homepage
-                    }
-                }).catch(error => console.error("Error:", error));
-        }
-    </script>
 </body>
-
 </html>

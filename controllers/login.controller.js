@@ -48,7 +48,7 @@ async function genTokenOnValidAuthentication (user, jwtSent, remember) {
                     timeExpiration = process.env.SESSION_LIFETIME;
                 };
                 const newAccessToken = jwt.sign(
-                    { foto: user.foto, name: user.name, userId: user._id.toString(), email: user.email,  privilegio: user.privilegio },
+                    { foto: user.foto, name: user.nombre, userId: user._id.toString(), email: user.email,  privilegio: user.privilegio },
                     process.env.ACCESS_TOKEN_SECRET,
                     { expiresIn: timeExpiration } 
                 );
