@@ -1,217 +1,217 @@
 {
     "administrador": {
         "usuarios": {
-            "accessUserModule": "allow",
-            "addUser": "allow",
-            "restoreUser": "allow",
-            "downloadPDF": "allow",
-            "downloadExcel":  "allow",
-            "userTableActions": "allow"
+            "accessUsersModule": true,
+            "addUser": true,
+            "restoreUser": true,
+            "downloadPDF": true,
+            "downloadExcel":  true,
+            "userTableActions": true
         },
         "permisos": {
-            "viewPermitsAll" : "allow",
-            "downloadPDF": "allow",
-            "downloadExcel":  "allow",
-            "viewPermitsTeam" : "allow",
-            "createPermitRequest": "allow",
-            "authorizePermitRequest": "allow",
-            "viewPermitsSelf": "allow"
+            "viewPermitsAll" : true,
+            "downloadPDF": true,
+            "downloadExcel":  true,
+            "viewPermitsTeam" : true,
+            "createPermitRequest": true,
+            "authorizePermitRequest": true,
+            "viewPermitsSelf": true
         },
         "vacaciones" : {
-            "downloadPDF": "allow",
-            "downloadExcel":  "allow",
-            "createVacationRequest": "allow",
-            "authorizeVacationRequest": "allow",
-            "viewVacationsTable": "allow",
-            "viewVacationsSelf": "allow"
+            "downloadPDF": true,
+            "downloadExcel":  true,
+            "createVacationRequest": true,
+            "authorizeVacationRequest": true,
+            "viewVacationsTable": true,
+            "viewVacationsSelf": true
         },
         "cursos": {
-            "downloadPDF": "allow",
-            "downloadExcel":  "allow",
-            "createCourseRequest": "allow",
-            "authorizeCourseRequest": "allow",
-            "viewCoursesTable": "allow",
-            "viewCoursesSelf": "allow"
+            "downloadPDF": true,
+            "downloadExcel":  true,
+            "createCourseRequest": true,
+            "authorizeCourseRequest": true,
+            "viewCoursesTable": true,
+            "viewCoursesSelf": true
         }
     },
 
     "direccion": {
         "usuarios": {
-            "accessUserModule": "deny",
-            "addUser": "deny",
-            "restoreUser": "deny",
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "userTableActions": "deny"
+            "accessUsersModule": false,
+            "addUser": false,
+            "restoreUser": false,
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "userTableActions": false
         },
         "permisos": {
-            "viewPermitsAll" : "deny",
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "viewPermitsTeam" : "deny",
-            "createPermitRequest": "deny",
-            "authorizePermitRequest": "deny",
-            "viewPermitsSelf": "deny"
+            "viewPermitsAll" : false,
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "viewPermitsTeam" : false,
+            "createPermitRequest": false,
+            "authorizePermitRequest": false,
+            "viewPermitsSelf": false
         },
         "vacaciones" : {
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "createVacationRequest": "deny",
-            "authorizeVacationRequest": "deny",
-            "viewVacationsTable": "deny",
-            "viewVacationsSelf": "deny"
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "createVacationRequest": false,
+            "authorizeVacationRequest": false,
+            "viewVacationsTable": false,
+            "viewVacationsSelf": false
         },
         "cursos": {
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "createCourseRequest": "deny",
-            "authorizeCourseRequest": "allow",
-            "viewCoursesTable": "deny",
-            "viewCoursesSelf": "deny"
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "createCourseRequest": false,
+            "authorizeCourseRequest": true,
+            "viewCoursesTable": false,
+            "viewCoursesSelf": false
         }
     },
 
     "jefeInmediato": {
         "usuarios": {
-            "accessUserModule": "deny",
-            "addUser": "deny",
-            "restoreUser": "deny",
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "userTableActions": "deny"
+            "accessUsersModule": false,
+            "addUser": false,
+            "restoreUser": false,
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "userTableActions": false
         },
         "permisos": {
-            "viewPermitsAll" : "deny",
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "viewPermitsTeam" : "allow",
-            "createPermitRequest": "deny",
-            "authorizePermitRequest": "allow",
-            "viewPermitsSelf": "deny"
+            "viewPermitsAll" : false,
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "viewPermitsTeam" : true,
+            "createPermitRequest": false,
+            "authorizePermitRequest": true,
+            "viewPermitsSelf": false
         },
         "vacaciones" : {
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "createVacationRequest": "deny",
-            "authorizeVacationRequest": "allow",
-            "viewVacationsTable": "deny",
-            "viewVacationsSelf": "deny"
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "createVacationRequest": false,
+            "authorizeVacationRequest": true,
+            "viewVacationsTable": false,
+            "viewVacationsSelf": false
         },
         "cursos": {
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "createCourseRequest": "deny",
-            "authorizeCourseRequest": "allow",
-            "viewCoursesTable": "deny",
-            "viewCoursesSelf": "deny"
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "createCourseRequest": false,
+            "authorizeCourseRequest": true,
+            "viewCoursesTable": false,
+            "viewCoursesSelf": false
         }
     },
 
     "rHumanos": {
         "usuarios": {
-            "accessUserModule": "allow",
-            "addUser": "allow",
-            "restoreUser": "allow",
-            "downloadPDF": "allow",
-            "downloadExcel":  "allow",
-            "userTableActions": "allow"
+            "accessUsersModule": true,
+            "addUser": true,
+            "restoreUser": true,
+            "downloadPDF": true,
+            "downloadExcel":  true,
+            "userTableActions": true
         },
         "permisos": {
-            "viewPermitsAll" : "allow",
-            "downloadPDF": "allow",
-            "downloadExcel":  "allow",
-            "viewPermitsTeam" : "deny",
-            "createPermitRequest": "deny",
-            "authorizePermitRequest": "deny",
-            "viewPermitsSelf": "deny"
+            "viewPermitsAll" : true,
+            "downloadPDF": true,
+            "downloadExcel":  true,
+            "viewPermitsTeam" : false,
+            "createPermitRequest": false,
+            "authorizePermitRequest": false,
+            "viewPermitsSelf": false
         },
         "vacaciones" : {
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "createVacationRequest": "deny",
-            "authorizeVacationRequest": "deny",
-            "viewVacationsTable": "allow",
-            "viewVacationsSelf": "deny"
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "createVacationRequest": false,
+            "authorizeVacationRequest": false,
+            "viewVacationsTable": true,
+            "viewVacationsSelf": false
         },
         "cursos": {
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "createCourseRequest": "deny",
-            "authorizeCourseRequest": "deny",
-            "viewCoursesTable": "allow",
-            "viewCoursesSelf": "deny"
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "createCourseRequest": false,
+            "authorizeCourseRequest": false,
+            "viewCoursesTable": true,
+            "viewCoursesSelf": false
         }
     },
 
     "colaborador": {
         "usuarios": {
-            "accessUserModule": "deny",
-            "addUser": "deny",
-            "restoreUser": "deny",
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "userTableActions": "deny"
+            "accessUsersModule": false,
+            "addUser": false,
+            "restoreUser": false,
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "userTableActions": false
         },
         "permisos": {
-            "viewPermitsAll" : "deny",
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "viewPermitsTeam" : "deny",
-            "createPermitRequest": "allow",
-            "authorizePermitRequest": "deny",
-            "viewPermitsSelf": "deny"
+            "viewPermitsAll" : false,
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "viewPermitsTeam" : false,
+            "createPermitRequest": true,
+            "authorizePermitRequest": false,
+            "viewPermitsSelf": false
         },
         "vacaciones" : {
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "createVacationRequest": "allow",
-            "authorizeVacationRequest": "deny",
-            "viewVacationsTable": "deny",
-            "viewVacationsSelf": "deny"
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "createVacationRequest": true,
+            "authorizeVacationRequest": false,
+            "viewVacationsTable": false,
+            "viewVacationsSelf": false
         },
         "cursos": {
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "createCourseRequest": "allow",
-            "authorizeCourseRequest": "deny",
-            "viewCoursesTable": "deny",
-            "viewCoursesSelf": "deny"
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "createCourseRequest": true,
+            "authorizeCourseRequest": false,
+            "viewCoursesTable": false,
+            "viewCoursesSelf": false
         }
     },
 
     "unauthorized": {
         "usuarios": {
-            "accessUserModule": "deny",
-            "addUser": "deny",
-            "restoreUser": "deny",
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "userTableActions": "deny"
+            "accessUsersModule": false,
+            "addUser": false,
+            "restoreUser": false,
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "userTableActions": false
         },
         "permisos": {
-            "viewPermitsAll" : "deny",
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "viewPermitsTeam" : "deny",
-            "createPermitRequest": "deny",
-            "authorizePermitRequest": "deny",
-            "viewPermitsSelf": "deny"
+            "viewPermitsAll" : false,
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "viewPermitsTeam" : false,
+            "createPermitRequest": false,
+            "authorizePermitRequest": false,
+            "viewPermitsSelf": false
         },
         "vacaciones" : {
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "createVacationRequest": "deny",
-            "authorizeVacationRequest": "deny",
-            "viewVacationsTable": "deny",
-            "viewVacationsSelf": "deny"
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "createVacationRequest": false,
+            "authorizeVacationRequest": false,
+            "viewVacationsTable": false,
+            "viewVacationsSelf": false
         },
         "cursos": {
-            "downloadPDF": "deny",
-            "downloadExcel":  "deny",
-            "createCourseRequest": "deny",
-            "authorizeCourseRequest": "deny",
-            "viewCoursesTable": "deny",
-            "viewCoursesSelf": "deny"
+            "downloadPDF": false,
+            "downloadExcel":  false,
+            "createCourseRequest": false,
+            "authorizeCourseRequest": false,
+            "viewCoursesTable": false,
+            "viewCoursesSelf": false
         }
     }
 }

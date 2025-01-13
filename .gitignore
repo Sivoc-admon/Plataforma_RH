@@ -6,6 +6,8 @@ npm-debug.log
 # Logs
 logs/
 *.log
+usuarios.xlsx
+usuarios.pdf
 
 # IDEs and Editors
 .idea/

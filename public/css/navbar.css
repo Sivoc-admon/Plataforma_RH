@@ -60,6 +60,7 @@ h1 {
     /* Center icon vertically */
     margin-right: 1rem;
     margin-left: 0.5rem;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 
 .sidebar.active {
@@ -86,6 +87,7 @@ h1 {
     display: flex;
     align-items: center;
     justify-items: center;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 1);
 }
 
 .menu-list a:hover {
@@ -104,6 +106,14 @@ h1 {
 .icon-text svg {
     width: 24px;
     height: 24px;
+}
+
+.pfp-css {
+    width: 2rem;
+    height: 2rem;
+    margin-right: 0rem 1rem;
+    border-radius: 100%;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
 }
 
 

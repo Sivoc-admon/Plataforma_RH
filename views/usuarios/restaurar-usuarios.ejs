@@ -1,14 +1,13 @@
 <%- include('../navbar.ejs') %>
     <link rel="stylesheet" href="/css/usuarios.css">
-    <script src="/js/usuarios.js" defer></script>
+    <script src="/js/restaurar-usuarios.js" defer></script>
 
     <div class="inside-content-css">
-
         <h1> Módulo Usuarios </h1>
 
         <div class="columns" style="margin-top: 1rem;">
 
-            <!-- restoreUser button : restoreUser TODO --->
+            <!-- restoreUser button : restoreUser --->
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="returnMainTable()">
                     <i class="fa-solid fa-circle-left default-icon-button-css"></i>
@@ -31,11 +30,12 @@
                     <th class="has-text-centered">Apellido Paterno</th>
                     <th class="has-text-centered">Apellido Materno</th>
                     <th class="has-text-centered">Área</th>
+                    <th class="has-text-centered">Puesto</th>
                     <th class="has-text-centered">Privilegio</th>
                     <th class="has-text-centered">Acciones</th>
                 </tr>
             </thead>
-            <tbody id="tableBody"> <!-- TODO Cap Display info at 50chars idk --->
+            <tbody id="tableBody">
                 <% usersRows.forEach(user=> { %>
                     <tr>
                         <td class="is-centered">
@@ -49,6 +49,9 @@
                         </td>
                         <td class="is-centered">
                             <%= user.area %>
+                        </td>
+                        <td class="is-centered">
+                            <%= user.puesto %>
                         </td>
                         <td class="is-centered">
                             <%= user.privilegio %>

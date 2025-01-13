@@ -8,14 +8,7 @@ const { authorize } = require('./utils/jwt');
 require('dotenv').config();
 /*-------------*/
 
-// Después de declarar las dependencias y antes de las rutas
-app.use((req, res, next) => {
-  // Si 'userName' está disponible en 'res.locals', lo pasamos a todas las vistas
-  res.locals.userName = res.locals.userName || 'Usuario';
-  next();
-});
-
-/* Goblar middlewares */
+/* Global middlewares */
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());

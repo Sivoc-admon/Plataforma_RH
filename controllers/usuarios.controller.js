@@ -2,6 +2,9 @@
 const usersModel = require("../models/usuarios.model");
 const filesModel = require("../models/files.model");
 const bcrypt = require("bcryptjs");
+const { Parser } = require('json2csv');
+const PDFDocument = require('pdfkit'); // Asegúrate de tener instalada esta biblioteca
+const fs = require('fs');
 
 
 /* --- MODEL LOGIC --- */
@@ -135,4 +138,97 @@ exports.getRestoreUsersView = async (req, res) => {
     }
 };
 
+// Output CSV file path
+// TODO, IF NOT AUTHETNICVTIATED IT DOWNLOADS THE LOGIN.EJS
+// TODO, remake
+exports.postDownloadExcelUsers = async (req, res) => {
+    const outputFilePath = './usuarios.xlsx'; 
 
+    try {
+        const usersRows = await usersModel.find().select('-__v -email -foto -password').lean();
+        
+        if (usersRows.length === 0) {
+            return res.status(404).json({ success: false, message: 'No users found to export.' });
+        }
+
+        // Generate CSV from data
+        const json2csvParser = new Parser();
+        const csv = json2csvParser.parse(usersRows);
+
+        // Write the file to disk
+        fs.writeFileSync(outputFilePath, csv);
+
+        // Send the file to the client
+        return res.download(outputFilePath, 'usuarios.xlsx', (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ success: false, message: 'Error sending file.' });
+            }
+        });
+
+    } catch (error) {
+        console.error('Error exporting users to CSV:', error);
+        return res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+};
+
+
+// Output CSV file path
+// TODO, IF NOT AUTHETNICVTIATED IT DOWNLOADS THE LOGIN.EJS
+// TODO, remake
+exports.postDownloadPDFUsers = async (req, res) => {
+    try {
+        const usersRows = await usersModel.find().select('-__v -email -foto -password').lean();
+
+        if (usersRows.length === 0) {
+            return res.status(404).json({ success: false, message: 'No users found to export.' });
+        }
+
+        // Crear un nuevo documento PDF
+        const doc = new PDFDocument();
+        const outputFilePath = './usuarios.pdf';
+
+        // Escribir el archivo PDF en el sistema de archivos
+        const stream = fs.createWriteStream(outputFilePath);
+        doc.pipe(stream);
+
+        // Añadir título
+        doc.fontSize(20).text('Lista de Usuarios', { align: 'center' });
+        doc.moveDown();
+
+        // Añadir encabezados de la tabla
+        const headers = ['Nombre', 'Apellido Paterno', 'Apellido Materno', 'Fecha de Ingreso', 'Área', 'Puesto', 'Activo'];
+        doc.fontSize(12).text(headers.join(' | '), { align: 'left' });
+        doc.moveDown();
+
+        // Añadir filas de usuarios
+        usersRows.forEach(user => {
+            const row = [
+                user.nombre,
+                user.apellidoP,
+                user.apellidoM,
+                new Date(user.fechaIngreso).toLocaleDateString(),
+                user.area,
+                user.puesto,
+                user.estaActivo ? 'Sí' : 'No'
+            ];
+            doc.text(row.join(' | '), { align: 'left' });
+        });
+
+        // Finalizar el documento y esperar a que se cierre el stream
+        doc.end();
+
+        stream.on('finish', () => {
+            return res.download(outputFilePath, 'usuarios.pdf', err => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({ success: false, message: 'Error sending file.' });
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        return res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+};

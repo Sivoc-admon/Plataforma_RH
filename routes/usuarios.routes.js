@@ -20,7 +20,14 @@ const storage = multer.diskStorage({
 const upload = multer({ storage }); // Compacted into 'upload'
 
 // Routes
-router.get("/", controller.getUsersView);
+router.get("/accessUsersModule", controller.getUsersView);
+
+// after IAM implementation
+router.post("/downloadExcelUsers", controller.postDownloadExcelUsers);
+router.post("/downloadPDFUsers", controller.postDownloadPDFUsers);
+
+
+// TODO need to remake for IAM
 router.get("/restaurar-usuarios", controller.getRestoreUsersView);
 router.post("/anadir-usuario", controller.postAddUser); 
 router.post("/subir-archivo", upload.single('file'), controller.postFileUpload);

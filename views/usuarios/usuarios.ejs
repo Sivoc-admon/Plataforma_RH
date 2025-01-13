@@ -37,7 +37,7 @@
                 </button>
             </div>
 
-            <!-- downloadExcel button : downloadExcel TODO --->
+            <!-- downloadExcel button : downloadExcel --->
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="downloadExcel()">
                     <i class="fa-solid fa-download default-icon-button-css"></i>
@@ -64,7 +64,7 @@
                     <th class="has-text-centered">Acciones</th>
                 </tr>
             </thead>
-            <tbody id="tableBody"> <!-- TODO Cap Display info at 50chars idk --->
+            <tbody id="tableBody"> 
                 <% usersRows.forEach(user=> { %>
                     <tr>
                         <td class="is-centered">
@@ -102,7 +102,8 @@
                                     foto = "<%= user.foto %>"
                                     puesto = "<%= user.puesto %>"
                                     jefeInmediato = "<%= user.jefeInmediato %>"
-                                    onclick="viewAndEditUser(this)">
+                                    >
+                                    <!-- onclick="viewAndEditUser(this)" -->
                                         <i class="fa-solid fa-user-pen"></i>
                                     </button>
                                 </div>

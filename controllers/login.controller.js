@@ -7,13 +7,16 @@ const jwt = require('jsonwebtoken');
 /* --- MODEL LOGIC --- */
 
 // POST Endpoint para '/POSTAUTH'
-// TODO, deny estaActivo: false users on login!!
 exports.postAuthentication = async (req, res) => {
     try {
 
         const user = await loginModel.findOne({ email: req.body.email });
         if (!user) {
             return res.status(401).json({ success: true, authorized: false, message: "El usuario ingresado no existe." });
+        }
+
+        if (!user.estaActivo) {
+            return res.status(401).json({ success: true, authorized: false, message: "El usuario se encuentra desactivado." });
         }
 
         const isMatching = await bcrypt.compare(req.body.password, user.password);

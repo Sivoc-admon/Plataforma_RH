@@ -5,7 +5,7 @@ async function addUser() { // async function to perform fetch chain
     hideSidebar(); // sidebar frontend
 
     // dynamic html to show available "Jefe Inmediatos"
-    let optionsJefeInmediato = ' <option class="placeholder" value="" hidden>Selecciona un Jefe Inmediato</option>';
+    let optionsJefeInmediato = ' <option value="" hidden>Selecciona un Jefe Inmediato</option>';
     for (let user of usersRows) {
         if (user.privilegio === "Jefe Inmediato") {
             optionsJefeInmediato += `<option value="${user._id}">${user.nombre} ${user.apellidoP} ${user.apellidoM}</option>`;
@@ -66,8 +66,8 @@ async function addUser() { // async function to perform fetch chain
             <div class="columns is-vcentered">
                 <div class="column">
                     <label>Área
-                        <select id="area" class="select is-fullwidth input">
-                        <option class="placeholder" value="" hidden>Selecciona un área</option>
+                        <select id="area" class="is-fullwidth input">
+                        <option value="" hidden>Selecciona un área</option>
                         ${Object.keys(areaToPuestos).map(area => `<option value="${area}">${area}</option>`).join('')}
                         </select> 
                     </label>
@@ -75,15 +75,15 @@ async function addUser() { // async function to perform fetch chain
 
                 <div class="column">
                     <label>Puesto
-                        <select id="puesto" class="select is-fullwidth input">
-                        <option class="placeholder" value="" hidden>(Selecciona un área primero)</option>
+                        <select id="puesto" class="is-fullwidth input">
+                        <option value="" hidden>(Selecciona un área primero)</option>
                         </select> 
                     </label>
                 </div>
 
                 <div class="column">
                     <label>Jefe Inmediato
-                        <select class="select is-fullwidth input" id="jefeInmediato" required>
+                        <select class="is-fullwidth input" id="jefeInmediato" required>
                         ${optionsJefeInmediato}
                         </select> 
                     </label>
@@ -94,7 +94,7 @@ async function addUser() { // async function to perform fetch chain
             <div class="columns is-vcentered">
                 <div class="column">
                     <label>Fecha de baja
-                        <input type="date" class="input" id="fechaBaja" required>
+                        <input type="date" class="input"  id="fechaBaja" required>
                     </label>
                 </div>
                 <div class="column">
@@ -121,7 +121,7 @@ async function addUser() { // async function to perform fetch chain
             areaSelect.addEventListener("change", () => {
                 const selectedArea = areaSelect.value; 
                 const puestos = areaToPuestos[selectedArea] || []; 
-                puestoSelect.innerHTML = '<option class="placeholder" value="" hidden>Selecciona un puesto</option>';
+                puestoSelect.innerHTML = '<option value="" hidden>Selecciona un puesto</option>';
                 puestos.forEach(puesto => {
                     const option = document.createElement("option");
                     option.value = puesto;
@@ -233,11 +233,11 @@ async function addUser() { // async function to perform fetch chain
                                 area: area,
                                 fechaBaja: fechaBaja,
                                 fechaIngreso: fechaIngreso,
-                                foto: dataFile.message.path,
+                                foto: dataFile.message.path, 
                                 jefeInmediato: jefeInmediato,
                                 puesto: puesto,
                                 estaActivo: estaActivo,
-                                privilegio: "Por definir", // default priviliges applied
+                                privilegio: "unauthorized", // default priviliges applied
                             })
                         });
                         const dataUser = await responseUser.json();
@@ -635,83 +635,6 @@ async function disabledUsersTable() {
     }
 };
 
-function returnMainTable() {
-    window.location.href = '/usuarios';
-}
-
-// enableUser button
-// TODO, grant that user "privilegio: unauthorized" (maybe save the previous privilegio somewhere else?)
-async function enableUser(button) { // async function to perform fetch chain
-    hideSidebar(); // sidebar frontend
-    Swal.fire({
-        html: `
-            <div style="padding: 0.5rem; margin: 1rem 0.5rem">
-                <h2>¿Deseas volver a activar este usuario?</h2>
-                <h2>Este usuario volverá a acceder a la plataforma.<h2>
-            </div>
-        `,
-        confirmButtonText: 'Activar usuario',
-        cancelButtonText: 'Cancelar',
-        cancelButtonColor: '#f0466e',
-        showCancelButton: true,
-        allowOutsideClick: false,
-        width: '1000px',
-        customClass: {
-            confirmButton: 'default-button-css',
-            cancelButton: 'default-button-css',
-        },
-
-        preConfirm: async () => {
-            const userId = button.getAttribute('userId');
-            // Fetch #01 - Execute user activation
-            try {
-                const response = await fetch('/usuarios/activar-usuario', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        userId: userId,
-                    })
-                });
-                const data = await response.json();
-
-                // Catch from Controller "/activar-usuario"
-                if (!data.success) {
-                    Swal.fire({
-                        title: 'Algo salió mal :(',
-                        icon: 'error',
-                        width: "500px",
-                        text: 'Favor de contactar a Soporte Técnico. (Error #014)'
-                    });
-                    return; // enableUser() failed execution
-                } else {
-                    Swal.fire({
-                        title: 'Usuario activado',
-                        icon: 'success',
-                        width: "500px",
-                        text: 'Se ha activado el usuario correctamente.'
-                    }).then(() => {
-                        location.reload(); // reload after popup
-                    });
-                    return; // enableUser() successful execution
-                }
-
-                // Catch from Fetch #01
-            } catch (error) {
-                Swal.fire({
-                    title: 'Algo salió mal :(',
-                    icon: 'error',
-                    width: "500px",
-                    text: 'Favor de contactar a Soporte Técnico. (Error #013)'
-                });
-                console.error('Hubo un error:', error);
-                return; // enableUser() failed execution
-            }
-        }
-    })
-};
-
 // changePrivilege button
 // TODO, grant that user "privilegio: unauthorized" (maybe save the previous privilegio somewhere else?)
 // TODO, deny "empty field" addUser() already does this with his Jefe Inmediato field
@@ -724,13 +647,13 @@ async function changePrivilege(button) { // async function to perform fetch chai
                 <br><br>
                     <div class="field">
                         <div class="control">
-                            <select id="newPrivilege" class="select is-fullwidth input">
-                            <option class="placeholder" value="" hidden>Selecciona un privilegio</option>
+                            <select id="newPrivilege" class="is-fullwidth input">
+                            <option value="" hidden>Selecciona un privilegio</option>
                             <option>Colaborador</option>
                             <option>Recursos Humanos</option>
                             <option>Jefe Inmediato</option>
                             <option>Dirección</option>
-                            <option>Por definir</option>
+                            <option>Unauthorized</option>
                             </select> 
                         </div>
                     </div>
@@ -799,4 +722,77 @@ async function changePrivilege(button) { // async function to perform fetch chai
             }
         }
     })
+};
+
+
+// downloadExcel button
+// TODO, remake
+async function downloadExcel() {
+    try {
+        const response = await fetch('/usuarios/downloadExcelUsers', {
+            method: 'POST',
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // Create a link to download the file
+        const blob = await response.blob();
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'usuarios.xlsx';
+        link.click();
+
+        Swal.fire({
+            title: 'Excel descargado',
+            icon: 'success',
+            width: "500px",
+            text: 'El archivo se descargó correctamente.'
+        });
+
+    } catch (error) {
+        console.error('Error downloading file:', error);
+        Swal.fire({
+            title: 'Algo salió mal :(',
+            icon: 'error',
+            width: "500px",
+            text: 'Favor de contactar a Soporte Técnico. (Error #020)'
+        });
+    }
+};
+
+// downloadPDF button
+// TODO, remake
+async function downloadPDF() {
+    try {
+        const response = await fetch('/usuarios/downloadPDFUsers', {
+            method: 'POST',
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'usuarios.pdf';
+        link.click();
+
+        Swal.fire({
+            title: 'PDF descargado',
+            icon: 'success',
+            width: "500px",
+            text: 'El archivo se descargó correctamente.'
+        });
+    } catch (error) {
+        console.error('Error downloading file:', error);
+        Swal.fire({
+            title: 'Algo salió mal :(',
+            icon: 'error',
+            width: "500px",
+            text: 'Favor de contactar a Soporte Técnico. (Error #019)'
+        });
+    }
 };

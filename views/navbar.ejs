@@ -36,11 +36,10 @@
     
         <!-- Sidebar toggle icon -->
         <i class="fa-solid fa-bars icon-css" style="color: var(--white); cursor: pointer; margin: 0rem 1rem;" onclick="toggleSidebar()"></i>
-    
         <!-- User information -->
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <i class="fa-solid fa-circle-user has-text-white icon-css" style="margin: 0rem;"></i>
-            <i class="is-size-5 has-text-white" style="margin: 0rem 1.5rem;"><%= userName %></i>
+            <img src="<%= userPhoto %>" class="pfp-css" onerror="this.onerror=null; this.src='/SIVOC_PFP.png';">
+            <text class="is-size-5 has-text-white" style="margin-left: 1rem; margin-right: 1rem; text-shadow: 0 0 8px rgba(0, 0, 0, 1);"><%= userName %></text>
         </div>
     </nav>
     
@@ -55,7 +54,7 @@
                     <i class="fa-solid fa-house icon-css"></i> Inicio
                 </a>
                 <!-- Botón Usuarios -->
-                <a href="/usuarios" class="has-text-white is-size-5 mt-2">
+                <a href="/usuarios/accessUsersModule" class="has-text-white is-size-5 mt-2">
                     <i class="fa-solid fa-users icon-css"></i> Usuarios
                 </a>
                 <!-- Botón Permisos -->
