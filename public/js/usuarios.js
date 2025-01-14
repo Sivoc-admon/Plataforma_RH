@@ -94,7 +94,7 @@ async function addUser() { // async function to perform fetch chain
             <div class="columns is-vcentered">
                 <div class="column">
                     <label>Fecha de baja
-                        <input type="date" class="input"  id="fechaBaja" required>
+                        <input type="date" class="input" id="fechaBaja" required>
                     </label>
                 </div>
                 <div class="column">
@@ -129,6 +129,46 @@ async function addUser() { // async function to perform fetch chain
                     puestoSelect.appendChild(option);
                 });
             });
+
+            // format styles and user experience for calendars (fechaIngreso)
+            const todayIn = new Date();
+            const formattedISODateIn = todayIn.toISOString().split('T')[0];
+            const dateInputIn = document.getElementById("fechaIngreso");
+            dateInputIn.value = formattedISODateIn;
+            dateInputIn.addEventListener("focus", () => {
+            dateInputIn.showPicker(); // Despliega el calendario nativo automáticamente
+            });
+            dateInputIn.addEventListener("focus", () => {
+                if (!isCalendarOpen) {
+                    dateInputIn.showPicker(); // Mostrar el calendario
+                    isCalendarOpen = true; // Cambiar estado
+                }
+            });
+            dateInputIn.addEventListener("click", (event) => {
+                event.preventDefault(); // Previene comportamiento predeterminado
+                dateInputIn.showPicker(); // Fuerza mostrar el calendario
+            });
+
+            // format styles and user experience for calendars (fechaIngreso)
+            const todayOut = new Date();
+            const formattedISODateOut = todayOut.toISOString().split('T')[0];
+            const dateInputOut = document.getElementById("fechaBaja");
+            dateInputOut.value = formattedISODateOut;
+            dateInputOut.addEventListener("focus", () => {
+            dateInputOut.showPicker(); // Despliega el calendario nativo automáticamente
+            });
+            dateInputOut.addEventListener("focus", () => {
+                if (!isCalendarOpen) {
+                    dateInputOut.showPicker(); // Mostrar el calendario
+                    isCalendarOpen = true; // Cambiar estado
+                }
+            });
+            dateInputOut.addEventListener("click", (event) => {
+                event.preventDefault(); // Previene comportamiento predeterminado
+                dateInputOut.showPicker(); // Fuerza mostrar el calendario
+            });
+
+            
         },
         preConfirm: async () => { // allows to perform fetch chain
             const nombre = $('#nombre').val().trim();

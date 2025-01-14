@@ -9,8 +9,8 @@ const authorize = (req, res, next) => {
 
     const token = req.cookies.__psmxoflxpspgolxps_mid;
 
-    if (["/login", "/login/POSTAUTH",].includes(req.url)) {
-        return next();
+    if (["/login", "/login/POSTAUTH"].includes(req.url)) {
+        return next(); // , "/usuarios/accessUsersModule"
     }
 
     try {

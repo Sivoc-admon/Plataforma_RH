@@ -108,50 +108,35 @@
 }
 
 
-
 /* Estilos de calendario */
-/* Estilo general para el input de tipo date */
-input[type="date"] {
-    width: 100%; /* Ocupa todo el ancho del contenedor */
-    padding: 10px; /* Espaciado interno */
-    margin-top: 5px; /* Espaciado entre el label y el input */
-    border: 1px solid #ccc; /* Borde gris claro */
-    border-radius: 4px; /* Bordes redondeados */
-    font-size: 14px; /* Tamaño de fuente */
-    color: #333; /* Color del texto */
-    background-color: #fff; /* Fondo blanco */
-    box-sizing: border-box; /* Incluye el padding en el ancho total */
-    appearance: none; /* Elimina el estilo predeterminado del navegador */
-}
+        /* Estilos de calendario */
+        input[type="date"] {
+            width: 100%; /* Ocupa todo el ancho del contenedor */
+            padding: 10px; /* Espaciado interno */
+            margin-top: 5px; /* Espaciado entre el label y el input */
+            border: 1px solid #ccc; /* Borde gris claro */
+            border-radius: 4px; /* Bordes redondeados */
+            font-size: 14px; /* Tamaño de fuente */
+            color: #333; /* Color del texto */
+            background-color: #fff; /* Fondo blanco */
+            box-sizing: border-box; /* Incluye el padding en el ancho total */
+            appearance: none; /* Elimina el estilo predeterminado del navegador */
+            cursor: pointer; /* Cambia el cursor al de mano */
+        }
 
-/* Hover: cuando el mouse pasa sobre el input */
-input[type="date"]:hover {
-    border-color: #666; /* Cambia el color del borde al pasar el mouse */
-}
+        /* Hover: cuando el mouse pasa sobre el input */
+        input[type="date"]:hover {
+            border-color: #666; /* Cambia el color del borde al pasar el mouse */
+        }
 
-/* Focus: cuando el input está activo */
-input[type="date"]:focus {
-    outline: none; /* Elimina el borde azul predeterminado */
-    border-color: #007BFF; /* Borde azul más vibrante */
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Resaltado */
-}
+        /* Focus: cuando el input está activo */
+        input[type="date"]:focus {
+            outline: none; /* Elimina el borde azul predeterminado */
+            border-color: #007BFF; /* Borde azul más vibrante */
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Resaltado */
+        }
 
-/* Para inputs dentro de una clase específica, como .input */
-.input[type="date"] {
-    background-color: #f9f9f9; /* Fondo ligeramente gris */
-    font-family: 'Arial', sans-serif; /* Fuente personalizada */
-}
-
-/* Estilo del ícono del calendario en navegadores compatibles */
-input[type="date"]::-webkit-calendar-picker-indicator {
-    background-color: #007BFF; /* Fondo azul */
-    color: white; /* Color del ícono */
-    padding: 5px; /* Espaciado */
-    border-radius: 4px; /* Bordes redondeados */
-    cursor: pointer; /* Cursor de mano */
-}
-
-/* Ocultar texto del formato */
-input[type="date"]::placeholder {
-    color: transparent;
-}
+        /* Estilo del ícono del calendario (oculto pero funcional) */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            display: none; /* Oculta el ícono del calendario visualmente */
+        }
