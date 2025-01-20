@@ -3,9 +3,11 @@ const iam = require('./IAM.json');
 
 const authorize = (req, res, next) => {
     // Default value of local session variables
+    res.locals.userId = res.locals.userId || '';
     res.locals.userName = res.locals.userName || 'Usuario';
     res.locals.userPhoto = res.locals.userPhoto || '';
     res.locals.userPrivilege = res.locals.userPrivilege || '';
+    res.locals.userArea = res.locals.userArea || '';
 
     const token = req.cookies.__psmxoflxpspgolxps_mid;
 
@@ -24,7 +26,10 @@ const authorize = (req, res, next) => {
         res.locals.userName = decoded.name;
         res.locals.userPhoto = decoded.foto.replace("public", "");
         res.locals.userPrivilege = decoded.privilegio;
+        res.locals.userArea = decoded.area;
+        res.locals.userId = decoded.userId;
 
+        
         // if you arrive to the lobby you dont need any privileges, but do need a jwt
         if (req.url === "/login/inicio") {
             return next();

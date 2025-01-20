@@ -16,13 +16,16 @@
             "changePrivilege" : true,
 
             "userTableActions": true,
-
-
-
-            "editUser" : true
+            "editUser" : true,
+            "TODO" : true
 
         },
         "permisos": {
+
+            "colaboradorPermitsView": true,
+
+
+
             "viewPermitsAll" : true,
             "downloadPDF": true,
             "downloadExcel":  true,
