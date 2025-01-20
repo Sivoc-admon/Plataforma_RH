@@ -10,7 +10,7 @@ const authorize = (req, res, next) => {
     const token = req.cookies.__psmxoflxpspgolxps_mid;
 
     if (["/login", "/login/POSTAUTH"].includes(req.url)) {
-        return next(); // , "/usuarios/accessUsersModule"
+        return next();     
     }
 
     try {
@@ -33,6 +33,31 @@ const authorize = (req, res, next) => {
             // TODO implement IAM here. BTW, Frontend IS DIFFERENT depending ON THE ROLE 
             // iam . (decoded.privilegio) . (url 1st portion, "/usuarios/agregar" = usuarios) . (url 2nd portion, "/usuarios/agregar" = agregar)
 
+            /*
+            const superadmin = {
+                usuarios: {
+                    accessUsersModule: true,
+                    downloadExcelUsers: true,
+                    downloadPDFUsers: true,
+                    restoreUsersView: true,
+                    addUser: true,
+                    uploadFile: true,
+                    deactivateUser: true,
+                    activateUser: true,
+                    "/existe-email": null, // Placeholder
+                    userTableActions: true
+                }
+            };
+
+            // Asignar el valor dinámicamente
+            superadmin.usuarios["/existe-email"] = superadmin.usuarios.addUser;
+
+            console.log(JSON.stringify(superadmin, null, 2));
+
+
+            
+
+
             // construct the IAM path dynamically by extracting portions of the URL
             const urlParts = req.url.split('/').filter(part => part); 
             const firstPortion = urlParts[0] || ''; 
@@ -45,6 +70,7 @@ const authorize = (req, res, next) => {
                 // TODO error message something idk i have never seen a PopUp like this
                 // the frontend is already managed by res.locals.userPrivilege = decoded.privilegio;
             }
+                */
         }
 
         return next();

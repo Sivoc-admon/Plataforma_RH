@@ -19,21 +19,21 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage }); // Compacted into 'upload'
 
+// TODO, cleanup after 80% backend framework
+
 // Routes
 router.get("/accessUsersModule", controller.getUsersView);
-
-// after IAM implementation
 router.post("/downloadExcelUsers", controller.postDownloadExcelUsers);
 router.post("/downloadPDFUsers", controller.postDownloadPDFUsers);
+router.get("/restoreUsersView", controller.getRestoreUsersView);
 
+router.post("/addUser", controller.postAddUser); 
+router.post("/uploadFile", upload.single('file'), controller.postFileUpload);
+router.post("/deactivateUser", controller.postUserDeactivation);
+router.post("/activateUser", controller.postUserActivation);
+router.post("/doesEmailExists", controller.postEmailExists);
+router.post("/changePrivilege", controller.postUserChangePrivilege);
 
-// TODO need to remake for IAM
-router.get("/restaurar-usuarios", controller.getRestoreUsersView);
-router.post("/anadir-usuario", controller.postAddUser); 
-router.post("/subir-archivo", upload.single('file'), controller.postFileUpload);
-router.post("/desactivar-usuario", controller.postUserDeactivation);
-router.post("/activar-usuario", controller.postUserActivation);
-router.post("/existe-email", controller.postEmailExists);
-router.post("/cambiar-privilegio", controller.postUserChangePrivilege);
+router.post("/editUser", controller.postEditUser); 
 
 module.exports = router;

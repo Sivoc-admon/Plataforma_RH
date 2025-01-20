@@ -6,15 +6,12 @@
         <h1> Módulo Usuarios </h1>
 
         <div class="columns" style="margin-top: 1rem;">
-
-            <!-- restoreUser button : restoreUser --->
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="returnMainTable()">
                     <i class="fa-solid fa-circle-left default-icon-button-css"></i>
                     <p>Regresar al tablero</p>
                 </button>
             </div>
-
         </div>
 
         <div class="field">
@@ -54,14 +51,26 @@
                             <%= user.puesto %>
                         </td>
                         <td class="is-centered">
-                            <%= user.privilegio %>
+                            <% if (user.privilegio === "colaborador") { %>
+                                Colaborador
+                            <% } else if (user.privilegio === "rHumanos") { %>
+                                Recursos Humanos
+                            <% } else if (user.privilegio === "jefeInmediato") { %>
+                                Jefe Inmediato
+                            <% } else if (user.privilegio === "direccion") { %>
+                                Dirección
+                            <% } else if (user.privilegio === "superadmin") { %>
+                                Superadmin
+                            <% } else { %>
+                                No autorizado
+                            <% } %>
                         </td>
                         <td class="is-centered">
                             <div class="columns is-centered">
 
-                                <!-- enableUser button : enableUser --->
+                                <!-- activateUser button : activateUser --->
                                 <div class="column is-narrow">
-                                    <button id="enableUser" class="default-button-css table-button-css" userId="<%= user._id %>" onclick="enableUser(this)">
+                                    <button id="activateUser" class="default-button-css table-button-css" userId="<%= user._id %>" onclick="activateUser(this)">
                                         <i class="fa-solid fa-user-check"></i>
                                     </button>
                                 </div>

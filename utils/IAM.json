@@ -1,12 +1,26 @@
 {
-    "administrador": {
+    "superadmin": {
         "usuarios": {
             "accessUsersModule": true,
+            "downloadExcelUsers": true,
+            "downloadPDFUsers":  true,
+            "restoreUsersView": true,
+
             "addUser": true,
-            "restoreUser": true,
-            "downloadPDF": true,
-            "downloadExcel":  true,
-            "userTableActions": true
+            "uploadFile": true,
+            "deactivateUser": true,
+            "activateUser": true,
+
+            "doesEmailExists": null,
+
+            "changePrivilege" : true,
+
+            "userTableActions": true,
+
+
+
+            "editUser" : true
+
         },
         "permisos": {
             "viewPermitsAll" : true,
@@ -34,6 +48,25 @@
             "viewCoursesSelf": true
         }
     },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     "direccion": {
         "usuarios": {

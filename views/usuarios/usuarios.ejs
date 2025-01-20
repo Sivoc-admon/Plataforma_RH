@@ -1,5 +1,6 @@
 <%- include('../navbar.ejs') %>
-    <!-- TODO, frontend 100% --->
+    <!-- // TODO, cleanup after 80% backend framework --->
+     
     <link rel="stylesheet" href="/css/usuarios.css">
 
     <script>
@@ -13,7 +14,7 @@
         <h1> Módulo Usuarios </h1>
 
         <div class="columns" style="margin-top: 1rem;">
-            <!-- addUser button : addUser --->
+
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="addUser()">
                     <i class="fa-solid fa-user-plus default-icon-button-css"></i>
@@ -21,15 +22,13 @@
                 </button>
             </div>
 
-            <!-- disabledUsersTable button : disabledUsersTable --->
             <div class="column is-centered" style="text-align: center;">
-                <button class="default-button-css functionality-button-css" onclick="disabledUsersTable()">
+                <button class="default-button-css functionality-button-css" onclick="restoreUsersView()">
                     <i class="fa-solid fa-boxes-packing default-icon-button-css"></i>
                     <p>Restaurar Usuarios</p>
                 </button>
             </div>
 
-            <!-- downloadPDF button : downloadPDF TODO --->
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="downloadPDF()">
                     <i class="fa-solid fa-download default-icon-button-css"></i>
@@ -37,7 +36,6 @@
                 </button>
             </div>
 
-            <!-- downloadExcel button : downloadExcel --->
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="downloadExcel()">
                     <i class="fa-solid fa-download default-icon-button-css"></i>
@@ -83,42 +81,38 @@
                             <%= user.puesto %>
                         </td>
                         <td class="is-centered">
-                            <%= user.privilegio %>
+                            <% if (user.privilegio === "colaborador") { %>
+                                Colaborador
+                            <% } else if (user.privilegio === "rHumanos") { %>
+                                Recursos Humanos
+                            <% } else if (user.privilegio === "jefeInmediato") { %>
+                                Jefe Inmediato
+                            <% } else if (user.privilegio === "direccion") { %>
+                                Dirección
+                            <% } else if (user.privilegio === "superadmin") { %>
+                                Superadmin
+                            <% } else { %>
+                                No autorizado
+                            <% } %>
                         </td>
                         <td class="is-centered">
                             <div class="columns is-centered">
 
-                                <!-- viewAndEditUser button : viewAndEditUser TODO (remake with only userId + global.usersRows --->
                                 <div class="column is-narrow">
-                                    <button class="default-button-css table-button-css"
-                                    email = "<%= user.email %>"
-                                    password = "<%= user.password %>"
-                                    nombre = "<%= user.nombre %>"
-                                    apellidoP = "<%= user.apellidoP %>"
-                                    apellidoM = "<%= user.apellidoM %>"
-                                    fechaBaja = "<%= user.fechaBaja %>"
-                                    fechaIngreso = "<%= user.fechaIngreso %>"
-                                    area = "<%= user.area %>"
-                                    foto = "<%= user.foto %>"
-                                    puesto = "<%= user.puesto %>"
-                                    jefeInmediato = "<%= user.jefeInmediato %>"
-                                    >
-                                    <!-- onclick="viewAndEditUser(this)" -->
-                                        <i class="fa-solid fa-user-pen"></i>
+                                    <button class="default-button-css table-button-css" userId="<%= user._id %>" onclick="editUser(this)" >
+                                        <i class="fa-solid fa-pencil"></i>
                                     </button>
                                 </div>
 
-                                <!-- disableUser button : disableUser --->
                                 <div class="column is-narrow">
-                                    <button class="default-button-css table-button-css" userId="<%= user._id %>" onclick="disableUser(this)">
+                                    <button class="default-button-css table-button-css" userId="<%= user._id %>" onclick="deactivateUser(this)">
                                         <i class="fa-solid fa-user-xmark"></i>
                                     </button>
                                 </div>
 
-                                <!-- changPrivilegebutton : changePrivilege --->
                                 <div class="column is-narrow">
                                     <button class="default-button-css table-button-css" userId="<%= user._id %>" onclick="changePrivilege(this)">
-                                        <i class="fa-solid fa-user-tag"></i>
+                                        <i class="fa-solid fa-key"></i>
                                     </button>
                                 </div>
 

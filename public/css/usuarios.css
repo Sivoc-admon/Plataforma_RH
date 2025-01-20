@@ -32,7 +32,7 @@
     background-color: transparent;
     color: var(--white);
     cursor: pointer;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     padding: 18px;
 
     display: flex;
@@ -58,12 +58,13 @@
 
 .input {
     width: 100%;
-    height: fit-content;
+    height: 48px;
     padding: 0.5rem;
     font-size: 1rem;
     border: 3px solid var(--light-blue) !important;
-    margin-bottom: 1rem;
+    margin: 0;
     box-sizing: border-box;
+    margin-top: 3px; /* Espaciado entre el label y el input */
 }
 
 .input:hover{
@@ -111,14 +112,8 @@
 /* Estilos de calendario */
         /* Estilos de calendario */
         input[type="date"] {
-            width: 100%; /* Ocupa todo el ancho del contenedor */
-            padding: 10px; /* Espaciado interno */
-            margin-top: 5px; /* Espaciado entre el label y el input */
-            border: 1px solid #ccc; /* Borde gris claro */
+
             border-radius: 4px; /* Bordes redondeados */
-            font-size: 14px; /* Tamaño de fuente */
-            color: #333; /* Color del texto */
-            background-color: #fff; /* Fondo blanco */
             box-sizing: border-box; /* Incluye el padding en el ancho total */
             appearance: none; /* Elimina el estilo predeterminado del navegador */
             cursor: pointer; /* Cambia el cursor al de mano */

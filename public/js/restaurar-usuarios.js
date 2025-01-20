@@ -4,8 +4,8 @@ function returnMainTable() {
     window.location.href = '/usuarios/accessUsersModule';
 }
 
-// enableUser button
-async function enableUser(button) { // async function to perform fetch chain
+// activateUser button
+async function activateUser(button) { // async function to perform fetch chain
     hideSidebar(); // sidebar frontend
     Swal.fire({
         html: `
@@ -29,7 +29,7 @@ async function enableUser(button) { // async function to perform fetch chain
             const userId = button.getAttribute('userId');
             // Fetch #01 - Execute user activation
             try {
-                const response = await fetch('/usuarios/activar-usuario', {
+                const response = await fetch('/usuarios/activateUser', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -40,7 +40,7 @@ async function enableUser(button) { // async function to perform fetch chain
                 });
                 const data = await response.json();
 
-                // Catch from Controller "/activar-usuario"
+                // Catch from Controller "/activateUser"
                 if (!data.success) {
                     Swal.fire({
                         title: 'Algo salió mal :(',

@@ -45,4 +45,8 @@ function prevPage() {
     }
 }
 
-paginateTable();
+try {
+    paginateTable();
+} catch (error) {
+    
+}

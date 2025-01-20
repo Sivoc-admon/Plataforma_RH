@@ -7,6 +7,9 @@ const PDFDocument = require('pdfkit'); // Asegúrate de tener instalada esta bib
 const fs = require('fs');
 
 
+// TODO, cleanup after 80% backend framework
+
+
 /* --- MODEL LOGIC --- */
 
 exports.postEmailExists = async (req, res) => {
@@ -31,7 +34,36 @@ exports.postAddUser = async (req, res) => {
         console.error(error);
         return res.status(500).json({ success: false, message: "" });
     }
-}
+};
+
+exports.postEditUser = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+
+        // Execute findByIdAndUpdate TODO
+        /*
+        const response = await usersModel.findByIdAndUpdate(
+            userId, 
+            { $set: { estaActivo: false } }, // Change attribute
+            { new: true } 
+        );
+        */
+
+        // If for some reason user not found, send 404
+        if (!response) {
+            return res.status(404).json({success: false, message: "" });
+        }
+
+        activeUsers.delete(userId); // log him out 
+
+        return res.status(200).json({success: true, message: req.body});
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({success: false, message: "" });
+    }
+
+
+};
 
 exports.postFileUpload = async (req, res) => {
     try {
@@ -90,6 +122,8 @@ exports.postUserActivation = async (req, res) => {
     }
 };
 
+
+// TODO, add a new button that says change password, use the skeleton down below.
 exports.postUserChangePrivilege = async (req, res) => {
     try {
         const userId = req.body.userId;
@@ -119,7 +153,7 @@ exports.postUserChangePrivilege = async (req, res) => {
 /* --- VIEWS LOGIC --- */
 exports.getUsersView = async (req, res) => {
     try {
-        const usersRows = await usersModel.find({ estaActivo: true }).select('-email -foto -password');
+        const usersRows = await usersModel.find({ estaActivo: true }).select('-password -__v');
         return res.render('usuarios/usuarios.ejs', { usersRows });
         
     } catch (error) {
@@ -130,8 +164,8 @@ exports.getUsersView = async (req, res) => {
 
 exports.getRestoreUsersView = async (req, res) => {
     try {
-        const usersRows = await usersModel.find({ estaActivo: false }).select('-email -foto -password');
-        return res.render('usuarios/restaurar-usuarios.ejs', { usersRows });
+        const usersRows = await usersModel.find({ estaActivo: false }).select('-email -foto -password -__v');
+        return res.render('usuarios/restoreUsersView.ejs', { usersRows });
     } catch (error) {
         console.error(error);
         return res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
@@ -139,13 +173,12 @@ exports.getRestoreUsersView = async (req, res) => {
 };
 
 // Output CSV file path
-// TODO, IF NOT AUTHETNICVTIATED IT DOWNLOADS THE LOGIN.EJS
 // TODO, remake
 exports.postDownloadExcelUsers = async (req, res) => {
     const outputFilePath = './usuarios.xlsx'; 
 
     try {
-        const usersRows = await usersModel.find().select('-__v -email -foto -password').lean();
+        const usersRows = await usersModel.find().select('-__v -foto -password').lean();
         
         if (usersRows.length === 0) {
             return res.status(404).json({ success: false, message: 'No users found to export.' });
@@ -174,11 +207,10 @@ exports.postDownloadExcelUsers = async (req, res) => {
 
 
 // Output CSV file path
-// TODO, IF NOT AUTHETNICVTIATED IT DOWNLOADS THE LOGIN.EJS
 // TODO, remake
 exports.postDownloadPDFUsers = async (req, res) => {
     try {
-        const usersRows = await usersModel.find().select('-__v -email -foto -password').lean();
+        const usersRows = await usersModel.find().select('-__v -foto -password').lean();
 
         if (usersRows.length === 0) {
             return res.status(404).json({ success: false, message: 'No users found to export.' });
