@@ -204,7 +204,9 @@
 
                             <td class="is-centered">
                             <% if (permit.isVerified) { %>
-                                <% } if (permit.estatus === "Aprobado") { %>
+
+
+                                <% if (permit.estatus === "Aprobado") { %>
                                         <i class="fa-solid fa-thumbs-up status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Aprobado
                                 <% } else if (permit.estatus === "Cancelado") { %>
                                         <i class="fa-solid fa-thumbs-down status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Cancelado
@@ -243,7 +245,7 @@
                             <% } %>
                             </td>
                         </tr>
-                    <% ); %>
+                    <% }); %>
             </tbody>
         </table>
         <% } else { %>

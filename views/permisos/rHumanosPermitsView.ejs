@@ -33,7 +33,7 @@
                 <% permitsRows.forEach(permit=> { %>
                     <tr>
                         <td class="is-centered">
-                            <%= permit.userId %>
+                            <%= permit.userId.nombre + " " + permit.userId.apellidoP + " " + permit.userId.apellidoM %>
                         </td>
                         <td class="is-centered">
                             <%= permit.tipoPermiso %>
@@ -76,7 +76,7 @@
 
 
                         <td class="is-centered">
-                            <% if (!isVerified) { %>
+                            <% if (!permit.isVerified) { %>
                                 <div class="columns is-centered">
                                     <div class="column is-narrow">
                                         <button class="default-button-css table-button-css" userId="<%= permit._id %>" onclick="changeStatus(this)" >
@@ -91,7 +91,7 @@
                                     </div>
                                 </div>
                             <% } else { %>
-                                <i class="fa-solid fa-check status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Se verificó
+                                <i class="fa-solid fa-check status-css" style="justify-self: center; margin-right: 0.5rem;"></i>Cerrado
                             <% } %>
                         </td>
                     </tr>

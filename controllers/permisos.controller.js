@@ -23,7 +23,8 @@ exports.accessPermitsView = async (req, res) => {
             if (team.length > 0) {
                 const teamData = team[0]; // use the first team as string init for appends
                 const permitPromises = teamData.colaboradoresIds.map(userId => {
-                    return permitsModel.find({ userId: userId, isSent: true }).select('-__v');
+                    // populate inserts the object referenced inside the query (check permitsModel.js)
+                    return permitsModel.find({ userId: userId, isSent: true }).populate('userId', 'nombre apellidoP apellidoM').select('-__v');
                 });
                 const permitsResults = await Promise.all(permitPromises);
                 permitsRows = permitsResults.flat(); // compact all permits as a single array
