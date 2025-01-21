@@ -1,16 +1,44 @@
 // Importar el modelo para utilizarlo
 const filesModel = require("../models/files.model");
 const permitsModel = require("../models/permisos.model");
-
+const teamsSchema = require("../models/equipos.model");
 
 
 /* --- VIEWS LOGIC --- */
 
-// Renderizar página de inicio (homepage)
-exports.colaboradorPermitsView = async (req, res) => {
+exports.accessPermitsView = async (req, res) => {
     try {
-        const permitsRows = await permitsModel.find({ userId: res.locals.userId }).select('-__v');
-        return res.render('permisos/colaboradorPermitsView.ejs', { permitsRows });
+        let permitsRows = "";
+
+        // Permits module for "colaborador"
+        if (res.locals.userPrivilege === "colaborador") {
+            // get all permits from a single user
+            permitsRows = await permitsModel.find({ userId: res.locals.userId }).select('-__v');
+            return res.render('permisos/colaboradorPermitsView.ejs', { permitsRows });
+
+        // Permits module for "jefeInmediato"
+        } else if (res.locals.userPrivilege === "jefeInmediato") {
+            // get all members from the team, map all their permits in a single array
+            const team = await teamsSchema.find({ jefeInmediatoId: res.locals.userId }).select('-__v');
+            if (team.length > 0) {
+                const teamData = team[0]; // use the first team as string init for appends
+                const permitPromises = teamData.colaboradoresIds.map(userId => {
+                    return permitsModel.find({ userId: userId, isSent: true }).select('-__v');
+                });
+                const permitsResults = await Promise.all(permitPromises);
+                permitsRows = permitsResults.flat(); // compact all permits as a single array
+            }
+            return res.render('permisos/jefeInmediatoPermitsView.ejs', { permitsRows });
+
+        // Permits module for "rHumanos"
+        } else if (res.locals.userPrivilege === "rHumanos") {
+            // get all permits regardless of the user but must be sent
+            permitsRows = await permitsModel.find({ isSent: true }).select('-__v');
+            return res.render('permisos/rHumanosPermitsView.ejs', { permitsRows });
+        }
+
+        // catch non-authenticated user
+        return res.redirect("/login");
 
     } catch (error) {
         console.error(error);

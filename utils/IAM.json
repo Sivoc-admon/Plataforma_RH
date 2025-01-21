@@ -1,28 +1,34 @@
 {
-    "superadmin": {
+    "catalog (borrar al finalizar mvp)": {
         "usuarios": {
             "accessUsersModule": true,
             "downloadExcelUsers": true,
             "downloadPDFUsers":  true,
             "restoreUsersView": true,
-
             "addUser": true,
             "uploadFile": true,
             "deactivateUser": true,
             "activateUser": true,
-
             "doesEmailExists": null,
-
             "changePrivilege" : true,
-
             "userTableActions": true,
             "editUser" : true,
+            
             "TODO" : true
 
         },
         "permisos": {
+            "accessPermitsView": true,
 
-            "colaboradorPermitsView": true,
+
+
+
+
+
+
+
+
+
 
 
 

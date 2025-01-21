@@ -5,8 +5,10 @@ const permitSchema = new mongoose.Schema({
     tipoPermiso: String,
     fechaInicio: String,
     fechaTermino: String,
-    docPaths: [String], // Cambiado a un array de strings
-    status: String,
+    docPaths: [String], // String array
+    estatus: String,
+    isSent: Boolean,
+    isVerified: Boolean,
 });
 
 // mongoose.model('permisos' = collection name)

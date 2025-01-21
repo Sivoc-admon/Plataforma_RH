@@ -9,7 +9,7 @@ const upload = multer({dest: 'public/uploads/permisos'});
 
 
 // Rutas
-router.get("/colaboradorPermitsView", controller.colaboradorPermitsView);
+router.get("/accessPermitsView", controller.accessPermitsView);
 
 
 module.exports = router;

@@ -14,6 +14,7 @@ async function createPermit() { // async function to perform fetch chain
             optionsJefeInmediato += `<option value="${user._id}">${user.nombre} ${user.apellidoP} ${user.apellidoM}</option>`;
         }
     }
+    
    
     Swal.fire({
         html: `

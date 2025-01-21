@@ -1,11 +1,8 @@
 <%- include('../navbar.ejs') %>
 
-    <script src="/js/permisos.js" defer></script>
+    <script src="/js/permisos/colaboradorPermitsView.js" defer></script>
 
-    <!--  TODO  <link rel="stylesheet" href="/css/usuarios.css"> -->
-    <link rel="stylesheet" href="/css/usuarios.css">
-
-
+    <link rel="stylesheet" href="/css/permisos.css">
 
 
     <div class="inside-content-css">
@@ -14,8 +11,9 @@
         <!-- Main buttons -->
         <div class="columns" style="margin-top: 1rem;">
             <div class="column is-centered" style="text-align: center;">
+                <!-- al momento de mandar el colaborador un permiso este automaticamente obtiene esttus pendietne. -->
                 <button class="default-button-css functionality-button-css" onclick="createPermit()">
-                    <i class="fa-solid fa-user-plus default-icon-button-css"></i>
+                    <i class="fa-solid fa-clipboard-user default-icon-button-css"></i>
                     <p>Crear Permiso</p>
                 </button>
             </div>
@@ -177,50 +175,80 @@
                     <th class="has-text-centered">Estado</th>
                 </tr>
             </thead>
-            <tbody id="tableBody"> 
-                <% permitsRows.forEach(permit=> { %>
-                    <tr>
-                        <td class="is-centered">
-                            <%= permit.tipoPermiso %>
-                        </td>
-                        <td class="is-centered">
-                            <%= permit.fechaInicio %>
-                        </td>
-                        <td class="is-centered">
-                            <%= permit.fechaTermino %>
-                        </td>
-                        <td class="is-centered">
-                            <%= permit.docPaths %>
-                        </td>
-                        <td class="is-centered">
-                            <%= permit.status %>
-                        </td>
-                        <td class="is-centered">
-                            <div class="columns is-centered">
 
-                                <!--             ACTIVABLE DE LA COLUMNA ESTATUS:
-             if not sent then boton que diga "Editar"
-             if sent an icon which (status.accepted = iconUp) (status.denied = iconDown);
-                            -->
+            <% if (permitsRows.length !== 0) { %>
+                <tbody id="tableBody"> 
+                    <% permitsRows.forEach(permit=> { %>
+                        <tr>
+                            <td class="is-centered">
+                                <%= permit.tipoPermiso %>
+                            </td>
+                            <td class="is-centered">
+                                <%= permit.fechaInicio %>
+                            </td>
+                            <td class="is-centered">
+                                <%= permit.fechaTermino %>
+                            </td>
+                            <td class="is-centered">
 
-                                <div class="column is-narrow">
-                                    <button class="default-button-css table-button-css" userId="<%= permit._id %>" onclick="editPermit(this)" >
-                                        <i class="fa-solid fa-pencil"></i>
-                                    </button>
-                                </div>
+                                <% if (!permit.docPaths || permit.docPaths.length === 0) { %>
+                                    No hay documentos
+                                <% } else { %>
+                                    <ul>
+                                        <% permit.docPaths.forEach(function(docPath) { %>
+                                            <li><%= docPath %></li>
+                                        <% }); %>
+                                    </ul>
+                                <% } %>
+                            </td>
 
-                                <div class="column is-narrow">
-                                    <button class="default-button-css table-button-css" userId="<%= permit._id %>" onclick="deletePermit(this)">
-                                        <i class="fa-solid fa-user-xmark"></i>
-                                    </button>
-                                </div>
+                            <td class="is-centered">
+                            <% if (permit.isVerified) { %>
+                                <% } if (permit.estatus === "Aprobado") { %>
+                                        <i class="fa-solid fa-thumbs-up status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Aprobado
+                                <% } else if (permit.estatus === "Cancelado") { %>
+                                        <i class="fa-solid fa-thumbs-down status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Cancelado
+                                <% } else if (permit.estatus === "Justificado") { %>
+                                        <i class="fa-solid fa-thumbs-up status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Justificado
+                                <% } else if (permit.estatus === "Injustificado") { %>
+                                        <i class="fa-solid fa-thumbs-down status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Injustificado
+                                <% } else { %>
+                                    <%= permit.estatus %>
+                                <% } %>
 
-                            </div>
-                        </td>
-                    </tr>
-                    <% }); %>
+                            <% } else if (!permit.isSent) { %>
+                                    <div class="columns is-centered">
+                                        <div class="column is-narrow">
+                                            <button class="default-button-css table-button-css" userId="<%= permit._id %>" onclick="editPermit(this)" >
+                                                <i class="fa-solid fa-pencil"></i>
+                                            </button>
+                                        </div>
+
+                                        <div class="column is-narrow">
+                                            <button class="default-button-css table-button-css" userId="<%= permit._id %>" onclick="deletePermit(this)">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </div>
+
+                                        <div class="column is-narrow">
+                                            <button class="default-button-css table-button-css" userId="<%= permit._id %>" onclick="sendPermit(this)">
+                                                <i class="fa-solid fa-paper-plane"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                            <% } else if (permit.isSent) { %>
+                                <i class="fa-solid fa-clock status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Pendiente
+                            <% } else { %>
+                                <%= permit.sent %>
+                            <% } %>
+                            </td>
+                        </tr>
+                    <% ); %>
             </tbody>
         </table>
+        <% } else { %>
+            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">No existen permisos a la fecha.</h2>
+        <% }; %>
         <div class="pagination" >
             <button class="default-button-css" onclick="prevPage()">Anterior</button>
             <button class="default-button-css" onclick="nextPage()">Siguiente</button>
