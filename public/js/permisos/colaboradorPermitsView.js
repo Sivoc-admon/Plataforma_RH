@@ -1,43 +1,9 @@
-
-
-
-
-/*
-       
-
-
-
-
-            
-
-
-
-
-
-
-
-
-
-
-            
-            
-
-
-
-             Ojo, aqui es DEJARLO COMO ESTÁ libre de edición hasta que se de click en confirmar. 
-
-
-             
-        </div>
--->
-
-*/
-
-
-
 // createPermit button
 async function createPermit() { // async function to perform fetch chain
 
+    let archivosSeleccionados = []; // Lista para almacenar los archivos seleccionados
+    let archivosEliminados = []; // Lista para almacenar los archivos eliminados
+    
     Swal.fire({
         html: `
         <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
@@ -85,35 +51,33 @@ async function createPermit() { // async function to perform fetch chain
             </div>
             
 
-            <div class="column">
-                <div class="column">
-                    <label class="label">Agregar archivos</label>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <!-- File Input Button -->
-                        <div class="file has-name is-boxed" style="flex: 1;">
-                            <label class="input" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-right:0.3rem; font-family: var(--font);">
-                                <i class="fas fa-upload" style="margin: 0rem 0.3rem;font-size: 1.1rem;"></i>
-                                <span>Elegir archivo</span>
 
-
-
-<input type="file" name="foto" class="file-input" id="foto" style="display: none;" onchange="validateUpload(event)" />
-
-
-
-
-                                </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="column" >
-                    <label class="label">Archivos seleccionados</label>
-
-                    <ul id="subidos" style="margin:0.6rem; padding-top:1rem;"></ul>
-                </div>
-
+            
+<div class="column">
+    <div class="column">
+        <label class="label">Agregar archivos (opcional)</label>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <!-- File Input Button -->
+            <div class="file has-name is-boxed" style="flex: 1;">
+                <label class="input" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-right:0.3rem; font-family: var(--font);">
+                    <i class="fas fa-upload" style="margin: 0rem 0.3rem; font-size: 1.1rem;"></i>
+                    <span>Subir archivo</span>
+                    <input type="file" name="files" class="file-input" id="files" style="display: none;" multiple onchange="validateUpload(event)" />
+                </label>
             </div>
+        </div>
+    </div>
+
+    <div class="column">
+        <label class="label">Archivos seleccionados</label>
+        <ul id="subidos" style="margin:0.6rem; padding-top:1rem;"></ul>
+    </div>
+</div>
+
+
+
+
+
         </div>
 
         `,
@@ -134,15 +98,7 @@ async function createPermit() { // async function to perform fetch chain
             const formattedISODateIn = todayIn.toISOString().split('T')[0];
             const dateInputIn = document.getElementById("fechaYHoraInicio");
             dateInputIn.value = formattedISODateIn;
-            dateInputIn.addEventListener("focus", () => {
-            dateInputIn.showPicker(); // Despliega el calendario nativo automáticamente
-            });
-            dateInputIn.addEventListener("focus", () => {
-                if (!isCalendarOpen) {
-                    dateInputIn.showPicker(); // Mostrar el calendario
-                    isCalendarOpen = true; // Cambiar estado
-                }
-            });
+
             dateInputIn.addEventListener("click", (event) => {
                 event.preventDefault(); // Previene comportamiento predeterminado
                 dateInputIn.showPicker(); // Fuerza mostrar el calendario
@@ -153,37 +109,19 @@ async function createPermit() { // async function to perform fetch chain
             const formattedISODateOut = todayOut.toISOString().split('T')[0];
             const dateInputOut = document.getElementById("fechaYHoraFinal");
             dateInputOut.value = formattedISODateOut;
-            dateInputOut.addEventListener("focus", () => {
-            dateInputOut.showPicker(); // Despliega el calendario nativo automáticamente
-            });
-            dateInputOut.addEventListener("focus", () => {
-                if (!isCalendarOpen) {
-                    dateInputOut.showPicker(); // Mostrar el calendario
-                    isCalendarOpen = true; // Cambiar estado
-                }
-            });
             dateInputOut.addEventListener("click", (event) => {
                 event.preventDefault(); // Previene comportamiento predeterminado
                 dateInputOut.showPicker(); // Fuerza mostrar el calendario
             });
 
-
-
-
-
-            let archivosSeleccionados = []; // Lista para almacenar los archivos seleccionados
-            let archivosEliminados = []; // Lista para almacenar los archivos eliminados
-            
             // Función para validar y mostrar archivos
             window.validateUpload = function (event) {
-                const input = event.target;
-                const files = Array.from(input.files); // Convertir FileList a Array
-            
+                const files = Array.from(event.target.files); // Convertir FileList a Array
                 files.forEach(file => {
                     const fileExtension = file.name.split('.').pop().toLowerCase();
                     const allowedExtensions = ['png', 'jpeg', 'jpg', 'pdf', 'doc', 'docx'];
                     const maxSize = 3 * 1024 * 1024; // 3 MB
-                        
+
                     // Validaciones
                     if (!allowedExtensions.includes(fileExtension)) {
                         Swal.showValidationMessage(`El formato de archivo ${file.name} no es válido. Solo se permiten: ${allowedExtensions.join(', ')}`);
@@ -195,51 +133,39 @@ async function createPermit() { // async function to perform fetch chain
                         Swal.showValidationMessage(`Solo se permiten ingresar 3 archivos`);
                         return;
                     } 
+
                     archivosSeleccionados.push(file); // Agregar archivo a la lista
                 });
-                        
+
                 // Actualizar la lista de archivos en el DOM
                 updateFileList();
-            
-                // Resetear el input[type="file"] para permitir volver a seleccionar los mismos archivos
-                input.value = ''; // Restablecer el valor para poder seleccionar el mismo archivo de nuevo
             };
-            
+
             // Función para actualizar el DOM con los archivos seleccionados
             function updateFileList() {
                 const subidosDiv = document.getElementById('subidos');
                 subidosDiv.innerHTML = ''; // Limpiar lista anterior
-            
                 archivosSeleccionados.forEach((file, index) => {
                     subidosDiv.innerHTML += `
                         <div class="file-item columns is-vcentered" style="margin-top:0.6rem;">
-                            <div>   
+                            <div>
                                 <button class="default-button-css table-button-css" onclick="deletePermitFromArrayAndHtml(${index})">
                                     <i class="fa-solid fa-xmark"></i>
                                 </button>
                             </div>
-            
+
                             <div class="column" style="align-self:center; justify-self:center;">
                                 <p>${file.name} ${(file.size / (1024 * 1024)).toFixed(2)} MB</p>
                             </div>
                         </div>
                     `;
                 });
-            
-                console.log('Lista de archivos en el DOM actualizada:', archivosSeleccionados); // Depuración
             }
-            
             // Función para eliminar un archivo
             window.deletePermitFromArrayAndHtml = function (index) {
-                const deletedFile = archivosSeleccionados.splice(index, 1)[0]; // Eliminar archivo del array
-                archivosEliminados.push(deletedFile.name); // Agregar el archivo eliminado a la lista de eliminados
-            
+                archivosSeleccionados.splice(index, 1); // Eliminar archivo del array
                 updateFileList(); // Actualizar el DOM
             };
-                        
-            
-            
-            
 
         },
         preConfirm: async () => {
@@ -247,6 +173,7 @@ async function createPermit() { // async function to perform fetch chain
             const filtro = $('#filtro').val().trim();
             const fechaYHoraInicio = new Date($('#fechaYHoraInicio').val().trim());
             const fechaYHoraFinal = new Date($('#fechaYHoraFinal').val().trim());
+            let files = "";
             
             // Prefecth validations
             if (/[\{\}\:\$\=\'\*\[\]]/.test(registro) || /[\{\}\:\$\=\'\*\[\]]/.test(filtro)) {
@@ -260,10 +187,126 @@ async function createPermit() { // async function to perform fetch chain
                 return;
             }
             
+            // Fetch documents if there is any (return file objects as an array "files" so it gets referenced by the permitUnit inside collection TODO)
+            if (archivosSeleccionados.length !== 0) try {
+                const formData = new FormData(); // Crear un objeto FormData
+        
+                // Agregar los archivos al FormData
+                archivosSeleccionados.forEach((file, index) => {
+                    formData.append('files', file, file.name); // Agregar cada archivo al FormData
+                });
+        
+                // Realizar la solicitud fetch para enviar los archivos al servidor
+                const responseFile = await fetch('/permisos/uploadFile', {
+                    method: 'POST',
+                    body: formData,
+                });
+        
+                // Respuesta del servidor
+                const dataFile = await responseFile.json();
+        
+                // Verificar si la carga fue exitosa
+                if (!dataFile.success) {
+                    Swal.fire({
+                        title: 'Algo salió mal :(',
+                        icon: 'error',
+                        width: '500px',
+                        text: 'Favor de contactar a Soporte Técnico. (Error #030)',
+                    });
+                    return;
+                }
+        
+                Swal.fire({
+                    title: '¡Archivos cargados con éxito!',
+                    icon: 'success',
+                    text: 'Tus archivos han sido cargados correctamente.',
+                });
 
-            // Preconfirm Fetch #01 - TPODOOOOO PNG, JPEG, PDF, DOC o DOCX
+            } catch (error) {
+                console.error('Error al cargar los archivos:', error);
+                Swal.fire({
+                    title: 'Error en la carga de archivos',
+                    icon: 'error',
+                    text: 'Hubo un problema al intentar cargar tus archivos. Intenta de nuevo más tarde.',
+                });
+            }
+        
+
+            // Fetch 01 - createPermitRequest
+            try {
+                const responsePermit = await fetch('/permisos/createPermitRequest', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+
+                        // acaso si es stringify??
+
+                        /*
+            const registro = $('#registro').val().trim(); 
+            const filtro = $('#filtro').val().trim();
+            const fechaYHoraInicio = new Date($('#fechaYHoraInicio').val().trim());
+            const fechaYHoraFinal = new Date($('#fechaYHoraFinal').val().trim());
+            let files = "";
+                        */
+
+                    })
+                });
+
+                const dataPermit = await responsePermit.json();
+                if (dataPermit.success) {
+                    Swal.fire({
+                        title: 'AÑADIDO',
+                        icon: 'success',
+                        width: "500px",
+                        text: 'Se añadió el  correctamente.'
+                    }).then(() => {
+                        location.reload(); // reload after popup
+                    });
+                    return; // createPermit() successful execution
+
+                // Catch from Controller "/permisos/createPermit"
+                } else {
+                    Swal.fire({
+                        title: 'Algo salió mal :(',
+                        icon: 'error',
+                        width: "500px",
+                        text: 'Favor de contactar a Soporte Técnico. (Error #031)'
+                    });
+                    return; // createPermit() failed execution
+                }
+
+            // Catch from Fetch #02
+            } catch (error) {
+                Swal.fire({
+                    title: 'Algo salió mal :(',
+                    icon: 'error',
+                    width: "500px",
+                    text: 'Favor de contactar a Soporte Técnico. (Error #032)'
+                });
+                console.error('Hubo un error:', error);
+                return; // createPermit() failed execution
+            }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            /*
             const formData = new FormData();
             formData.append('file', fileInput.files[0]); // Postman "Key" = "file"
 

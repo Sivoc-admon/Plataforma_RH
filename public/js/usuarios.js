@@ -139,15 +139,6 @@ async function addUser() { // async function to perform fetch chain
             const formattedISODateIn = todayIn.toISOString().split('T')[0];
             const dateInputIn = document.getElementById("fechaIngreso");
             dateInputIn.value = formattedISODateIn;
-            dateInputIn.addEventListener("focus", () => {
-            dateInputIn.showPicker(); // Despliega el calendario nativo automáticamente
-            });
-            dateInputIn.addEventListener("focus", () => {
-                if (!isCalendarOpen) {
-                    dateInputIn.showPicker(); // Mostrar el calendario
-                    isCalendarOpen = true; // Cambiar estado
-                }
-            });
             dateInputIn.addEventListener("click", (event) => {
                 event.preventDefault(); // Previene comportamiento predeterminado
                 dateInputIn.showPicker(); // Fuerza mostrar el calendario
@@ -158,15 +149,6 @@ async function addUser() { // async function to perform fetch chain
             const formattedISODateOut = todayOut.toISOString().split('T')[0];
             const dateInputOut = document.getElementById("fechaBaja");
             dateInputOut.value = formattedISODateOut;
-            dateInputOut.addEventListener("focus", () => {
-            dateInputOut.showPicker(); // Despliega el calendario nativo automáticamente
-            });
-            dateInputOut.addEventListener("focus", () => {
-                if (!isCalendarOpen) {
-                    dateInputOut.showPicker(); // Mostrar el calendario
-                    isCalendarOpen = true; // Cambiar estado
-                }
-            });
             dateInputOut.addEventListener("click", (event) => {
                 event.preventDefault(); // Previene comportamiento predeterminado
                 dateInputOut.showPicker(); // Fuerza mostrar el calendario
@@ -610,19 +592,9 @@ async function editUser(button) { // async function to perform fetch chain
 
             // format styles and user experience for calendars (fechaIngreso)
             const todayIn = new Date();
-            isCalendarOpenIn = false;
             const formattedISODateIn = todayIn.toISOString().split('T')[0];
             const dateInputIn = document.getElementById("fechaIngreso");
             dateInputIn.value = formattedISODateIn;
-            dateInputIn.addEventListener("focus", () => {
-            dateInputIn.showPicker(); // Despliega el calendario nativo automáticamente
-            });
-            dateInputIn.addEventListener("focus", () => {
-                if (!isCalendarOpenIn) {
-                    dateInputIn.showPicker(); // Mostrar el calendario
-                    isCalendarOpenIn = true; // Cambiar estado
-                }
-            });
             dateInputIn.addEventListener("click", (event) => {
                 event.preventDefault(); // Previene comportamiento predeterminado
                 dateInputIn.showPicker(); // Fuerza mostrar el calendario
@@ -630,19 +602,9 @@ async function editUser(button) { // async function to perform fetch chain
 
             // format styles and user experience for calendars (fechaIngreso)
             const todayOut = new Date();
-            isCalendarOpenOut = false;
             const formattedISODateOut = todayOut.toISOString().split('T')[0];
             const dateInputOut = document.getElementById("fechaBaja");
             dateInputOut.value = formattedISODateOut;
-            dateInputOut.addEventListener("focus", () => {
-            dateInputOut.showPicker(); // Despliega el calendario nativo automáticamente
-            });
-            dateInputOut.addEventListener("focus", () => {
-                if (!isCalendarOpenOut) {
-                    dateInputOut.showPicker(); // Mostrar el calendario
-                    isCalendarOpenOut = true; // Cambiar estado
-                }
-            });
             dateInputOut.addEventListener("click", (event) => {
                 event.preventDefault(); // Previene comportamiento predeterminado
                 dateInputOut.showPicker(); // Fuerza mostrar el calendario

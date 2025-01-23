@@ -20,6 +20,8 @@
         "permisos": {
             "accessPermitsView": true,
             "postFileUpload":true,
+            "createPermitRequest": true,
+
 
 
 
@@ -37,7 +39,6 @@
             "downloadPDF": true,
             "downloadExcel":  true,
             "viewPermitsTeam" : true,
-            "createPermitRequest": true,
             "authorizePermitRequest": true,
             "viewPermitsSelf": true
         },

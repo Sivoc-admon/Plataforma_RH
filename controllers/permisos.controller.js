@@ -4,8 +4,49 @@ const permitsModel = require("../models/permisos.model");
 const teamsSchema = require("../models/equipos.model");
 
 
-/* --- VIEWS LOGIC --- */
 
+/* --- MODEL LOGIC --- */
+exports.postFileUpload = async (req, res) => {
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({success: false, message: ""});
+        }
+
+        //const response = await filesModel.create(req.file); true for now 
+        // desactivado para no generar registros de más en la base de atos TODO
+        return res.status(200).json({success: true, message: "response"}); // response.path = file location
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({success: false, message: "" });
+    }
+};
+
+exports.createPermitRequest = async (req, res) => {
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({success: false, message: ""});
+        }
+
+        //const response = await filesModel.create(req.file); true for now 
+        // desactivado para no generar registros de más en la base de atos TODO
+        return res.status(200).json({success: true, message: "response"}); // response.path = file location
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({success: false, message: "" });
+    }
+};
+/****************/
+/*************/
+/**********/
+/*******/
+/****/
+/**/
+
+
+
+/* --- VIEWS LOGIC --- */
 exports.accessPermitsView = async (req, res) => {
     try {
         let permitsRows = "";
@@ -46,3 +87,9 @@ exports.accessPermitsView = async (req, res) => {
         res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
 };
+/****************/
+/*************/
+/**********/
+/*******/
+/****/
+/**/
