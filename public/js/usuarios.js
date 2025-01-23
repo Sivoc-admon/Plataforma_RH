@@ -1,5 +1,3 @@
-/* ---- script from usuarios.ejs ---- */
-
 // TODO, cleanup after 80% backend framework
 
 

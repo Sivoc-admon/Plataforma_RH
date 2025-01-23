@@ -1,5 +1,3 @@
-/* ---- script from login.ejs ---- */
-
 // addUser button
 async function logIn() {
         const email = document.getElementById("email").value.trim();

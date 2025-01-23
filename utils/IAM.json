@@ -13,12 +13,13 @@
             "changePrivilege" : true,
             "userTableActions": true,
             "editUser" : true,
-            
+
             "TODO" : true
 
         },
         "permisos": {
             "accessPermitsView": true,
+            "postFileUpload":true,
 
 
 

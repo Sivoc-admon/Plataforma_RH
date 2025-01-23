@@ -34,7 +34,7 @@ exports.accessPermitsView = async (req, res) => {
         // Permits module for "rHumanos"
         } else if (res.locals.userPrivilege === "rHumanos") {
             // get all permits regardless of the user but must be sent
-            permitsRows = await permitsModel.find({ isSent: true }).select('-__v');
+            permitsRows = await permitsModel.find({ isSent: true }).populate('userId', 'nombre apellidoP apellidoM').select('-__v');
             return res.render('permisos/rHumanosPermitsView.ejs', { permitsRows });
         }
 

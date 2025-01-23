@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const permitSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'usuarios' },  // 'users' es el nombre de la colección
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'usuarios' },  // 'usuarios' es el nombre de la colección
     tipoPermiso: String,
     fechaInicio: String,
     fechaTermino: String,

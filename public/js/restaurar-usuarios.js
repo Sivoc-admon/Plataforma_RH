@@ -1,5 +1,3 @@
-/* ---- script from usuarios.ejs ---- */
-
 function returnMainTable() {
     window.location.href = '/usuarios/accessUsersModule';
 }

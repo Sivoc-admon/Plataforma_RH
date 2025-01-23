@@ -24,139 +24,6 @@
                 </label>
             </div>
         </div>
-        <!-- Main buttons -->
-
-
-
-
-        <!-- Esto se va a un PopUp como añadir usuario y con su respectivo PopUp de Edición.
-        <div class="columns" style="margin-top: 1rem;">
-            <div class="column is-centered">
-                <label>Tipo de Registro</label>
-                <select id="area" class="input">
-                    <option value="" hidden>Seleccione tipo de Registro</option>
-                    <option value="Incapacidad">Incapacidad</option>
-                    <option value="Incapacidad">Permisos</option>
-                </select> 
-            </div>
-
-            <div class="column is-centered">
-                <label>Filtro de permiso</label>
-                <select id="area" class="input">
-                    <option value="" hidden>Seleccione el filtro de permiso</option>
-                    <option value="Home Office">Home Office</option>
-                    <option value="Cita medica">Cita medica</option>
-                    <option value="Asunto Familiar">Asunto Familiar</option>
-                </select> 
-            </div>
-
-            <div class="column is-centered">
-                <label>Fecha de inicio</label>
-                <input type="datetime-local" class="input" id="fechaYHoraInicio" required>
-            </div>
-             
-            // format styles and user experience for calendars (fechaYHoraInicio) !!
-            const todayIn = new Date();
-            const formattedISODateIn = todayIn.toISOString().split('T')[0];
-            const dateInputIn = document.getElementById("fechaIngreso");
-            dateInputIn.value = formattedISODateIn;
-            dateInputIn.addEventListener("focus", () => {
-            dateInputIn.showPicker(); // Despliega el calendario nativo automáticamente
-            });
-            dateInputIn.addEventListener("focus", () => {
-                if (!isCalendarOpen) {
-                    dateInputIn.showPicker(); // Mostrar el calendario
-                    isCalendarOpen = true; // Cambiar estado
-                }
-            });
-            dateInputIn.addEventListener("click", (event) => {
-                event.preventDefault(); // Previene comportamiento predeterminado
-                dateInputIn.showPicker(); // Fuerza mostrar el calendario
-            });
-            
-
-            <div class="column is-centered">
-                <label>Fecha de termino</label>
-                <input type="datetime-local" class="input" id="fechaYHoraFinal" required>
-            </div>
-
-
-            
-            // format styles and user experience for calendars (fechaYHoraFinal) !!
-            const todayOut = new Date();
-            const formattedISODateOut = todayOut.toISOString().split('T')[0];
-            const dateInputOut = document.getElementById("fechaBaja");
-            dateInputOut.value = formattedISODateOut;
-            dateInputOut.addEventListener("focus", () => {
-            dateInputOut.showPicker(); // Despliega el calendario nativo automáticamente
-            });
-            dateInputOut.addEventListener("focus", () => {
-                if (!isCalendarOpen) {
-                    dateInputOut.showPicker(); // Mostrar el calendario
-                    isCalendarOpen = true; // Cambiar estado
-                }
-            });
-            dateInputOut.addEventListener("click", (event) => {
-                event.preventDefault(); // Previene comportamiento predeterminado
-                dateInputOut.showPicker(); // Fuerza mostrar el calendario
-            });
-            
-
-
-
-            <div class="column is-centered">
-                <label>Agregue documentos</label>
-                <div class="file has-name is-boxed" style="flex: 1;">
-                    <label class="input" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-right:0.3rem;">
-                        <i class="fas fa-upload" style="margin: 0rem 0.3rem;font-size: 1.1rem;"></i>
-                        <input type="file" name="documentStream" class="file-input" id="documentStream" style="display: none;">
-                    </label>
-                </div>
-            </div>
-
-
-            // ojo es example, adaptalo:
-                        // Función para actualizar la vista previa de la imagen cuando se selecciona un archivo
-            window.updateImagePreview = function(event) {
-                const file = event.target.files[0];
-
-                if (file) {
-                    // Validar extensión del archivo
-                    const validExtensions = ['image/jpeg', 'image/png'];
-                    if (!validExtensions.includes(file.type)) {
-                        Swal.showValidationMessage('Selecciona un archivo de imagen válido (JPEG, PNG).');
-                        event.target.value = ''; // Limpia el input de archivo
-                        return;
-                    }
-
-                    // Validar tamaño del archivo (límite: 2 MB)
-                    const maxSize = 2 * 1024 * 1024; // 2 MB
-                    if (file.size > maxSize) {
-                        Swal.showValidationMessage('El tamaño máximo permitido es de 2 MB.');
-                        event.target.value = ''; // Limpia el input de archivo
-                        return;
-                    }
-
-                    // Leer y mostrar la vista previa de la imagen si todo es válido
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        // Actualiza la fuente de la imagen en la vista previa
-                        document.getElementById('profile-img').src = e.target.result;
-                    };
-                    reader.readAsDataURL(file); // Lee el archivo como una URL de datos
-                }
-            };
-            
-            
-
-
-
-             Ojo, aqui es DEJARLO COMO ESTÁ libre de edición hasta que se de click en confirmar. 
-
-
-             
-        </div>
--->
 
 
         <div class="field">
@@ -234,7 +101,7 @@
 
                                         <div class="column is-narrow">
                                             <button class="default-button-css table-button-css" userId="<%= permit._id %>" onclick="sendPermit(this)">
-                                                <i class="fa-solid fa-paper-plane"></i>
+                                                <i class="fa-solid fa-check" style="font-size: 1.552rem;"></i>
                                             </button>
                                         </div>
                                     </div>
