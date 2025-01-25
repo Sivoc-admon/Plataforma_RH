@@ -7,7 +7,7 @@ const multer = require('multer');
 const path = require('path');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/uploads/permisos'); // Destination folder
+    cb(null, 'private/uploads/permisos'); // Destination folder
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9); // Collision avoidance
@@ -17,6 +17,11 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // Compacted into 'upload'
+
+
+// CHANGES:
+// "private/uploads/permisos"
+// going to implement res.sendFile(); res.download(); and 'GET /descargar/file-1736156695153-456034020.jpg' fetches.
 
 
 // Rutas

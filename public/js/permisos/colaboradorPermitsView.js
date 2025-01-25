@@ -30,7 +30,7 @@ async function createPermit() { // async function to perform fetch chain
                 <select id="filtro" class="input">
                     <option value="" hidden>Seleccione filtro</option>
                     <option value="Home Office">Home Office</option>
-                    <option value="Cita medica">Cita medica</option>
+                    <option value="Cita Medica">Cita Medica</option>
                     <option value="Asunto Familiar">Asunto Familiar</option>
                 </select> 
                 </div>
@@ -173,7 +173,7 @@ async function createPermit() { // async function to perform fetch chain
             const filtro = $('#filtro').val().trim();
             const fechaYHoraInicio = new Date($('#fechaYHoraInicio').val().trim());
             const fechaYHoraFinal = new Date($('#fechaYHoraFinal').val().trim());
-            let files = "";
+            const docPaths = [];
             
             // Prefecth validations
             if (/[\{\}\:\$\=\'\*\[\]]/.test(registro) || /[\{\}\:\$\=\'\*\[\]]/.test(filtro)) {
@@ -186,6 +186,25 @@ async function createPermit() { // async function to perform fetch chain
                 Swal.showValidationMessage('La hora de termino debe ser después de la hora de inicio.');
                 return;
             }
+
+            // Transform dates into readable
+            const formatReadableDateTime = (isoDate) => {
+                const date = new Date(isoDate);
+                const readableDate = date.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                });
+                const readableTime = date.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                });
+                return `${readableDate}, ${readableTime}`;
+            };
+            const fechaInicio = formatReadableDateTime(fechaYHoraInicio.toISOString());
+            const fechaTermino = formatReadableDateTime(fechaYHoraFinal.toISOString());
+
+
             
             // Fetch documents if there is any (return file objects as an array "files" so it gets referenced by the permitUnit inside collection TODO)
             if (archivosSeleccionados.length !== 0) try {
@@ -195,6 +214,8 @@ async function createPermit() { // async function to perform fetch chain
                 archivosSeleccionados.forEach((file, index) => {
                     formData.append('files', file, file.name); // Agregar cada archivo al FormData
                 });
+
+                console.log(formData);
         
                 // Realizar la solicitud fetch para enviar los archivos al servidor
                 const responseFile = await fetch('/permisos/uploadFile', {
@@ -212,26 +233,29 @@ async function createPermit() { // async function to perform fetch chain
                         icon: 'error',
                         width: '500px',
                         text: 'Favor de contactar a Soporte Técnico. (Error #030)',
+                    }).then(() => {
+                        location.reload(); // reload after popup
                     });
-                    return;
+                    return; // createPermit() failed execution
+                } else {
+                    // do nothing, just save up the doctPaths from the documents
+                    // aqui agregar: response.message.docPaths = docPaths; (guardar array en variable array)
                 }
         
-                Swal.fire({
-                    title: '¡Archivos cargados con éxito!',
-                    icon: 'success',
-                    text: 'Tus archivos han sido cargados correctamente.',
-                });
-
             } catch (error) {
                 console.error('Error al cargar los archivos:', error);
                 Swal.fire({
                     title: 'Error en la carga de archivos',
                     icon: 'error',
-                    text: 'Hubo un problema al intentar cargar tus archivos. Intenta de nuevo más tarde.',
+                    text: 'Hubo un problema al intentar cargar tus archivos. Intenta de nuevo más tarde. #033',
+                }).then(() => {
+                    location.reload(); // reload after popup
                 });
+                return; // createPermit() failed execution
             }
-        
+    
 
+            // newTodo aqui agregar: response.message.docPaths = docPaths; (guardar array en variable array)
             // Fetch 01 - createPermitRequest
             try {
                 const responsePermit = await fetch('/permisos/createPermitRequest', {
@@ -241,26 +265,25 @@ async function createPermit() { // async function to perform fetch chain
                     },
                     body: JSON.stringify({
 
-                        // acaso si es stringify??
-
-                        /*
-            const registro = $('#registro').val().trim(); 
-            const filtro = $('#filtro').val().trim();
-            const fechaYHoraInicio = new Date($('#fechaYHoraInicio').val().trim());
-            const fechaYHoraFinal = new Date($('#fechaYHoraFinal').val().trim());
-            let files = "";
-                        */
-
+                        registro: registro,
+                        filtro: filtro,
+                        fechaInicio: fechaInicio,
+                        fechaTermino: fechaTermino,
+                        docPaths: ["empty1", "empty2"], // placeholder data
+                        estatus: "Pendiente",
+                        isSent: false,
+                        isVerified: false,
+                        userId: localUserId,
                     })
                 });
 
                 const dataPermit = await responsePermit.json();
                 if (dataPermit.success) {
                     Swal.fire({
-                        title: 'AÑADIDO',
+                        title: 'Permiso creado',
                         icon: 'success',
                         width: "500px",
-                        text: 'Se añadió el  correctamente.'
+                        text: 'Se añadió el permiso correctamente.'
                     }).then(() => {
                         location.reload(); // reload after popup
                     });
@@ -289,189 +312,6 @@ async function createPermit() { // async function to perform fetch chain
                 return; // createPermit() failed execution
             }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            /*
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]); // Postman "Key" = "file"
-
-            try {
-                const responseUser = await fetch('/usuarios/editUser', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        nombre: nombre,
-                        apellidoP: apellidoP,
-                        apellidoM: apellidoM,
-                        email: email,
-                        area: area,
-                        fechaBaja: fechaBaja,
-                        fechaIngreso: fechaIngreso,
-                        // foto: dataFile.message.path,  TODO
-                        jefeInmediato: jefeInmediato,
-                        puesto: puesto,
-                        estaActivo: estaActivo,
-                        privilegio: privilegio, 
-                    })
-                });
-                const dataUser = await responseUser.json();
-                if (dataUser.success) {
-                    Swal.fire({
-                        title: 'Usuario EDITADO',
-                        icon: 'success',
-                        width: "500px",
-                        text: 'Se añadió el usuario correctamente.'
-                    }).then(() => {
-                        location.reload(); // reload after popup
-                    });
-                    return; // addUser() successful execution
-
-                    // Catch from Controller "/usuarios/addUser"
-                } else {
-                    Swal.fire({
-                        title: 'Algo salió mal :(',
-                        icon: 'error',
-                        width: "500px",
-                        text: 'Favor de contactar a Soporte Técnico. (Error #004)'
-                    });
-                    return; // addUser() failed execution
-                }
-
-                // Catch from Fetch #02
-            } catch (error) {
-                Swal.fire({
-                    title: 'Algo salió mal :(',
-                    icon: 'error',
-                    width: "500px",
-                    text: 'Favor de contactar a Soporte Técnico. (Error #003)'
-                });
-                console.error('Hubo un error:', error);
-                return; // addUser() failed execution
-            }
-        
-
-
-
-
-            //if (!fileInput.files[0])
-
-
-
-
-
-
-                // !fileInput.files[0]
-                //  help
-
-
-            
-            // Fetch #01 - File upload (profile picture)
-            /*
-            try {
-                const responseFile = await fetch('/usuarios/uploadFile', {
-                    method: 'POST',
-                    body: formData,
-                });
-                const dataFile = await responseFile.json();
-
-                // Catch from Controller "/usuarios/uploadFile"
-                if (!dataFile.success) {
-                    Swal.fire({
-                        title: 'Algo salió mal :(',
-                        icon: 'error',
-                        width: "500px",
-                        text: 'Favor de contactar a Soporte Técnico. (Error #001)'
-                    });
-                    return; // addUser() failed execution
-                } else {
-
-                    // (CHAINED) Fetch #02 - User information (json object)
-                    try {
-                        const responseUser = await fetch('/usuarios/editUser', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                nombre: nombre,
-                                apellidoP: apellidoP,
-                                apellidoM: apellidoM,
-                                email: email,
-                                area: area,
-                                fechaBaja: fechaBaja,
-                                fechaIngreso: fechaIngreso,
-                                foto: dataFile.message.path, 
-                                jefeInmediato: jefeInmediato,
-                                puesto: puesto,
-                                estaActivo: estaActivo,
-                                privilegio: privilegio, 
-                            })
-                        });
-                        const dataUser = await responseUser.json();
-                        if (dataUser.success) {
-                            Swal.fire({
-                                title: 'Usuario EDITADO',
-                                icon: 'success',
-                                width: "500px",
-                                text: 'Se añadió el usuario correctamente.'
-                            }).then(() => {
-                                location.reload(); // reload after popup
-                            });
-                            return; // addUser() successful execution
-
-                            // Catch from Controller "/usuarios/addUser"
-                        } else {
-                            Swal.fire({
-                                title: 'Algo salió mal :(',
-                                icon: 'error',
-                                width: "500px",
-                                text: 'Favor de contactar a Soporte Técnico. (Error #004)'
-                            });
-                            return; // addUser() failed execution
-                        }
-
-                        // Catch from Fetch #02
-                    } catch (error) {
-                        Swal.fire({
-                            title: 'Algo salió mal :(',
-                            icon: 'error',
-                            width: "500px",
-                            text: 'Favor de contactar a Soporte Técnico. (Error #003)'
-                        });
-                        console.error('Hubo un error:', error);
-                        return; // addUser() failed execution
-                    }
-                }
-
-                // Catch from Fetch #01
-            } catch (error) {
-                Swal.fire({
-                    title: 'Algo salió mal :(',
-                    icon: 'error',
-                    width: "500px",
-                    text: 'Favor de contactar a Soporte Técnico. (Error #002)'
-                });
-                console.error('Hubo un error:', error);
-                return; // addUser() failed execution
-            }
-            */
         }
     })
 };

@@ -19,6 +19,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage }); // Compacted into 'upload'
 
 // TODO, cleanup after 80% backend framework
+// remake so No Files are on app.use(express.static(path.join(__dirname, "public")));
+// files upload must NOT be there, all files must be idk where
 
 // Routes
 router.get("/accessUsersModule", controller.getUsersView);

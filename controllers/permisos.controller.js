@@ -24,13 +24,8 @@ exports.postFileUpload = async (req, res) => {
 
 exports.createPermitRequest = async (req, res) => {
     try {
-        if (!req.files || req.files.length === 0) {
-            return res.status(400).json({success: false, message: ""});
-        }
-
-        //const response = await filesModel.create(req.file); true for now 
-        // desactivado para no generar registros de más en la base de atos TODO
-        return res.status(200).json({success: true, message: "response"}); // response.path = file location
+        const response = await permitsModel.create(req.body);
+        return res.status(200).json({success: true, message: ""}); // response.path = file location
 
     } catch (error) {
         console.error(error);

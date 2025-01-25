@@ -15,101 +15,7 @@
         </div>
 
         <table class="table is-fullwidth is-hoverable">
-
-
-            <!-- now you gotta map out this todoslos permisos en un solo array
-[
-  {
-    _id: new ObjectId('678dd67e9ed3fca5ed2e8842'),
-    userId: '678015aab366e37052cf12bc',
-    tipoPermiso: 'Incapacidad',
-    fechaInicio: 'XD1',
-    fechaTermino: 'XD2',
-    docPaths: [],
-    status: 'denied'
-  },
-  {
-    _id: new ObjectId('678ddfab9ed3fca5ed2e884e'),
-    userId: '678015aab366e37052cf12bc',
-    tipoPermiso: 'Incapacidad',
-    fechaInicio: 'XD1',
-    fechaTermino: 'XD2',
-    docPaths: [ 'path1', 'path2' ],
-    status: 'accepted'
-  },
-  {
-    _id: new ObjectId('678ddfb49ed3fca5ed2e884f'),
-    userId: '678015aab366e37052cf12bc',
-    tipoPermiso: 'Incapacidad',
-    fechaInicio: 'XD1',
-    fechaTermino: 'XD2',
-    docPaths: [ 'path1', 'path2' ],
-    status: 'notSent'
-  },
-  {
-    _id: new ObjectId('678de1159ed3fca5ed2e8850'),
-    userId: '678015aab366e37052cf12bc',
-    tipoPermiso: 'Incapacidad',
-    fechaInicio: 'XD1',
-    fechaTermino: 'XD2',
-    docPaths: [ 'path1', 'path2' ],
-    status: 'sent'
-  },
-  {
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    userId: '6785923011999f6a09ba4501',
-    tipoPermiso: 'Incapacidad',
-    fechaInicio: 'XD1',
-    fechaTermino: 'XD2',
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    userId: '6785923011999f6a09ba4501',
-    tipoPermiso: 'Incapacidad',
-    fechaInicio: 'XD1',
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    userId: '6785923011999f6a09ba4501',
-    tipoPermiso: 'Incapacidad',
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    userId: '6785923011999f6a09ba4501',
-    tipoPermiso: 'Incapacidad',
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    userId: '6785923011999f6a09ba4501',
-    tipoPermiso: 'Incapacidad',
-    fechaInicio: 'XD1',
-    fechaTermino: 'XD2',
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    userId: '6785923011999f6a09ba4501',
-    tipoPermiso: 'Incapacidad',
-    fechaInicio: 'XD1',
-    fechaTermino: 'XD2',
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    userId: '6785923011999f6a09ba4501',
-    tipoPermiso: 'Incapacidad',
-    fechaInicio: 'XD1',
-    fechaTermino: 'XD2',
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    userId: '6785923011999f6a09ba4501',
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    userId: '6785923011999f6a09ba4501',
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    userId: '6785923011999f6a09ba4501',
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    userId: '6785923011999f6a09ba4501',
-    tipoPermiso: 'Incapacidad',
-    _id: new ObjectId('678ec331518d57e6af0d755f'),
-    userId: '6785923011999f6a09ba4501',
-    userId: '6785923011999f6a09ba4501',
-    tipoPermiso: 'Incapacidad',
-    fechaInicio: 'XD1',
-    fechaTermino: 'XD2',
-    docPaths: [ 'path1', 'path2' ],
-    status: 'sent'
-  }
-]            -->
-
-
+            
             <thead>
                 <tr style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue));">
                     <th class="has-text-centered">Colaborador</th>
@@ -130,7 +36,7 @@
                             <%= permit.userId.nombre + " " + permit.userId.apellidoP + " " + permit.userId.apellidoM %>
                         </td>
                         <td class="is-centered">
-                            <%= permit.tipoPermiso %>
+                            <%= permit.registro %>
                         </td>
                         <td class="is-centered">
                             <%= permit.fechaInicio %>
