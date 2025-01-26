@@ -6,7 +6,7 @@ const permitSchema = new mongoose.Schema({
     filtro: String,
     fechaInicio: String,
     fechaTermino: String,
-    docPaths: [String], // String array
+    docPaths: [{type: mongoose.Schema.Types.ObjectId, ref: 'archivos' }],  // 'archivos' es el nombre de la colección
     estatus: String,
     isSent: Boolean,
     isVerified: Boolean,

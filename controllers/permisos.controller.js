@@ -3,33 +3,57 @@ const filesModel = require("../models/files.model");
 const permitsModel = require("../models/permisos.model");
 const teamsSchema = require("../models/equipos.model");
 
+const path = require('path');
 
 
 /* --- MODEL LOGIC --- */
-exports.postFileUpload = async (req, res) => {
+exports.getFileDownload = async (req, res) => {
     try {
-        if (!req.files || req.files.length === 0) {
-            return res.status(400).json({success: false, message: ""});
-        }
-
-        //const response = await filesModel.create(req.file); true for now 
-        // desactivado para no generar registros de más en la base de atos TODO
-        return res.status(200).json({success: true, message: "response"}); // response.path = file location
-
+        const filePath = path.join(__dirname, '..', 'uploads', 'permisos', req.params.filename);
+        res.sendFile(filePath, (err) => {
+            if (err) {
+                console.error('Error al intentar servir el archivo PDF:', err);
+                res.status(404).send('No se encontró el archivo PDF.');
+            }
+        });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({success: false, message: "" });
+        return res.status(500).send('Favor de contactar a Soporte Técnico. (Error #030)');
     }
 };
+
+
+exports.postFileUpload = async (req, res) => {
+    try {
+        // Check if files are present
+        if (!req.files?.length) {
+            return res.status(400).json({ success: false, message: "" });
+        }
+
+        // Save files to the database
+        let docResponses = [];
+        await Promise.all(
+            req.files.map(async (file) => {
+                const response = await filesModel.create(file);
+                docResponses.push(response);
+            })
+        );
+
+        return res.status(200).json({ success: true, message: docResponses });
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: "" });
+    }
+};
+
 
 exports.createPermitRequest = async (req, res) => {
     try {
         const response = await permitsModel.create(req.body);
-        return res.status(200).json({success: true, message: ""}); // response.path = file location
+        return res.status(200).json({ success: true, message: "" }); // response.path = file location
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({success: false, message: "" });
+        return res.status(500).json({ success: false, message: "" });
     }
 };
 /****************/
@@ -49,10 +73,13 @@ exports.accessPermitsView = async (req, res) => {
         // Permits module for "colaborador"
         if (res.locals.userPrivilege === "colaborador") {
             // get all permits from a single user
-            permitsRows = await permitsModel.find({ userId: res.locals.userId }).select('-__v');
+            permitsRows = await permitsModel.find({ userId: res.locals.userId })
+                .populate('docPaths', 'originalname filename path') // Esto llena docPaths con los datos de la colección 'archivos'
+                .select('-__v');
             return res.render('permisos/colaboradorPermitsView.ejs', { permitsRows });
 
-        // Permits module for "jefeInmediato"
+
+            // Permits module for "jefeInmediato"
         } else if (res.locals.userPrivilege === "jefeInmediato") {
             // get all members from the team, map all their permits in a single array
             const team = await teamsSchema.find({ jefeInmediatoId: res.locals.userId }).select('-__v');
@@ -67,7 +94,7 @@ exports.accessPermitsView = async (req, res) => {
             }
             return res.render('permisos/jefeInmediatoPermitsView.ejs', { permitsRows });
 
-        // Permits module for "rHumanos"
+            // Permits module for "rHumanos"
         } else if (res.locals.userPrivilege === "rHumanos") {
             // get all permits regardless of the user but must be sent
             permitsRows = await permitsModel.find({ isSent: true }).populate('userId', 'nombre apellidoP apellidoM').select('-__v');

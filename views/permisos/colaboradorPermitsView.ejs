@@ -67,11 +67,22 @@
                                 <% if (!permit.docPaths || permit.docPaths.length === 0) { %>
                                     No hay documentos
                                 <% } else { %>
-                                    <ul>
-                                        <% permit.docPaths.forEach(function(docPath) { %>
-                                            <li><%= docPath %></li>
-                                        <% }); %>
-                                    </ul>
+
+                                    <!-- Generate a download button for each document -->   
+                                    <% permit.docPaths.forEach(doc => { %>
+
+                                        <div class="columns is-centered">
+                                            <div class="column is-narrow">
+                                                <button class="default-button-css table-button-css" docPath="<%= JSON.stringify(doc) %>" onclick="downloadFile(this)" >
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div style="align-self: center; justify-self: center;">
+                                                <%= doc.originalname %>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+
                                 <% } %>
                             </td>
 

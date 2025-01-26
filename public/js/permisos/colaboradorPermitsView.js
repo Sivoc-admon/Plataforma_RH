@@ -214,8 +214,6 @@ async function createPermit() { // async function to perform fetch chain
                 archivosSeleccionados.forEach((file, index) => {
                     formData.append('files', file, file.name); // Agregar cada archivo al FormData
                 });
-
-                console.log(formData);
         
                 // Realizar la solicitud fetch para enviar los archivos al servidor
                 const responseFile = await fetch('/permisos/uploadFile', {
@@ -237,9 +235,12 @@ async function createPermit() { // async function to perform fetch chain
                         location.reload(); // reload after popup
                     });
                     return; // createPermit() failed execution
+
+                // On successul upload, save up all paths into docPaths to be saved inside mongodb
                 } else {
-                    // do nothing, just save up the doctPaths from the documents
-                    // aqui agregar: response.message.docPaths = docPaths; (guardar array en variable array)
+                    dataFile.message.forEach(item => {
+                        docPaths.push(item._id);
+                    });
                 }
         
             } catch (error) {
@@ -264,12 +265,11 @@ async function createPermit() { // async function to perform fetch chain
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-
                         registro: registro,
                         filtro: filtro,
                         fechaInicio: fechaInicio,
                         fechaTermino: fechaTermino,
-                        docPaths: ["empty1", "empty2"], // placeholder data
+                        docPaths: docPaths,
                         estatus: "Pendiente",
                         isSent: false,
                         isVerified: false,
@@ -314,4 +314,10 @@ async function createPermit() { // async function to perform fetch chain
 
         }
     })
+};
+
+
+async function downloadFile(button) {
+    const docPath = JSON.parse(button.getAttribute('docPath')); // Convertimos el JSON en un objeto
+    window.open(`/permisos/downloadFile/${docPath.filename}`);  // 200 iq, "fakePost" the filename into the url, this means u can post tiny information INTO A GET ROUTE
 };

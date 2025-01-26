@@ -22,6 +22,9 @@
             "postFileUpload":true,
             "createPermitRequest": true,
 
+            "uploadFile": true,
+            "downloadFile": true,
+
 
 
 
