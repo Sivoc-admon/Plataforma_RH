@@ -4,9 +4,56 @@ const permitsModel = require("../models/permisos.model");
 const teamsSchema = require("../models/equipos.model");
 
 const path = require('path');
+const fs = require('fs');
 
 
 /* --- MODEL LOGIC --- */
+exports.postEditPermit = async (req, res) => {
+    try {
+
+        const response = await permitsModel.findByIdAndUpdate(
+            req.body.permitId, 
+            { 
+                $set: { 
+                    registro: req.body.registro, 
+                    filtro: req.body.filtro,
+                    fechaInicio: req.body.fechaInicio,
+                    fechaTermino: req.body.fechaTermino,
+                    docPaths: req.body.docPaths
+                } 
+            }, // Cambiar atributos
+            { new: true } 
+        );
+    
+        return res.status(200).json({ success: true, message: "" });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "" });
+    }
+
+};
+
+exports.deleteFile = async (req, res) => {
+        try {
+            const filePath = path.join(__dirname, '..', 'uploads', 'permisos', req.body.dbName);
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error('Hubo un error al eliminar el archivo:', err);
+                    return res.status(500).json({ message: 'Hubo un error al eliminar el archivo' });
+                }
+            });
+
+            const response = await permitsModel.deleteOne({ filename: req.body.dbName });
+            return res.status(200).json({ success: true, message: response });
+    
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ success: false, message: "" });
+        }
+
+};
+
 exports.getFileDownload = async (req, res) => {
     try {
         const filePath = path.join(__dirname, '..', 'uploads', 'permisos', req.params.filename);
@@ -20,7 +67,6 @@ exports.getFileDownload = async (req, res) => {
         return res.status(500).send('Favor de contactar a Soporte Técnico. (Error #030)');
     }
 };
-
 
 exports.postFileUpload = async (req, res) => {
     try {
@@ -74,7 +120,7 @@ exports.accessPermitsView = async (req, res) => {
         if (res.locals.userPrivilege === "colaborador") {
             // get all permits from a single user
             permitsRows = await permitsModel.find({ userId: res.locals.userId })
-                .populate('docPaths', 'originalname filename path') // Esto llena docPaths con los datos de la colección 'archivos'
+                .populate('docPaths', '_id originalname filename path') // Esto llena docPaths con los datos de la colección 'archivos'
                 .select('-__v');
             return res.render('permisos/colaboradorPermitsView.ejs', { permitsRows });
 

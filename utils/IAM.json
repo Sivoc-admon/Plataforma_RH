@@ -24,6 +24,7 @@
 
             "uploadFile": true,
             "downloadFile": true,
+            "deleteFile": true,
 
 
 

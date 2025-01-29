@@ -28,18 +28,9 @@ const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // Co
 router.get("/accessPermitsView", controller.accessPermitsView);
 
 router.post("/uploadFile", upload.array('files', 3), controller.postFileUpload);
-
-
-
-router.get('/downloadFile/:filename', (req, res) => {
-  const filePath = path.join(__dirname, '..', 'uploads', 'permisos', req.params.filename);
-  res.sendFile(filePath, (err) => {
-      if (err) {
-          console.error('Error al intentar servir el archivo PDF:', err);
-          res.status(404).send('No se encontró el archivo PDF.');
-      }
-  });
-});
+router.get('/downloadFile/:filename', controller.getFileDownload);
+router.delete('/deleteFile', controller.deleteFile);
+router.post("/editPermit", controller.postEditPermit);
 
 
 

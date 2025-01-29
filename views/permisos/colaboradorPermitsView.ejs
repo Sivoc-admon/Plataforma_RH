@@ -9,14 +9,12 @@
     </script>
 
 
-
     <div class="inside-content-css">
-        <h1> Módulo Permisos (Vista de colaborador) </h1>
+        <h1> Módulo Permisos </h1>
 
         <!-- Main buttons -->
         <div class="columns" style="margin-top: 1rem;">
             <div class="column is-centered" style="text-align: center;">
-                <!-- al momento de mandar el colaborador un permiso este automaticamente obtiene esttus pendietne. -->
                 <button class="default-button-css functionality-button-css" onclick="createPermit()">
                     <i class="fa-solid fa-clipboard-user default-icon-button-css"></i>
                     <p>Crear Permiso</p>
@@ -29,7 +27,6 @@
                 </label>
             </div>
         </div>
-
 
         <div class="field">
             <div class="control">
@@ -63,12 +60,11 @@
                                 <%= permit.fechaTermino %>
                             </td>
                             <td class="is-centered">
-
                                 <% if (!permit.docPaths || permit.docPaths.length === 0) { %>
                                     No hay documentos
                                 <% } else { %>
 
-                                    <!-- Generate a download button for each document -->   
+                                    <!-- Generate a visualization button for each document -->   
                                     <% permit.docPaths.forEach(doc => { %>
 
                                         <div class="columns is-centered">
@@ -104,12 +100,11 @@
                                 <% } %>
                             </td>
 
-                            
                             <td class="is-centered">
                                 <% if (!permit.isSent) { %>
                                         <div class="columns is-centered">
                                             <div class="column is-narrow">
-                                                <button class="default-button-css table-button-css" permitId="<%= permit._id %>" onclick="editPermit(this)" >
+                                                <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="editPermit(this)">
                                                     <i class="fa-solid fa-pencil"></i>
                                                 </button>
                                             </div>
