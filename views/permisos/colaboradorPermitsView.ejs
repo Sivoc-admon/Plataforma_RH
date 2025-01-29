@@ -110,13 +110,13 @@
                                             </div>
 
                                             <div class="column is-narrow">
-                                                <button class="default-button-css table-button-css" permitId="<%= permit._id %>" onclick="deletePermit(this)">
+                                                <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="deletePermit(this)">
                                                     <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </div>
 
                                             <div class="column is-narrow">
-                                                <button class="default-button-css table-button-css" permitId="<%= permit._id %>" onclick="sendPermit(this)">
+                                                <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="sendPermit(this)">
                                                     <i class="fa-solid fa-check" style="font-size: 1.552rem;"></i>
                                                 </button>
                                             </div>

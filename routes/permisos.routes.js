@@ -29,8 +29,12 @@ router.get("/accessPermitsView", controller.accessPermitsView);
 
 router.post("/uploadFile", upload.array('files', 3), controller.postFileUpload);
 router.get('/downloadFile/:filename', controller.getFileDownload);
+
+
 router.delete('/deleteFile', controller.deleteFile);
 router.post("/editPermit", controller.postEditPermit);
+router.delete('/deletePermit', controller.deletePermit);
+
 
 
 

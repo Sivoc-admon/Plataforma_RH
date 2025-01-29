@@ -325,6 +325,7 @@ async function downloadFile(button) {
 // editPermit button
 async function editPermit(button) { // async function to perform fetch chain
     const permitObject = JSON.parse(button.getAttribute('permitObject'));
+    const originalDocs = permitObject.docPaths;
 
     // Función para convertir fechas del formato legible a ISO
     function formatFecha(fechaString) {
@@ -337,13 +338,10 @@ async function editPermit(button) { // async function to perform fetch chain
             return `${anio}-${meses[mes] || '01'}-${dia.padStart(2, '0')}T${hora}:${minuto}`;
         }));
     }
-
-    // Usamos la función para formatear ambas fechas
     const formattedFechaInicio = formatFecha(permitObject.fechaInicio).toISOString().slice(0, 16);
     const formattedFechaTermino = formatFecha(permitObject.fechaTermino).toISOString().slice(0, 16);
 
     let archivosSeleccionados = []; // Lista para almacenar los archivos seleccionados
-    let archivosOriginales = []; // Lista para almacenar los archivos que fueron detectados para eliminar
 
     Swal.fire({
         html: `
@@ -436,12 +434,14 @@ async function editPermit(button) { // async function to perform fetch chain
         didOpen: () => {
 
             // preload the already existing files
-            if (permitObject.docPaths && permitObject.docPaths.length > 0) {
-                permitObject.docPaths.forEach(doc => {
-                    const fileObject = {"name": doc.originalname, "isFile": false, "dbName": doc.filename, "_id": doc._id}
-                    archivosOriginales.push(fileObject); // Agregar archivo a la lista
-                    archivosSeleccionados.push(fileObject); // Agregar archivo a la lista
+            if (originalDocs && originalDocs.length > 0) {
+                originalDocs.forEach(doc => {
+                    // add the atribute "name": doc.originalname to each
+                    doc.name = doc.originalname;
                 });
+
+                // critical, create an INDEPENDENT copy using this format
+                archivosSeleccionados = JSON.parse(JSON.stringify(originalDocs));
                 updateFileList();
             }
 
@@ -554,97 +554,115 @@ async function editPermit(button) { // async function to perform fetch chain
 
 
             
-            // Fetch documents if there is any (return file objects as an array "files" so it gets referenced by the permitUnit inside collection TODO)
-            if (archivosSeleccionados.length !== 0) try {
-                const formData = new FormData(); // Crear un objeto FormData
-        
-                // 1. Agregar los archivos al FormData
-                archivosSeleccionados.forEach((file, index) => {
-                    // Verificamos si el archivo tiene el atributo 'isFile'
-                    if (file.isFile !== false) {  // Si 'isFile' no existe o es diferente de 'false', lo agregamos
-                        formData.append('files', file, file.name);
-                    }
-                    // Si uno de los archivos se mantuvo, agrega su docPath a los docpaths
-                    else {
-                        // tienes que enviar el objectId de dicha imagen no del permiso
-                        docPaths.push(file._id); 
-                        console.log(`El archivo ${file.name} no es un archivo válido o no tiene 'isFile'`);
-                    }
-                });
+            // 1. Detecta los cambios de ambas listas
+            // a. file exists in docs but not in archivosSeleccionados = DELETE
+            // b. file doesnt exist in docs but does in archivosSeleccionados = UPLOAD
+            // c. file doesnt exist neither docs nor archivosSeleccionados = skip
+            // d. file exists in docs and in archivosSeleccionados = skip
 
-                // 2. Eliminar los archivos deseleccionados
-                for (const file of archivosOriginales) {
-                    if (!archivosSeleccionados.includes(file)) {
+            // Resultado:
+            // a. forEach docs that !archivosSeleccionados.includes() = DELETE
+            // b. forEach archivosSeleccionados that !docs.includes() = UPLOAD
+
+            // a. forEach docs that !archivosSeleccionados.includes() = DELETE
+            async function processDeletes() {
+                for (const originalDoc of originalDocs) {
+                    // Verificamos si el documento no está en archivosSeleccionados
+                    if (!archivosSeleccionados.some((selectedDoc) => 
+                        JSON.stringify(selectedDoc) === JSON.stringify(originalDoc))) {
+            
                         try {
+                            // Realizamos la solicitud para eliminar el archivo
                             const responseDelete = await fetch('/permisos/deleteFile', {
                                 method: 'DELETE',
                                 headers: {
-                                    'Content-Type': 'application/json', // Si es necesario especificar tipo de contenido
+                                    'Content-Type': 'application/json', // Asegúrate de que es el tipo de contenido correcto
                                 },
-                                body: JSON.stringify({ dbName: file.dbName }), // Envolvemos el 'dbName' en un objeto JSON
+                                body: JSON.stringify({
+                                    dbName: originalDoc.filename,
+                                    _id: originalDoc._id
+                                }), // Enviamos el nombre del archivo y el id como JSON
                             });
-
+            
+                            // Comprobamos si la respuesta de la eliminación fue exitosa
                             if (!responseDelete.ok) {
-                                // TODO, this way of standrized errors is better because is only 1 Swal for each fetch and not 2.
-                                throw new Error(`Error al eliminar el archivo: ${file.dbName}`);
+                                throw new Error(`Error al eliminar el archivo: ${originalDoc.filename}`);
                             }
-
+            
                         } catch (error) {
+                            // Si hay algún error, mostramos un mensaje al usuario
                             Swal.fire({
                                 title: 'Algo salió mal :(',
                                 icon: 'error',
                                 width: '500px',
                                 text: 'Favor de contactar a Soporte Técnico. (Error #037)',
                             }).then(() => {
-                                location.reload(); // reload after popup
+                                location.reload(); // Recargamos la página después del mensaje de error
                             });
-                            return; // editPermit() failed execution
+                            return; // Si ocurre un error, detenemos la ejecución
                         }
                     }
-                };
+                }
+            }
+            await processDeletes(); // critical, must be executed async 
 
-                // 3. Realizar la solicitud fetch para enviar los archivos al servidor
-                const responseFile = await fetch('/permisos/uploadFile', {
-                    method: 'POST',
-                    body: formData,
-                });
-        
-                // Respuesta del servidor
-                const dataFile = await responseFile.json();
-        
-                // Verificar si la carga fue exitosa
-                if (!dataFile.success) {
+            // b. forEach archivosSeleccionados that !docs.includes() = UPLOAD
+            async function processUploads() {
+                const formData = new FormData(); // Crear un objeto FormData
+
+                for (const selectedDoc of archivosSeleccionados) {
+                    // Verificamos si el archivo seleccionado no está en originalDocs
+                    if (!originalDocs.some((originalDoc) => 
+                        JSON.stringify(originalDoc) === JSON.stringify(selectedDoc))) {
+                        formData.append('files', selectedDoc, selectedDoc.name);
+                    }
+                }
+
+                // ejecuta el fetch post solo si existen archivos en el array de formData
+                if (Array.from(formData.entries()).length > 0) try {
+                    // fetch de los archivos al FormData
+                    const responseFile = await fetch('/permisos/uploadFile', {
+                        method: 'POST',
+                        body: formData,
+                    });
+            
+                    // Respuesta del servidor
+                    const dataFile = await responseFile.json();
+            
+                    // Verificar si la carga fue exitosa
+                    if (!dataFile.success) {
+                        Swal.fire({
+                            title: 'Algo salió mal :(',
+                            icon: 'error',
+                            width: '500px',
+                            text: 'Favor de contactar a Soporte Técnico. (Error #030)',
+                        }).then(() => {
+                            location.reload(); // reload after popup
+                        });
+                        return; // editPermit() failed execution
+
+                    // On successul upload, save up all paths into docPaths to be saved inside mongodb
+                    } else {
+                        dataFile.message.forEach(item => {
+                            docPaths.push(item._id);
+                        });
+                    }
+                        
+                } catch {
                     Swal.fire({
                         title: 'Algo salió mal :(',
                         icon: 'error',
                         width: '500px',
-                        text: 'Favor de contactar a Soporte Técnico. (Error #030)',
+                        text: 'Favor de contactar a Soporte Técnico. (Error #050)',
                     }).then(() => {
                         location.reload(); // reload after popup
                     });
                     return; // editPermit() failed execution
-
-                // On successul upload, save up all paths into docPaths to be saved inside mongodb
-                } else {
-                    dataFile.message.forEach(item => {
-                        docPaths.push(item._id);
-                    });
                 }
-        
-            } catch (error) {
-                console.error('Error al cargar los archivos:', error);
-                Swal.fire({
-                    title: 'Error en la carga de archivos',
-                    icon: 'error',
-                    text: 'Hubo un problema al intentar cargar tus archivos. Intenta de nuevo más tarde. #033',
-                }).then(() => {
-                    location.reload(); // reload after popup
-                });
-                return; // editPermit() failed execution
             }
-    
+            await processUploads(); // critical, must be executed async 
 
-            // newTodo aqui agregar: response.message.docPaths = docPaths; (guardar array en variable array)
+
             // Fetch 01 - editPermitRequest
             try {
                 const responsePermit = await fetch('/permisos/editPermit', {
@@ -696,7 +714,124 @@ async function editPermit(button) { // async function to perform fetch chain
                 console.error('Hubo un error:', error);
                 return; // editPermit() failed execution
             }
-
         }
+            
     })
 };
+
+
+
+
+// deletePermit button
+        async function deletePermit(button) {
+            const permitObject = JSON.parse(button.getAttribute('permitObject'));
+
+            Swal.fire({
+                html: `
+
+                <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
+                    <i class="fa-solid fa-trash-can" style="margin-right:0.9rem;"></i>Eliminar permiso
+                </h2>
+                <p>¿Estás seguro que deseas eliminar el permiso? (Esta acción no se puede deshacer)</p>
+
+                `,
+                confirmButtonText: 'Confirmar',
+                cancelButtonText: 'Cancelar',
+                cancelButtonColor: '#f0466e',
+                showCancelButton: true,
+                allowOutsideClick: false,
+                width: '1000px',
+                customClass: {
+                    confirmButton: 'default-button-css',
+                    cancelButton: 'default-button-css',
+                },
+        
+                preConfirm: async () => {
+                    try {
+
+                    // borra las files que pertenecen al permiso antes de borrarlo                         
+                    async function processDeletes() {
+                        for (const file of permitObject.docPaths) {
+                                try {
+                                    // Realizamos la solicitud para eliminar el archivo
+                                    const responseDelete = await fetch('/permisos/deleteFile', {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'Content-Type': 'application/json', // Asegúrate de que es el tipo de contenido correcto
+                                        },
+                                        body: JSON.stringify({
+                                            dbName: file.filename,
+                                            _id: file._id
+                                        }), // Enviamos el nombre del archivo y el id como JSON
+                                    });
+
+                                    // Comprobamos si la respuesta de la eliminación fue exitosa
+                                    if (!responseDelete.ok) {
+                                        throw new Error(`Error al eliminar el archivo: ${file.filename}`);
+                                    }
+
+                                } catch (error) {
+                                    // Si hay algún error, mostramos un mensaje al usuario
+                                    Swal.fire({
+                                        title: 'Algo salió mal :(',
+                                        icon: 'error',
+                                        width: '500px',
+                                        text: 'Favor de contactar a Soporte Técnico. (Error #037)',
+                                    }).then(() => {
+                                        location.reload(); // Recargamos la página después del mensaje de error
+                                    });
+                                    return; // Si ocurre un error, detenemos la ejecución
+                                }
+                        }
+                    }
+                    await processDeletes(); // critical, must be executed async 
+
+                        const response = await fetch('/permisos/deletePermit', {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                _id: permitObject._id,
+                            })
+                        });
+                        
+                        
+                        const data = await response.json();
+        
+                        // Catch from Controller "/deletePermit"
+                        if (!data.success) {
+                            Swal.fire({
+                                title: 'Algo salió mal :(',
+                                icon: 'error',
+                                width: "500px",
+                                text: 'Favor de contactar a Soporte Técnico. (Error #041)'
+                            });
+                            return; // deletePermit() failed execution
+                        } else {
+                            Swal.fire({
+                                title: 'Permiso eliminado ',
+                                icon: 'success',
+                                width: "500px",
+                                text: 'Se ha eliminado el permiso correctamente.'
+                            }).then(() => {
+                                location.reload(); // reload after popup
+                            });
+                            return; // deletePermit() successful execution
+                        }
+                       
+        
+                        // Catch from Fetch #01
+                    } catch (error) {
+                        Swal.fire({
+                            title: 'Algo salió mal :(',
+                            icon: 'error',
+                            width: "500px",
+                            text: 'Favor de contactar a Soporte Técnico. (Error #042)'
+                        });
+                        console.error('Hubo un error:', error);
+                        return; // deletePermit() failed execution
+                    }
+                }
+            })
+        };

@@ -8,6 +8,18 @@ const fs = require('fs');
 
 
 /* --- MODEL LOGIC --- */
+exports.deletePermit = async (req, res) => {
+    try {
+        const response = await permitsModel.deleteOne({ _id: req.body._id });
+        return res.status(200).json({ success: true, message: "" });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "" });
+    }
+
+};
+
 exports.postEditPermit = async (req, res) => {
     try {
 
@@ -34,8 +46,8 @@ exports.postEditPermit = async (req, res) => {
 
 };
 
-exports.deleteFile = async (req, res) => {
-        try {
+exports.deleteFile = async (req, res) => {   
+        try {            
             const filePath = path.join(__dirname, '..', 'uploads', 'permisos', req.body.dbName);
             fs.unlink(filePath, (err) => {
                 if (err) {
@@ -44,14 +56,13 @@ exports.deleteFile = async (req, res) => {
                 }
             });
 
-            const response = await permitsModel.deleteOne({ filename: req.body.dbName });
+            const response = await filesModel.deleteOne({ _id: req.body._id });
             return res.status(200).json({ success: true, message: response });
     
         } catch (error) {
             console.error(error);
             return res.status(500).json({ success: false, message: "" });
         }
-
 };
 
 exports.getFileDownload = async (req, res) => {
