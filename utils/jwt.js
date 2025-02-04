@@ -1,17 +1,20 @@
 const jwt = require('jsonwebtoken');
 const iam = require('./IAM.json');
 
+// Critical, protection against CRSF Attacks + IAM Configuration Structure
+// Cookies generated from Loggin-in must be "{ httpOnly: true, secure: true, sameSite: 'Strict' }"
+
 const authorize = (req, res, next) => {
     // Default value of local session variables
     res.locals.userId = res.locals.userId || '';
-    res.locals.userName = res.locals.userName || 'Usuario';
+    res.locals.userName = res.locals.userName || '';
     res.locals.userPhoto = res.locals.userPhoto || '';
     res.locals.userPrivilege = res.locals.userPrivilege || '';
     res.locals.userArea = res.locals.userArea || '';
 
     const token = req.cookies.__psmxoflxpspgolxps_mid;
 
-    if (["/login", "/login/POSTAUTH"].includes(req.url)) {
+    if (["/login", "/login/POSTAUTH","/Unauthorized", "/logout"].includes(req.url)) {
         return next();     
     }
 
@@ -25,7 +28,6 @@ const authorize = (req, res, next) => {
         
         res.locals.userName = decoded.name;
         res.locals.userPhoto = decoded.foto.replace("public", "");
-        
         res.locals.userPrivilege = decoded.privilegio;
         res.locals.userArea = decoded.area;
         res.locals.userId = decoded.userId;
@@ -34,49 +36,24 @@ const authorize = (req, res, next) => {
         // if you arrive to the lobby you dont need any privileges, but do need a jwt
         if (req.url === "/login/inicio") {
             return next();
+
+        // if you do want to execute ANYTHING it must past the IAM test
         } else {
             
-            // TODO implement IAM here. BTW, Frontend IS DIFFERENT depending ON THE ROLE 
             // iam . (decoded.privilegio) . (url 1st portion, "/usuarios/agregar" = usuarios) . (url 2nd portion, "/usuarios/agregar" = agregar)
-
-            /*
-            const superadmin = {
-                usuarios: {
-                    accessUsersModule: true,
-                    downloadExcelUsers: true,
-                    downloadPDFUsers: true,
-                    restoreUsersView: true,
-                    addUser: true,
-                    uploadFile: true,
-                    deactivateUser: true,
-                    activateUser: true,
-                    "/existe-email": null, // Placeholder
-                    userTableActions: true
-                }
-            };
-
-            // Asignar el valor dinámicamente
-            superadmin.usuarios["/existe-email"] = superadmin.usuarios.addUser;
-
-            console.log(JSON.stringify(superadmin, null, 2));
-
-
-            
-
-
+/*
             // construct the IAM path dynamically by extracting portions of the URL
             const urlParts = req.url.split('/').filter(part => part); 
-            const firstPortion = urlParts[0] || ''; 
-            const secondPortion = urlParts[1] || '';
+            const originModule = urlParts[0] || ''; 
+            const actionToExecute = urlParts[1] || '';
             const privilege = decoded.privilegio;
-            const permissionPath = iam?.[privilege]?.[firstPortion]?.[secondPortion];
+            const permissionPath = iam?.[privilege]?.[originModule]?.[actionToExecute];
                     
+            // if not enough permissions then detect Unauthorized
             if (!permissionPath) {
-                console.log("Access Denied: Insufficient Permissions");
-                // TODO error message something idk i have never seen a PopUp like this
-                // the frontend is already managed by res.locals.userPrivilege = decoded.privilegio;
-            }
-                */
+                return res.redirect("/Unauthorized");
+            }           
+                */  
         }
 
         return next();

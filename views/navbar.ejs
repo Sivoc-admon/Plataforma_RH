@@ -49,16 +49,21 @@
         <img src="/SIVOC_LOGO.png" style="width: 80%; display: block; margin: auto; margin-bottom: 1rem;">
         <aside class="menu">
             <ul class="menu-list" style="margin: 0.5rem 0.5rem;">
+                
                 <!-- Botón Inicio -->
                 <a href="/login/inicio" class="has-text-white is-size-5 mt-2">
                     <i class="fa-solid fa-house icon-css"></i> Inicio
                 </a>
+
+                <% if ( userPrivilege !== "colaborador") { %>
                 <!-- Botón Usuarios -->
                 <a href="/usuarios/accessUsersModule" class="has-text-white is-size-5 mt-2">
                     <i class="fa-solid fa-users icon-css"></i> Usuarios
                 </a>
+                <% }; %>
+
                 <!-- Botón Permisos -->
-                <a href="/permisos/accessPermitsView" class="has-text-white is-size-5 mt-2">
+                <a href="/permisos/accessPermitsModule" class="has-text-white is-size-5 mt-2">
                     <i class="fa-solid fa-clipboard-user icon-css"></i> Permisos
                 </a>
                 <!-- Botón Vacaciones -->

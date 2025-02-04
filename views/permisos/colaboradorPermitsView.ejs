@@ -64,11 +64,10 @@
                                     No hay documentos
                                 <% } else { %>
 
-                                    <!-- Generate a visualization button for each document -->   
                                     <% permit.docPaths.forEach(doc => { %>
 
                                         <div class="columns is-centered">
-                                            <div class="column is-narrow">
+                                            <div class="column">
                                                 <button class="default-button-css table-button-css" docPath="<%= JSON.stringify(doc) %>" onclick="downloadFile(this)" >
                                                     <i class="fa-solid fa-eye"></i>
                                                 </button>
@@ -85,12 +84,12 @@
                             <td class="is-centered">
                                 <% if (!permit.isSent) { %>
                                     <i class="fa-solid fa-triangle-exclamation status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Sin enviar
+                                <% } else if (permit.estatus === "Pendiente" || !permit.isVerified) { %>
+                                        <i class="fa-solid fa-clock status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Pendiente
                                 <% } else if (permit.estatus === "Aprobado") { %>
                                     <i class="fa-solid fa-thumbs-up status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Aprobado
                                 <% } else if (permit.estatus === "Cancelado") { %>
                                     <i class="fa-solid fa-thumbs-down status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Cancelado
-                                <% } else if (permit.estatus === "Pendiente") { %>
-                                    <i class="fa-solid fa-clock status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Pendiente
                                 <% } else if (permit.estatus === "Justificado") { %>
                                     <i class="fa-solid fa-thumbs-up status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Justificado
                                 <% } else if (permit.estatus === "Injustificado") { %>
@@ -103,19 +102,19 @@
                             <td class="is-centered">
                                 <% if (!permit.isSent) { %>
                                         <div class="columns is-centered">
-                                            <div class="column is-narrow">
+                                            <div class="column">
                                                 <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="editPermit(this)">
                                                     <i class="fa-solid fa-pencil"></i>
                                                 </button>
                                             </div>
 
-                                            <div class="column is-narrow">
+                                            <div class="column">
                                                 <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="deletePermit(this)">
                                                     <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </div>
 
-                                            <div class="column is-narrow">
+                                            <div class="column">
                                                 <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="sendPermit(this)">
                                                     <i class="fa-solid fa-check" style="font-size: 1.552rem;"></i>
                                                 </button>

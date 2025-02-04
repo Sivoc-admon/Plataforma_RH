@@ -6,7 +6,7 @@
 
 
     <div class="inside-content-css">
-        <h1> Módulo Permisos (Vista de recursos humanos) </h1>
+        <h1> Módulo Permisos</h1>
 
         <div class="field">
             <div class="control">
@@ -15,11 +15,13 @@
         </div>
 
         <table class="table is-fullwidth is-hoverable">
-
+            
             <thead>
                 <tr style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue));">
-                    <th class="has-text-centered">Colaborador</th>
-                    <th class="has-text-centered">Tipo Permiso</th>
+                    <th class="has-text-centered">Colaborador Nombre</th>
+                    <th class="has-text-centered">Colaborador Area</th>
+                    <th class="has-text-centered">Registro</th>
+                    <th class="has-text-centered">Filtro</th>
                     <th class="has-text-centered">Fecha inicio</th>
                     <th class="has-text-centered">Fecha termino</th>
                     <th class="has-text-centered">Consultar docs</th>
@@ -36,7 +38,13 @@
                             <%= permit.userId.nombre + " " + permit.userId.apellidoP + " " + permit.userId.apellidoM %>
                         </td>
                         <td class="is-centered">
+                            <%= permit.userId.area %>
+                        </td>
+                        <td class="is-centered">
                             <%= permit.registro %>
+                        </td>
+                        <td class="is-centered">
+                            <%= permit.filtro %>
                         </td>
                         <td class="is-centered">
                             <%= permit.fechaInicio %>
@@ -49,11 +57,22 @@
                             <% if (!permit.docPaths || permit.docPaths.length === 0) { %>
                                 No hay documentos
                             <% } else { %>
-                                <ul>
-                                    <% permit.docPaths.forEach(function(docPath) { %>
-                                        <li><%= docPath %></li>
-                                    <% }); %>
-                                </ul>
+
+
+                                <% permit.docPaths.forEach(doc => { %>
+                                <div class="columns">
+                                    <div class="column" style="padding:0.3rem;align-self: center;">
+                                        <button class="default-button-css table-button-css" docPath="<%= JSON.stringify(doc) %>" onclick="downloadFile(this)" >
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="column" style="padding:0.3rem;align-self: center;">
+                                        <%= doc.originalname %>
+                                    </div>
+                                </div>
+
+                                <% }) %>
+
                             <% } %>
                             
                         </td>
@@ -78,20 +97,20 @@
                         <td class="is-centered">
                             <% if (!permit.isVerified) { %>
                                 <div class="columns is-centered">
-                                    <div class="column is-narrow">
-                                        <button class="default-button-css table-button-css" userId="<%= permit._id %>" onclick="changeStatus(this)" >
+                                    <div class="column">
+                                        <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="changeStatus(this)" >
                                             <i class="fa-solid fa-gear"></i>
                                         </button>
                                     </div>
 
-                                    <div class="column is-narrow">
-                                        <button class="default-button-css table-button-css" userId="<%= permit._id %>" onclick="verifyPermit(this)">
-                                            <i class="fa-solid fa-clipboard-check"></i>
+                                    <div class="column">
+                                        <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="verifyPermit(this)">
+                                            <i class="fa-solid fa-check"></i>
                                         </button>
                                     </div>
                                 </div>
                             <% } else { %>
-                                <i class="fa-solid fa-check status-css" style="justify-self: center; margin-right: 0.5rem;"></i>Cerrado
+                                <i class="fa-solid fa-check status-css" style="justify-self: center; margin-right: 0.5rem;"></i> Cerrado
                             <% } %>
                         </td>
                     </tr>

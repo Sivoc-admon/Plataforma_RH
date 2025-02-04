@@ -25,7 +25,7 @@ const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // Co
 
 
 // Rutas
-router.get("/accessPermitsView", controller.accessPermitsView);
+router.get("/accessPermitsModule", controller.accessPermitsModule);
 
 router.post("/uploadFile", upload.array('files', 3), controller.postFileUpload);
 router.get('/downloadFile/:filename', controller.getFileDownload);
@@ -34,9 +34,15 @@ router.get('/downloadFile/:filename', controller.getFileDownload);
 router.delete('/deleteFile', controller.deleteFile);
 router.post("/editPermit", controller.postEditPermit);
 router.delete('/deletePermit', controller.deletePermit);
+router.post("/sendPermit", controller.postSendPermit);
+
+router.post("/changeStatus", controller.postChangeStatus);
 
 
+router.post("/verifyPermit", controller.postVerifyPermit);
 
+
+router.get("/downloadPDF", controller.getDownloadPDF);
 
 
 

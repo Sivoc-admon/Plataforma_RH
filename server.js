@@ -59,9 +59,11 @@ app.get("/logout", (req, res) => {
   res.redirect("/login");
 });
 
-app.use((req, res) => {
+app.get("/Unauthorized", (req, res) => {
+  res.clearCookie('__psmxoflxpspgolxps_mid');
   res.status(404).render("404.ejs");  // Catch 404 before middlewares
 });
+
 /*-------------*/
 
 /* Client-side active sessions tracker */

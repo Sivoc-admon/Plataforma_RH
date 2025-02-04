@@ -34,3 +34,5 @@ uploads/vacaciones/*
 !uploads/permisos/.gitkeep
 !uploads/usuarios/.gitkeep
 !uploads/vacaciones/.gitkeep
+downloads/*
+!downloads/.gitkeep

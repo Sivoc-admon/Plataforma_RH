@@ -6,7 +6,27 @@
 
 
     <div class="inside-content-css">
-        <h1> Módulo Permisos (Vista de jefe inmediato) </h1>
+        <h1> Módulo Permisos</h1>
+
+        <div class="columns" style="margin-top: 1rem;">
+
+            <div class="column is-centered" style="text-align: center;">
+                <button class="default-button-css functionality-button-css" onclick="downloadPDF()">
+                    <i class="fa-solid fa-download default-icon-button-css"></i>
+                    <p>Descargar PDF</p>
+                </button>
+            </div>
+
+            <div class="column is-centered" style="text-align: center;">
+                <button class="default-button-css functionality-button-css" onclick="downloadExcel()">
+                    <i class="fa-solid fa-download default-icon-button-css"></i>
+                    <p>Descargar Excel</p>
+                </button>
+            </div>
+
+        </div>
+
+
 
         <div class="field">
             <div class="control">
@@ -19,7 +39,8 @@
             <thead>
                 <tr style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue));">
                     <th class="has-text-centered">Colaborador</th>
-                    <th class="has-text-centered">Tipo Permiso</th>
+                    <th class="has-text-centered">Registro</th>
+                    <th class="has-text-centered">Filtro</th>
                     <th class="has-text-centered">Fecha inicio</th>
                     <th class="has-text-centered">Fecha termino</th>
                     <th class="has-text-centered">Consultar docs</th>
@@ -39,6 +60,9 @@
                             <%= permit.registro %>
                         </td>
                         <td class="is-centered">
+                            <%= permit.filtro %>
+                        </td>
+                        <td class="is-centered">
                             <%= permit.fechaInicio %>
                         </td>
                         <td class="is-centered">
@@ -49,11 +73,22 @@
                             <% if (!permit.docPaths || permit.docPaths.length === 0) { %>
                                 No hay documentos
                             <% } else { %>
-                                <ul>
-                                    <% permit.docPaths.forEach(function(docPath) { %>
-                                        <li><%= docPath %></li>
-                                    <% }); %>
-                                </ul>
+
+
+                                <% permit.docPaths.forEach(doc => { %>
+
+                                    <div class="columns is-centered">
+                                        <div class="column">
+                                            <button class="default-button-css table-button-css" docPath="<%= JSON.stringify(doc) %>" onclick="downloadFile(this)" >
+                                                <i class="fa-solid fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="column" style="align-self: center; justify-self: center;">
+                                            <%= doc.originalname %>
+                                        </div>
+                                    </div>
+                                <% }) %>
+
                             <% } %>
                             
                         </td>
@@ -79,14 +114,14 @@
                             <% if (!permit.isVerified) { %>
                                 <div class="columns is-centered">
                                     <div class="column is-narrow">
-                                        <button class="default-button-css table-button-css" userId="<%= permit._id %>" onclick="changeStatus(this)" >
+                                        <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="changeStatus(this)" >
                                             <i class="fa-solid fa-gear"></i>
                                         </button>
                                     </div>
 
                                     <div class="column is-narrow">
-                                        <button class="default-button-css table-button-css" userId="<%= permit._id %>" onclick="verifyPermit(this)">
-                                            <i class="fa-solid fa-clipboard-check"></i>
+                                        <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="verifyPermit(this)">
+                                            <i class="fa-solid fa-check"></i>
                                         </button>
                                     </div>
                                 </div>

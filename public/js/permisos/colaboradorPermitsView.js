@@ -1,6 +1,11 @@
 // createPermit button
 async function createPermit() { // async function to perform fetch chain
 
+    // TODO: No permitir subir permisos cuando Today > fechaInicio
+    // Accionar permisos que esten !isSent cuando la fecha Today > fechaInicio
+    // Al subir un permit.registro === "Incapacidad", fechaInicio fechaTermino serán sin hora.
+    //          -> trick, set those datetimes as (fechaInicio:00:00hrs, fechaTermino:23:59:hrs)
+
     let archivosSeleccionados = []; // Lista para almacenar los archivos seleccionados
 
     Swal.fire({
@@ -10,7 +15,7 @@ async function createPermit() { // async function to perform fetch chain
         </h2>
 
         <div class="columns is-multiline">
-
+,
             <!-- Fields -->
             <div class="column">
 
@@ -31,6 +36,7 @@ async function createPermit() { // async function to perform fetch chain
                     <option value="Home Office">Home Office</option>
                     <option value="Cita Medica">Cita Medica</option>
                     <option value="Asunto Familiar">Asunto Familiar</option>
+                    <option value="Otro">Otro</option>
                 </select> 
                 </div>
 
@@ -346,7 +352,7 @@ async function editPermit(button) { // async function to perform fetch chain
     Swal.fire({
         html: `
         <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
-            <i class="fa-solid fa-clipboard-user" style="margin-right:0.9rem;"></i>Crear Permiso
+            <i class="fa-solid fa-pencil" style="margin-right:0.9rem;"></i>Editar Permiso
         </h2>
 
         <div class="columns is-multiline">
@@ -371,6 +377,7 @@ async function editPermit(button) { // async function to perform fetch chain
                     <option value="Home Office">Home Office</option>
                     <option value="Cita Medica">Cita Medica</option>
                     <option value="Asunto Familiar">Asunto Familiar</option>
+                    <option value="Otro">Otro</option>
                 </select> 
                 </div>
 
@@ -831,6 +838,84 @@ async function editPermit(button) { // async function to perform fetch chain
                         });
                         console.error('Hubo un error:', error);
                         return; // deletePermit() failed execution
+                    }
+                }
+            })
+        };
+
+
+// sendPermit button
+        async function sendPermit(button) {
+            const permitObject = JSON.parse(button.getAttribute('permitObject'));
+
+            Swal.fire({
+                html: `
+                <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
+                    <i class="fa-solid fa-check" style="margin-right:0.9rem;"></i>Enviar permiso
+                </h2>
+                <p>¿Estás seguro que deseas enviar este permiso para aprobación? (Esta acción no se puede deshacer)</p>
+
+                `,
+                confirmButtonText: 'Confirmar',
+                cancelButtonText: 'Cancelar',
+                cancelButtonColor: '#f0466e',
+                showCancelButton: true,
+                allowOutsideClick: false,
+                width: '1000px',
+                customClass: {
+                    confirmButton: 'default-button-css',
+                    cancelButton: 'default-button-css',
+                },
+        
+                preConfirm: async () => {
+                    try {
+
+
+                        const response = await fetch('/permisos/sendPermit', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                _id: permitObject._id,
+                            })
+                        });
+                        
+                        
+                        const data = await response.json();
+        
+                        // Catch from Controller "/sendPermit"
+                        if (!data.success) {
+                            Swal.fire({
+                                title: 'Algo salió mal :(',
+                                icon: 'error',
+                                width: "500px",
+                                text: 'Favor de contactar a Soporte Técnico. (Error #052)'
+                            });
+                            return; // sendPermit() failed execution
+                        } else {
+                            Swal.fire({
+                                title: 'Permiso enviado',
+                                icon: 'success',
+                                width: "500px",
+                                text: 'Se ha enviado el permiso correctamente.'
+                            }).then(() => {
+                                location.reload(); // reload after popup
+                            });
+                            return; // sendPermit() successful execution
+                        }
+                       
+        
+                        // Catch from Fetch #01
+                    } catch (error) {
+                        Swal.fire({
+                            title: 'Algo salió mal :(',
+                            icon: 'error',
+                            width: "500px",
+                            text: 'Favor de contactar a Soporte Técnico. (Error #051)'
+                        });
+                        console.error('Hubo un error:', error);
+                        return; // sendPermit() failed execution
                     }
                 }
             })
