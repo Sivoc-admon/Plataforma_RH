@@ -1,7 +1,10 @@
 // viewFile button
 async function viewPermitsRowFile(button) {
-    window.open(`/permisos/viewPermitsRowFile/${button.getAttribute('filename')}`); 
+    window.open(DOMPurify.sanitize(`/permisos/viewPermitsRowFile/${button.getAttribute('filename')}`)); 
 };
+
+// VALIDATOR - this is the only and First view to get validation and XSS protection.
+// TODO, implement that quality onto the next features but do not rework until MVP finished. 
 
 
 // changeStatus button (FIXED) (Just finish the PopUps)
@@ -10,13 +13,12 @@ async function changeStatus(button) {
     const currentStatus = button.getAttribute('currentStatus');
 
     Swal.fire({
-        html: `
+        html: DOMPurify.sanitize(`
         <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
             <i class="fa-solid fa-rotate" style="margin-right:0.9rem;"></i>Cambiar estatus
         </h2>
-
+        
         <p>Elija el nuevo estatus del permiso</p>
-
         <div class="column">
             <select id="estatus" class="is-fullwidth input">
                 <option value="${currentStatus}" hidden>${currentStatus}</option>
@@ -27,8 +29,7 @@ async function changeStatus(button) {
                 <option value="Injustificado">Injustificado</option>
             </select> 
         </div>
-
-        `,
+        `),
         confirmButtonText: 'Confirmar',
         cancelButtonText: 'Cancelar',
         cancelButtonColor: '#f0466e',

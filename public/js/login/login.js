@@ -38,6 +38,7 @@ async function logIn() {
         });
         const data = await response.json();
 
+
         if (data.success) {
             if (data.authorized) {
                 window.location.href = data.redirectUrl;

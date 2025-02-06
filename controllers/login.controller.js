@@ -10,6 +10,20 @@ const jwt = require('jsonwebtoken');
 exports.postAuthentication = async (req, res) => {
     try {
 
+        // Built-in root user, this will always access with maxOut authorization even without database
+        // this works because of all the security provided by jwt.js + SameSiteStric + validator.js + DOMpurify.js
+        if (req.body.email === process.env.ROOT_USERNAME && req.body.password === process.env.ROOT_PASSWORD){
+            const rootToken = await genRootToken();
+            if (!rootToken.success) {
+                return res.status(500).json({ success: false, message: "" });
+            } else if (rootToken.accessToken !== ""){
+                res.cookie('__psmxoflxpspgolxps_mid', rootToken.accessToken, { httpOnly: true, secure: true, sameSite: 'Strict' });  
+            }
+            global.activeUsers.add(rootToken.userId.toString()); // user set to ensure unique ids
+            return res.status(200).json({ success: true, authorized: true, redirectUrl: "/login/inicio"});
+        }
+        
+
         const user = await loginModel.findOne({ email: req.body.email });
         if (!user) {
             return res.status(401).json({ success: true, authorized: false, message: "El usuario ingresado no existe." });
@@ -40,6 +54,19 @@ exports.postAuthentication = async (req, res) => {
     }
 };
 
+async function genRootToken () {
+    try {
+        const newAccessToken = jwt.sign(
+            { area: "Dirección", foto: "", name: "USUARIO RAÍZ", userId: "000", email: process.env.ROOT_USERNAME,  privilegio: "direccion" },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: "30min" } // hardcoded 30min no matter what
+        );
+        return { success: true, accessToken: newAccessToken, userId: "000"};
+    } catch (error) {
+        return { success: false, accessToken: ""};
+    }
+};
+
 async function genTokenOnValidAuthentication (user, jwtSent, remember) {
         try {
             jwt.verify(jwtSent, process.env.ACCESS_TOKEN_SECRET); // decoded info or controlled error only responses
@@ -55,10 +82,10 @@ async function genTokenOnValidAuthentication (user, jwtSent, remember) {
                     process.env.ACCESS_TOKEN_SECRET,
                     { expiresIn: timeExpiration } 
                 );
-                return { success: true, accessToken: newAccessToken, timeExpiration: timeExpiration};
+                return { success: true, accessToken: newAccessToken};
             } else {
                 console.error(error);
-                return { success: false, accessToken: "", timeExpiration: timeExpiration};
+                return { success: false, accessToken: ""};
             }
         }
 };

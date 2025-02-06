@@ -8,14 +8,12 @@ const fs = require('fs');
 const PDFDocument = require('pdfkit'); // Assuming you are using pdfkit
 const crypto = require('crypto');
 
+const validator = require("../validators/permisos.validator"); // access via validator.{action}
 
-
-
-const { changeStatusValidation, validateUser } = require("../validators/jefeInmediatoPermitsView.validator");
 
 exports.changeStatus = async (req, res) => {
     // ✅ Aplicar validación (FIXED)
-    const { error } = changeStatusValidation(req.body);
+    const { error } = validator.changeStatus(req.body);
     if (error) {
         return res.status(400).json({ success: false, message: error.details.map(d => d.message).join(", ") });
     }
@@ -113,6 +111,7 @@ exports.viewPermitsRowFile = async (req, res) => {
 
 
 exports.getDownloadPDF = async (req, res) => {
+    /*
     try {
         let permitsRows = "";
 
@@ -254,7 +253,6 @@ stream.on('finish', () => {
             console.log("PDF rHumanos: " + permitsRows);
             return true;
         }
-
         // catch non-authenticated user
         return res.redirect("/login");
 
@@ -266,6 +264,9 @@ stream.on('finish', () => {
 
 
        
+*/
+return res.status(200).json({ success: true, message: "" });
+
 
 };
 
@@ -449,6 +450,16 @@ exports.accessPermitsModule = async (req, res) => {
 
         // Permits module for "rHumanos"
         } else if (res.locals.userPrivilege === "rHumanos") {
+            // get all permits regardless of the user but must be sent
+            permitsRows = await permitsModel.find({ isSent: true })                            
+                            .populate('userId', 'nombre apellidoP apellidoM area')
+                            .populate('docPaths', '_id originalname filename path') 
+                            .select('-__v');
+            return res.render('permisos/rHumanosPermitsView.ejs', { permitsRows });
+        
+        
+        // Permits module for "direccion"
+        } else if (res.locals.userPrivilege === "direccion") {
             // get all permits regardless of the user but must be sent
             permitsRows = await permitsModel.find({ isSent: true })                            
                             .populate('userId', 'nombre apellidoP apellidoM area')

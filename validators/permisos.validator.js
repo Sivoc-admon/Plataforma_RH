@@ -1,27 +1,41 @@
-// like a controller, 1:1 validation per route per controller function
-// slice the validators between modules (1:1 validator file x {usuarios, permisos, cursos, vacaciones})
-
 const joi = require("joi");
+const mongoose = require("mongoose");
 
-const validator = (schema) => (payload) =>
-  schema.validate(payload, { abortEarly: false });
+// just avoid regex all toghteer. (FIXED)
 
-const signupSchema = joi.object({
-  email: joi.string().email().required(),
-  password: joi.string().min(3).max(10).required(),
-  confirmPassword: joi.ref("password"),
-  address: {
-    state: joi.string().length(2).required(),
-  },
-  DOB: joi.date().greater(new Date("2012-01-01")).required(),
-  referred: joi.boolean().required(),
-  referralDetails: joi.string().when("referred", {
-    is: true,
-    then: joi.string().required().min(3).max(50),
-    otherwise: joi.string().optional(),
-  }),
-  hobbies: joi.array().items([joi.string(), joi.number()]),
-  acceptTos: joi.boolean().truthy("Yes").valid(true).required(),
+const validator = (schema) => (payload) => 
+    schema.validate(payload, { abortEarly: false });
+
+/* 📌 Schema: changeStatus */
+const changeStatus = joi.object({
+    permitId: joi.string()
+        .custom((value, helpers) => 
+            mongoose.Types.ObjectId.isValid(value) ? value : helpers.error("any.invalid")
+        )
+        .required()
+        .messages({ "any.invalid": "ID de permiso inválido." }),
+
+    estatus: joi.string()
+        .valid("Aprobado", "Pendiente", "Cancelado", "Justificado", "Injustificado")
+        .required()
+        .messages({ "any.only": "Estatus no válido." }),
 });
 
-exports.validateSignup = validator(signupSchema);
+exports.changeStatus = validator(changeStatus);
+
+
+
+
+
+
+/* 📌 Schema 2: Users */
+const usersSchema = joi.object({
+    userId: joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
+        .messages({ "string.pattern.base": "ID de usuario inválido." }),
+
+    docPaths: joi.array().items(joi.string().regex(/^[0-9a-fA-F]{24}$/))
+        .messages({ "string.pattern.base": "Uno o más IDs de documentos no son válidos." }),
+});
+
+// Exportar validaciones separadas
+exports.validateUser = validator(usersSchema);

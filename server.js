@@ -45,6 +45,7 @@ app.use("/cursos", require("./routes/cursos.routes"));
 
 /* Global routes */
 app.get("/", (req, res) => {
+  res.clearCookie('__psmxoflxpspgolxps_mid');
   res.redirect("/login");
 });
 app.get("/logout", (req, res) => {
