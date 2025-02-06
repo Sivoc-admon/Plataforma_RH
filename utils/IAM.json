@@ -63,6 +63,13 @@
             "accessUsersModule": true
         },
         "permisos": {
+            "viewPermitsRowFile": true,
+
+
+
+
+
+
             "accessPermitsModule": true,
             "downloadFile": true,
             "changeStatus": true,

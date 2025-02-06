@@ -79,7 +79,7 @@
 
                                     <div class="columns is-centered">
                                         <div class="column">
-                                            <button class="default-button-css table-button-css" docPath="<%= JSON.stringify(doc) %>" onclick="downloadFile(this)" >
+                                            <button class="default-button-css table-button-css" filename="<%= doc.originalname %>" onclick="viewPermitsRowFile(this)" >
                                                 <i class="fa-solid fa-eye"></i>
                                             </button>
                                         </div>
@@ -114,13 +114,13 @@
                             <% if (!permit.isVerified) { %>
                                 <div class="columns is-centered">
                                     <div class="column is-narrow">
-                                        <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="changeStatus(this)" >
+                                        <button class="default-button-css table-button-css" permitId="<%= permit._id %>" currentStatus="<%= permit.estatus %>" onclick="changeStatus(this)" >
                                             <i class="fa-solid fa-gear"></i>
                                         </button>
                                     </div>
 
                                     <div class="column is-narrow">
-                                        <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="verifyPermit(this)">
+                                        <button class="default-button-css table-button-css" permitId="<%= permit._id %>" onclick="verifyPermit(this)">
                                             <i class="fa-solid fa-check"></i>
                                         </button>
                                     </div>

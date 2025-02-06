@@ -8,7 +8,109 @@ const fs = require('fs');
 const PDFDocument = require('pdfkit'); // Assuming you are using pdfkit
 const crypto = require('crypto');
 
-/* --- MODEL LOGIC --- */
+
+
+
+const { changeStatusValidation, validateUser } = require("../validators/jefeInmediatoPermitsView.validator");
+
+exports.changeStatus = async (req, res) => {
+    // ✅ Aplicar validación (FIXED)
+    const { error } = changeStatusValidation(req.body);
+    if (error) {
+        return res.status(400).json({ success: false, message: error.details.map(d => d.message).join(", ") });
+    }
+
+    // ✅ Lógica del modelo 
+    try {
+        const { permitId, estatus } = req.body;
+        const updatedPermit = await permitsModel.findByIdAndUpdate(
+            permitId, 
+            { 
+                $set: { 
+                    estatus: estatus,
+                } 
+            },
+            { new: true } 
+        );
+        if (!updatedPermit) {
+            return res.status(404).json({ success: false, message: "Permiso no encontrado" });
+        }
+
+        return res.status(200).json({ success: true, message: "Permiso actualizado correctamente." });
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: "Error en el servidor" });
+    }
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exports.viewPermitsRowFile = async (req, res) => {
+    try {
+
+
+
+        // 1. VALIDATON 
+        // 2. SERVICE (business logic)
+        // 3. MODEL (database logic)
+
+        // find the filename
+
+
+        const filePath = path.join(__dirname, '..', 'uploads', 'permisos', req.params.filename);
+        res.sendFile(filePath, (err) => {
+            if (err) {
+                res.status(404).send('Correct. No se encontró el archivo PDF.');
+            }
+        });
+    } catch (error) {
+        return res.status(500).send('Favor de contactar a Soporte Técnico. (Error #030)');
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 exports.getDownloadPDF = async (req, res) => {
     try {
@@ -190,26 +292,6 @@ exports.postVerifyPermit = async (req, res) => {
 };
 
 
-exports.postChangeStatus = async (req, res) => {
-    try {
-        const response = await permitsModel.findByIdAndUpdate(
-            req.body._id, 
-            { 
-                $set: { 
-                    estatus: req.body.estatus,
-                } 
-            },
-            { new: true } 
-        );
-        return res.status(200).json({ success: true, message: "" });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
-    }
-
-};
-
 exports.postSendPermit = async (req, res) => {
     try {
         const response = await permitsModel.findByIdAndUpdate(
@@ -288,19 +370,6 @@ exports.deleteFile = async (req, res) => {
         }
 };
 
-exports.getFileDownload = async (req, res) => {
-    try {
-        const filePath = path.join(__dirname, '..', 'uploads', 'permisos', req.params.filename);
-        res.sendFile(filePath, (err) => {
-            if (err) {
-                console.error('Error al intentar servir el archivo PDF:', err);
-                res.status(404).send('No se encontró el archivo PDF.');
-            }
-        });
-    } catch (error) {
-        return res.status(500).send('Favor de contactar a Soporte Técnico. (Error #030)');
-    }
-};
 
 exports.postFileUpload = async (req, res) => {
     try {

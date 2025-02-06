@@ -1,13 +1,13 @@
-// downloadFile button
-async function downloadFile(button) {
-    const docPath = JSON.parse(button.getAttribute('docPath')); // Convertimos el JSON en un objeto
-    window.open(`/permisos/downloadFile/${docPath.filename}`);  // 200 iq, "fakePost" the filename into the url, this means u can post tiny information INTO A GET ROUTE
+// viewFile button
+async function viewPermitsRowFile(button) {
+    window.open(`/permisos/viewPermitsRowFile/${button.getAttribute('filename')}`); 
 };
 
 
-// changeStatus button
+// changeStatus button (FIXED) (Just finish the PopUps)
 async function changeStatus(button) {
-    const permitObject = JSON.parse(button.getAttribute('permitObject'));
+    const permitId = button.getAttribute('permitId');
+    const currentStatus = button.getAttribute('currentStatus');
 
     Swal.fire({
         html: `
@@ -19,7 +19,7 @@ async function changeStatus(button) {
 
         <div class="column">
             <select id="estatus" class="is-fullwidth input">
-                <option value="${permitObject.estatus}" hidden>${permitObject.estatus}</option>
+                <option value="${currentStatus}" hidden>${currentStatus}</option>
                 <option value="Aprobado">Aprobado</option>
                 <option value="Cancelado">Cancelado</option>
                 <option value="Pendiente">Pendiente</option>
@@ -49,7 +49,7 @@ async function changeStatus(button) {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        _id: permitObject._id,
+                        permitId: permitId,
                         estatus: estatus,
                     })
                 });
@@ -57,13 +57,13 @@ async function changeStatus(button) {
                 
                 const data = await response.json();
 
-                // Catch from Controller "/changeStatus"
+                // Catch from Controller "/changeStatus" (FIXED)
                 if (!data.success) {
                     Swal.fire({
-                        title: 'Algo salió mal :(',
+                        title: 'Modificación reportada',
                         icon: 'error',
                         width: "500px",
-                        text: 'Favor de contactar a Soporte Técnico. (Error #055)'
+                        text: data.message
                     });
                     return; // changeStatus() failed execution
                 } else {

@@ -19,6 +19,17 @@ const storage = multer.diskStorage({
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // Compacted into 'upload'
 
 
+// jefeInmediatoPermitsView
+router.get('/viewPermitsRowFile/:filename', controller.viewPermitsRowFile);
+router.post("/changeStatus", controller.changeStatus);//(FIXED)
+
+
+
+
+
+
+
+
 // CHANGES:
 // going to implement res.sendFile(); res.download(); and 'GET /descargar/file-1736156695153-456034020.jpg' fetches.
 // forgor gitkeeps and ignores xd
@@ -28,7 +39,7 @@ const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // Co
 router.get("/accessPermitsModule", controller.accessPermitsModule);
 
 router.post("/uploadFile", upload.array('files', 3), controller.postFileUpload);
-router.get('/downloadFile/:filename', controller.getFileDownload);
+//router.get('/downloadFile/:filename', controller.getFileDownload);
 
 
 router.delete('/deleteFile', controller.deleteFile);
@@ -36,7 +47,6 @@ router.post("/editPermit", controller.postEditPermit);
 router.delete('/deletePermit', controller.deletePermit);
 router.post("/sendPermit", controller.postSendPermit);
 
-router.post("/changeStatus", controller.postChangeStatus);
 
 
 router.post("/verifyPermit", controller.postVerifyPermit);

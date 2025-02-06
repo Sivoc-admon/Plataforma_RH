@@ -525,7 +525,7 @@ async function editUser(button) { // async function to perform fetch chain
                             id="profile-img" 
                             src="${foto}"
                             style="position: absolute; top: 50%; left: 50%; width: auto; height: auto; transform: translate(-50%, -50%);"
-                            onerror="this.onerror=null; this.src='/SIVOC_PFP.png';">
+                            onerror="this.onerror=null; this.src='/img/SIVOC_PFP.png';">
                     </div>
                 </div>
             </div>
