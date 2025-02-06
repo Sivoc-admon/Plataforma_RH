@@ -44,7 +44,7 @@ const crypto = require('crypto');
 // Crear un nuevo documento PDF
 const doc = new PDFDocument();
 const filename = crypto.randomUUID() + ".pdf";
-const outputFilePath = `./downloads/${filename}`;
+const outputFilePath = `./uploads/temp/${filename}`;
 
 // Escribir el archivo PDF en el sistema de archivos
 const stream = fs.createWriteStream(outputFilePath);
