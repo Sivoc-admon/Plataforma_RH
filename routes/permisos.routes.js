@@ -2,43 +2,29 @@ const express = require("express");
 const router = express.Router();
 const controller = require('../controllers/permisos.controller');
 
-// Storage directory (critical)
-const multer = require('multer');
-const path = require('path');
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/permisos'); // Destination folder
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9); // Collision avoidance
-    const extension = path.extname(file.originalname);
-    const newName = file.fieldname + '-' + uniqueSuffix + extension;
-    cb(null, newName);
-  }
-});
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // Compacted into 'upload'
+
+// 📌 Route specifically designed
+const configureFileUpload = require("../utils/configureFileUpload");
+const allowedFileTypes = ["image/png", "image/jpeg", "image/jpg", "application/pdf"];
+// !!                     const allowedExtensions = ['png', 'jpeg', 'jpg', 'pdf', 'doc', 'docx'];
+const upload = configureFileUpload("uploads/permisos", allowedFileTypes);
+router.post("/createPermitRequest", upload.array('files', 3), controller.createPermitRequest);
 
 
-// jefeInmediatoPermitsView
+// REMADE ROUTES
 router.get('/viewPermitsRowFile/:filename', controller.viewPermitsRowFile);
 router.post("/changeStatus", controller.changeStatus);//(FIXED)
 
-
-
-
-
+//router.post("/createPermitRequest", controller.createPermitRequest);
 
 
 
 // CHANGES:
 // going to implement res.sendFile(); res.download(); and 'GET /descargar/file-1736156695153-456034020.jpg' fetches.
 // forgor gitkeeps and ignores xd
-
-
 // Rutas
 router.get("/accessPermitsModule", controller.accessPermitsModule);
 
-router.post("/uploadFile", upload.array('files', 3), controller.postFileUpload);
 //router.get('/downloadFile/:filename', controller.getFileDownload);
 
 
@@ -56,7 +42,6 @@ router.get("/downloadPDF", controller.getDownloadPDF);
 
 
 
-router.post("/createPermitRequest", controller.createPermitRequest);
 
 // Ruta para cargar archivos
   

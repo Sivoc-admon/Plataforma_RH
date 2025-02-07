@@ -9,7 +9,6 @@ const jwt = require('jsonwebtoken');
 // POST Endpoint para '/POSTAUTH'
 exports.postAuthentication = async (req, res) => {
     try {
-
         // Built-in root user, this will always access with maxOut authorization even without database
         // this works because of all the security provided by jwt.js + SameSiteStric + validator.js + DOMpurify.js
         if (req.body.email === process.env.ROOT_USERNAME && req.body.password === process.env.ROOT_PASSWORD){

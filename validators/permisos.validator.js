@@ -21,7 +21,18 @@ const changeStatus = joi.object({
         .messages({ "any.only": "Estatus no válido." }),
 });
 
-exports.changeStatus = validator(changeStatus);
+/* 📌 Schema: viewPermitsRowFile */
+const viewPermitsRowFile = joi.object({
+    filename: joi.string()
+      .regex(/^[a-zA-Z0-9_-]+\.[a-zA-Z0-9]{2,4}$/) // Esto asegura que sea un nombre de archivo seguro con extensión válida
+      .required()
+      .messages({
+        'string.pattern.base': 'El nombre de archivo es inválido, solo se permiten letras, números, guiones y puntos.',
+        'any.required': 'El nombre de archivo es obligatorio.'
+      })
+  });
+
+exports.viewPermitsRowFile = validator(viewPermitsRowFile);
 
 
 

@@ -11,6 +11,144 @@ const crypto = require('crypto');
 const validator = require("../validators/permisos.validator"); // access via validator.{action}
 
 
+
+const express = require("express");
+const multer = require("multer");
+
+const app = express();
+
+
+exports.createPermitRequest = async (req, res) => {
+
+    /*
+    // TODO: No permitir subir permisos cuando Today > fechaInicio
+    // Accionar permisos que esten !isSent cuando la fecha Today > fechaInicio
+    // Al subir un permit.registro === "Incapacidad", fechaInicio fechaTermino serán sin hora.
+    //          -> trick, set those datetimes as (fechaInicio:00:00hrs, fechaTermino:23:59:hrs)
+    // // EVITAR PERMISOS FUTUROS TAMBIEN
+
+    */ 
+
+    
+    console.log("📌 req.body:", req.body);   // Muestra los datos enviados (registro, filtro, userId, etc.)
+    console.log("📌 req.files:", req.files); // Muestra los archivos subidos (PDFs)
+    /*
+        📌 req.body: [Object: null prototype] {
+        registro: 'Permiso',
+        filtro: 'Cita Medica',
+        fechaInicio: '2025-02-10T11:05',
+        fechaTermino: '2025-04-05T11:05',
+        userId: '678015aab366e37052cf12bc'
+        }
+        📌 req.files: [
+        {
+            fieldname: 'files',
+            originalname: 'Semblanza (1).pdf',
+            encoding: '7bit',
+            mimetype: 'application/pdf',
+            destination: 'uploads/permisos',
+            filename: 'files-1738947966555-815359186.pdf',
+            path: 'uploads\\permisos\\files-1738947966555-815359186.pdf',
+            size: 842619
+        }
+        ]
+
+    */
+
+        
+/*
+            const registro = $('#registro').val().trim(); 
+            const filtro = $('#filtro').val().trim();
+            const fechaYHoraInicio = new Date($('#fechaYHoraInicio').val().trim());
+            const fechaYHoraFinal = new Date($('#fechaYHoraFinal').val().trim());
+            const docPaths = [];
+            
+            // Cool validations XD
+            if (/[\{\}\:\$\=\'\*\[\]]/.test(registro) || /[\{\}\:\$\=\'\*\[\]]/.test(filtro)) {
+                Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
+                return;
+            } else if (!registro || !filtro || !fechaYHoraInicio || !fechaYHoraFinal || isNaN(fechaYHoraInicio.getTime()) || isNaN(fechaYHoraFinal.getTime())) {
+                Swal.showValidationMessage('Todos los campos son requeridos.');
+                return;
+            } else if (fechaYHoraInicio >= fechaYHoraFinal) { // Catch impossible timeframe
+                Swal.showValidationMessage('La hora de termino debe ser después de la hora de inicio.');
+                return;
+            } 
+
+            // Transform dates into readable
+            const formatReadableDateTime = (isoDate) => {
+                const date = new Date(isoDate);
+                const readableDate = date.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                });
+                const readableTime = date.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                });
+                return `${readableDate}, ${readableTime}`;
+            };
+            const fechaInicio = formatReadableDateTime(fechaYHoraInicio.toISOString());
+            const fechaTermino = formatReadableDateTime(fechaYHoraFinal.toISOString());
+*/
+
+
+
+
+    return res.status(200).json({ success: true, message: "" }); 
+
+    /*
+    try {
+        //builtin validation inside the model.js
+        const response = await permitsModel.create(req.body);
+        return res.status(200).json({ success: true, message: "" }); 
+    } catch (error) {
+        if (error.name === 'ValidationError') {
+            return res.status(401).json({ success: false, messageTitle: "Modificación Detectada", messageText: "Se ha detectado un intento de actividad maliciosa." });
+        } 
+        return res.status(500).json({ success: false, messageTitle: "Algo salió mal :(" , messageText: "Favor de contactar a Soporte Técnico. (Error #031)"});
+    }
+        */
+
+
+
+};
+
+
+
+
+
+
+// REMADE CONTROLLERS
+exports.viewPermitsRowFile = async (req, res) => {
+
+    // ✅ Validation
+    const { error } = validator.viewPermitsRowFile(req.params.filename);
+    if (error) {
+        return res.status(400).json({ success: false, message: error.details.map(d => d.message).join(", ") });
+    }
+
+    // ✅ Model
+    try {
+        const response = await permitsModel.findOne({});
+        const filePath = path.join(__dirname, '..', 'uploads', 'permisos', req.params.filename);
+        res.sendFile(filePath, (err) => {
+            if (err) {
+                res.status(404).send('Correct. No se encontró el archivo PDF.');
+            }
+        });
+    } catch (error) {
+        return res.status(500).send('Favor de contactar a Soporte Técnico. (Error #030)');
+    }
+
+};
+
+
+
+
+
+
 exports.changeStatus = async (req, res) => {
     // ✅ Aplicar validación (FIXED)
     const { error } = validator.changeStatus(req.body);
@@ -60,28 +198,7 @@ exports.changeStatus = async (req, res) => {
 
 
 
-exports.viewPermitsRowFile = async (req, res) => {
-    try {
 
-
-
-        // 1. VALIDATON 
-        // 2. SERVICE (business logic)
-        // 3. MODEL (database logic)
-
-        // find the filename
-
-
-        const filePath = path.join(__dirname, '..', 'uploads', 'permisos', req.params.filename);
-        res.sendFile(filePath, (err) => {
-            if (err) {
-                res.status(404).send('Correct. No se encontró el archivo PDF.');
-            }
-        });
-    } catch (error) {
-        return res.status(500).send('Favor de contactar a Soporte Técnico. (Error #030)');
-    }
-};
 
 
 
@@ -395,17 +512,6 @@ exports.postFileUpload = async (req, res) => {
     }
 };
 
-
-exports.createPermitRequest = async (req, res) => {
-    try {
-        const response = await permitsModel.create(req.body);
-        return res.status(200).json({ success: true, message: "" }); // response.path = file location
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
-    }
-};
 /****************/
 /*************/
 /**********/

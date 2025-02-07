@@ -125,7 +125,7 @@ async function addUser() { // async function to perform fetch chain
             areaSelect.addEventListener("change", () => {
                 const selectedArea = areaSelect.value; 
                 const puestos = areaToPuestos[selectedArea] || []; 
-                puestoSelect.innerHTML = '<option value="" hidden>Selecciona un puesto</option>';
+                puestoSelect.innerHTML = DOMPurify.sanitize('<option value="" hidden>Selecciona un puesto</option>');
                 puestos.forEach(puesto => {
                     const option = document.createElement("option");
                     option.value = puesto;
@@ -581,7 +581,7 @@ async function editUser(button) { // async function to perform fetch chain
             areaSelect.addEventListener("change", () => {
                 const selectedArea = areaSelect.value; 
                 const puestos = areaToPuestos[selectedArea] || []; 
-                puestoSelect.innerHTML = '<option value="" hidden>Selecciona un puesto</option>';
+                puestoSelect.innerHTML = DOMPurify.sanitize('<option value="" hidden>Selecciona un puesto</option>');
                 puestos.forEach(puesto => {
                     const option = document.createElement("option");
                     option.value = puesto;

@@ -1,13 +1,13 @@
-// viewFile button
-async function viewPermitsRowFile(button) {
-    window.open(DOMPurify.sanitize(`/permisos/viewPermitsRowFile/${button.getAttribute('filename')}`)); 
-};
-
 // VALIDATOR - this is the only and First view to get validation and XSS protection.
 // TODO, implement that quality onto the next features but do not rework until MVP finished. 
 
+// viewFile button
+async function viewPermitsRowFile(button) {
+    window.open(DOMPurify.sanitize(`/permisos/viewPermitsRowFile/${button.getAttribute('permitId')}/${button.getAttribute('filename')}`)); 
+};
 
-// changeStatus button (FIXED) (Just finish the PopUps)
+
+// changeStatus button
 async function changeStatus(button) {
     const permitId = button.getAttribute('permitId');
     const currentStatus = button.getAttribute('currentStatus');
@@ -54,19 +54,19 @@ async function changeStatus(button) {
                         estatus: estatus,
                     })
                 });
-                
-                
                 const data = await response.json();
 
-                // Catch from Controller "/changeStatus" (FIXED)
+                // Catch from Controller "/changeStatus" 
                 if (!data.success) {
                     Swal.fire({
                         title: 'Modificación reportada',
                         icon: 'error',
                         width: "500px",
                         text: data.message
+                    }).then(() => {
+                        location.reload();
                     });
-                    return; // changeStatus() failed execution
+                    return; // changeStatus() execution
                 } else {
                     Swal.fire({
                         title: 'Estatus cambiado',
@@ -74,9 +74,9 @@ async function changeStatus(button) {
                         width: "500px",
                         text: 'Se ha enviado el permiso correctamente.'
                     }).then(() => {
-                        location.reload(); // reload after popup
+                        location.reload(); 
                     });
-                    return; // changeStatus() successful execution
+                    return; // changeStatus() execution
                 }
                
 
@@ -101,13 +101,13 @@ async function verifyPermit(button) {
     const permitObject = JSON.parse(button.getAttribute('permitObject'));
 
     Swal.fire({
-        html: `
+        html: DOMPurify.sanitize(`
         <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
             <i class="fa-solid fa-check" style="margin-right:0.9rem;"></i>Aceptar permiso
         </h2>
         <p>¿Estás seguro que deseas aceptar/verificar este permiso para aprobación? (Esta acción no se puede deshacer)</p>
 
-        `,
+        `),
         confirmButtonText: 'Confirmar',
         cancelButtonText: 'Cancelar',
         cancelButtonColor: '#f0466e',
@@ -121,8 +121,6 @@ async function verifyPermit(button) {
 
         preConfirm: async () => {
             try {
-
-
                 const response = await fetch('/permisos/verifyPermit', {
                     method: 'POST',
                     headers: {

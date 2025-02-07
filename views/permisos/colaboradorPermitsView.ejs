@@ -15,7 +15,7 @@
         <!-- Main buttons -->
         <div class="columns" style="margin-top: 1rem;">
             <div class="column is-centered" style="text-align: center;">
-                <button class="default-button-css functionality-button-css" onclick="createPermit()">
+                <button class="default-button-css functionality-button-css" onclick="createPermitRequest()">
                     <i class="fa-solid fa-clipboard-user default-icon-button-css"></i>
                     <p>Crear Permiso</p>
                 </button>
@@ -37,7 +37,8 @@
         <table class="table is-fullwidth is-hoverable">
             <thead>
                 <tr style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue));">
-                    <th class="has-text-centered">Tipo permiso</th>
+                    <th class="has-text-centered">Registro</th>
+                    <th class="has-text-centered">Filtro</th>
                     <th class="has-text-centered">Fecha inicio</th>
                     <th class="has-text-centered">Fecha termino</th>
                     <th class="has-text-centered">Consultar docs</th>
@@ -52,6 +53,9 @@
                         <tr>
                             <td class="is-centered">
                                 <%= permit.registro %>
+                            </td>
+                            <td class="is-centered">
+                                <%= permit.filtro %>
                             </td>
                             <td class="is-centered">
                                 <%= permit.fechaInicio %>
