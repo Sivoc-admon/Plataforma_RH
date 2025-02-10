@@ -1,5 +1,7 @@
 @import url('global_values.css');
 
+/* Global css too */
+
 /* Estilos para el sidebar oculto */
 .sidebar {
     display: none;
@@ -127,4 +129,11 @@ h1 {
     cursor: pointer;
     padding: 0rem 1rem;
     position: relative;
+}
+
+.hidden { display: none; }
+
+.functionality-button-css {
+    width: 12rem;
+    height: 5rem;
 }

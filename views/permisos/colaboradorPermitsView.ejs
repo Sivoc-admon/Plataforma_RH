@@ -15,12 +15,19 @@
         <!-- Main buttons -->
         <div class="columns" style="margin-top: 1rem;">
             <div class="column is-centered" style="text-align: center;">
-                <button class="default-button-css functionality-button-css" onclick="createPermitRequest()">
+                <button class="default-button-css functionality-button-css" onclick="createPermitRequest('Permiso')">
                     <i class="fa-solid fa-clipboard-user default-icon-button-css"></i>
-                    <p>Crear Permiso</p>
+                    <p>Registrar permiso</p>
                 </button>
             </div>
         
+            <div class="column is-centered" style="text-align: center;">
+                <button class="default-button-css functionality-button-css" onclick="createPermitRequest('Incapacidad')">
+                    <i class="fa-solid fa-wheelchair default-icon-button-css"></i>
+                    <p>Registrar incapacidad</p>
+                </button>
+            </div>
+
             <div class="column">
                 <label class="input">
                     <%= userName + " - " + userArea %>

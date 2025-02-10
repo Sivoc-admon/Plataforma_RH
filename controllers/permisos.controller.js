@@ -27,6 +27,7 @@ exports.createPermitRequest = async (req, res) => {
     //          -> trick, set those datetimes as (fechaInicio:00:00hrs, fechaTermino:23:59:hrs)
     // // EVITAR PERMISOS FUTUROS TAMBIEN
 
+    1. Checar si el userId coincide con el res.locals.userId
     */ 
 
     
