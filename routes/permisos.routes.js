@@ -5,17 +5,22 @@ const controller = require('../controllers/permisos.controller');
 
 // 📌 Route specifically designed
 const configureFileUpload = require("../utils/configureFileUpload");
-const allowedFileTypes = ["image/png", "image/jpeg", "image/jpg", "application/pdf"];
-// !!                     const allowedExtensions = ['png', 'jpeg', 'jpg', 'pdf', 'doc', 'docx'];
+const allowedFileTypes = [
+    "image/png",
+    "image/jpeg",
+    "image/jpg",
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+];
 const upload = configureFileUpload("uploads/permisos", allowedFileTypes);
 router.post("/createPermitRequest", upload.array('files', 3), controller.createPermitRequest);
 
 
 // REMADE ROUTES
 router.get('/viewPermitsRowFile/:filename', controller.viewPermitsRowFile);
-router.post("/changeStatus", controller.changeStatus);//(FIXED)
+router.post("/changeStatus", controller.changeStatus);
 
-//router.post("/createPermitRequest", controller.createPermitRequest);
 
 
 

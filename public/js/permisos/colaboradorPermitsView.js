@@ -1,5 +1,7 @@
 // createPermit button
-async function createPermitRequest(registro) { // async function to perform fetch chain
+async function createPermitRequest(theInput) { 
+    const registro = DOMPurify.sanitize(theInput);
+    let archivosSeleccionados = [];
     Swal.fire({
         html: DOMPurify.sanitize(`
         <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
@@ -33,7 +35,6 @@ async function createPermitRequest(registro) { // async function to perform fetc
                         <!-- 200 iq (Must be placed in this order) -->
                         <input type="text" id="fechaYHoraInicio" style="opacity: 0; position: absolute;" required readOnly>
                         <input type="text" id="fechaYHoraInicioDisplay" value="Seleccione una fecha" class="input" readOnly />
-
                 </div>
 
                 <!-- Field -->
@@ -57,9 +58,6 @@ async function createPermitRequest(registro) { // async function to perform fetc
                                 <span>Subir archivo</span>
                                 <input type="file" name="files" class="file-input" id="files" style="display: none;" multiple
                                     onChange="validateUpload()" />
-
-
-
                             </label>
                         </div>
                     </div>
@@ -128,6 +126,7 @@ async function createPermitRequest(registro) { // async function to perform fetc
                         hour12: false
 
                     });
+                    if (registro === "Incapacidad") return `${readableDate}`; 
                     return `${readableDate}, ${readableTime}`;
                 };
 
@@ -152,68 +151,114 @@ async function createPermitRequest(registro) { // async function to perform fetc
                 });
             /* Front-end Date Setup */
             
-            /* Front-end File Setup (NOT WORKING) */
-                
+            /* Front-end File Setup */
+                // let archivosSeleccionados = []; function level scope
+                document.getElementById("files").addEventListener("change", function () {
+                    const files = Array.from(this.files);
+                    const allowedExtensions = ['png', 'jpeg', 'jpg', 'pdf', 'doc', 'docx'];
+                    const maxSize = 3 * 1024 * 1024; // 3 MB
+                    files.forEach(file => {
+                        const fileExtension = file.name.split('.').pop().toLowerCase();
 
-            function validateUpload(){
-                console.log("yeaa");
-                // XD
-            }
+                        // Front-end validations
+                        if (!allowedExtensions.includes(fileExtension)) 
+                            return Swal.showValidationMessage('Formato de archivo inválido.');
+                        if (file.size > maxSize) 
+                            return Swal.showValidationMessage(`El archivo ${file.name} excede el tamaño máximo de 3 MB.`);
+                        if (archivosSeleccionados.length >= 3) 
+                            return Swal.showValidationMessage("Solo se permiten ingresar 3 archivos.");
+                        if (archivosSeleccionados.some(f => f.name === file.name)) 
+                            return Swal.showValidationMessage("Duplicado detectado");
+                        Swal.resetValidationMessage();
+                        archivosSeleccionados.push(file);
+                    });
+                    updateFileList();
+                });
 
+                function updateFileList() {
+                    // console.log("Current list: "); archivosSeleccionados.forEach(file => console.log(file));
 
-            /* Front-end File Setup (NOT WORKING) */
-
+                    const subidosDiv = document.getElementById("subidos");
+                    subidosDiv.innerHTML = DOMPurify.sanitize("");
+                    archivosSeleccionados.forEach((file, index) => {
+                        const fileItem = document.createElement("div");
+                        fileItem.classList.add("fil3e-item", "columns", "is-vcentered");
+                        fileItem.style.marginTop = "0.6rem";
+                        fileItem.innerHTML = DOMPurify.sanitize(`
+                            <div>
+                                <button class="default-button-css table-button-css delete-file" data-index="${index}">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <div class="column" style="align-self:center; justify-self:center;">
+                                <p>${file.name} ${(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                            </div>
+                        `);
+                        subidosDiv.appendChild(fileItem);
+                    });
+                    document.querySelectorAll(".delete-file").forEach(button => {
+                        button.addEventListener("click", function () {
+                            const index = parseInt(this.getAttribute("data-index"));
+                            deletePermitFromArrayAndHtml(index);
+                        });
+                    });
+                }
+                function deletePermitFromArrayAndHtml(index) {
+                    archivosSeleccionados.splice(index, 1); 
+                    Swal.resetValidationMessage();
+                    updateFileList(); 
+                }
+            /* Front-end File Setup */
 
         },
         preConfirm: async () => { // Single Fetch
             try {
-                // 1. Build formData
+                // 0. Prepare the values
+                const filtro = $('#filtro').val();
+                const fechaInicio = $('#fechaYHoraInicio').val();
+                const fechaTermino = $('#fechaYHoraFinal').val();
+                const fechaInicioDate = new Date(fechaInicio);
+                const fechaTerminoDate = new Date(fechaTermino);
+            
+                // 1. Front-end pre-fetch validation
+                if (!registro || !filtro || !fechaInicio || !fechaTermino || isNaN(fechaInicioDate.getTime()) || isNaN(fechaTerminoDate.getTime())) {
+                    return Swal.showValidationMessage('Todos los campos son requeridos.');
+                }
+            
+                // 2. Build formData
                 const formData = new FormData();
                 formData.append("registro", registro);
-                formData.append("filtro", $('#filtro').val());
-                formData.append("fechaInicio", $('#fechaYHoraInicio').val());
-                formData.append("fechaTermino", $('#fechaYHoraFinal').val());
-                formData.append("userId", localUserId);
-                const filesInput = document.getElementById('files');
-                for (let file of filesInput.files) {
+                formData.append("filtro", filtro);
+                formData.append("fechaInicio", fechaInicio);
+                formData.append("fechaTermino", fechaTermino);
+            
+                for (let file of archivosSeleccionados) {
                     formData.append("files", file);
                 }
-
-                // 2. Send formData
+            
+                // 3. Fetch formData
                 const response = await fetch('/permisos/createPermitRequest', {
                     method: 'POST',
                     body: formData,
                 });
-
-                // 3. Show changes
+            
+                // 4. Show response
                 const data = await response.json();
                 const { title, icon, text } = data.success
                     ? { title: 'Permiso creado', icon: 'success', text: 'Se añadió el permiso correctamente.' }
                     : { title: data.messageTitle, icon: 'error', text: data.messageText };
+                await Swal.fire({ title, icon, width: "500px", text });
+                location.reload();
 
-                return Swal.fire({ title, icon, width: "500px", text }).then(() => location.reload());
-
-                // Since front-end, just reload on any execution error
+            // Just reload
             } catch (error) {
-                return location.reload();
+                location.reload();
             }
+            
         }
     })
 };
 
-// downloadFile button
-/* check jefeInemdaito permit
-async function downloadFile(button) {
-    try {
-        const docPath = JSON.parse(button.getAttribute('docPath')); // Convertimos el JSON en un objeto
-        window.open(DOMPurify.sanitize(`/permisos/downloadFile/${docPath.filename}`));  // 200 iq "GET with body"
-
-    // Since front-end, just reload on any execution error
-    } catch (error) {
-        return location.reload();
-    }
-};
-*/
 
 // editPermit button
 async function editPermit(button) { // async function to perform fetch chain

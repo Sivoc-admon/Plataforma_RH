@@ -9,9 +9,6 @@ const PDFDocument = require('pdfkit'); // Assuming you are using pdfkit
 const crypto = require('crypto');
 
 const validator = require("../validators/permisos.validator"); // access via validator.{action}
-
-
-
 const express = require("express");
 const multer = require("multer");
 
@@ -19,20 +16,79 @@ const app = express();
 
 
 exports.createPermitRequest = async (req, res) => {
-
-    /*
-    // TODO: No permitir subir permisos cuando Today > fechaInicio
-    // Accionar permisos que esten !isSent cuando la fecha Today > fechaInicio
-    // Al subir un permit.registro === "Incapacidad", fechaInicio fechaTermino serán sin hora.
-    //          -> trick, set those datetimes as (fechaInicio:00:00hrs, fechaTermino:23:59:hrs)
-    // // EVITAR PERMISOS FUTUROS TAMBIEN
-
-    1. Checar si el userId coincide con el res.locals.userId
-    */ 
-
-    
+    // El pdf se crea on successful exection.
     console.log("📌 req.body:", req.body);   // Muestra los datos enviados (registro, filtro, userId, etc.)
     console.log("📌 req.files:", req.files); // Muestra los archivos subidos (PDFs)
+
+    try {
+
+    /*
+Validar los tamaños de los archivos: Si recibes archivos con FormData, asegúrate de validar el tamaño máximo y tipo de archivo. Un atacante podría intentar subir un archivo malicioso (por ejemplo, un script o malware).
+
+javascript
+Copiar
+Editar
+if (req.files && req.files.length > 0) {
+    const file = req.files[0]; // Suponiendo que es un solo archivo
+    if (file.size > MAX_FILE_SIZE) {
+        return res.status(400).json({ error: "El archivo es demasiado grande" });
+    }
+    if (!ALLOWED_FILE_TYPES.includes(file.mimetype)) {
+        return res.status(400).json({ error: "Tipo de archivo no permitido" });
+    }
+}
+
+    */
+
+    // A. VALIDATION
+        // 1. Validate field arrangement 
+        const allowedFields = ["registro", "filtro", "fechaInicio", "fechaTermino"];
+        const receivedFields = Object.keys(req.body);
+        const hasExtraFields = receivedFields.some(field => !allowedFields.includes(field));
+        if (hasExtraFields) {
+            return res.status(401).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+        }
+
+        // 2. Validate field quality 
+        const { registro, filtro, fechaInicio, fechaTermino } = req.body;
+        if (
+            !registro || !filtro || !fechaInicio || !fechaTermino ||
+            typeof registro !== "string" || typeof filtro !== "string" ||
+            typeof fechaInicio !== "string" || typeof fechaTermino !== "string" ||
+            !["Permiso", "Incapacidad"].includes(registro)
+        ) {
+            return res.status(401).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+        }
+
+        // 3. Validate dates
+        const fechaInicioDate = new Date(fechaInicio);
+        const fechaTerminoDate = new Date(fechaTermino);
+        const today = new Date();
+        if (isNaN(fechaInicioDate.getTime()) || isNaN(fechaTerminoDate.getTime())) {
+            return res.status(401).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+        }
+        const fechaInicioTime = fechaInicioDate.getTime();
+        const fechaTerminoTime = fechaTerminoDate.getTime();
+        if (fechaInicioTime >= fechaTerminoTime || today > fechaInicioTime) {
+            return res.status(401).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+        }
+        // Validar que si "registro" es "Incapacidad", la hora esté en 00:00
+        if (registro === "Incapacidad" && fechaInicioDate.getHours() !== 0) {
+            return res.status(401).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+        }
+
+        // ya tenemos acceso al userId en el backed desde su token JWT, solo accede a la base de datos para verificar si existe y así res.locals.userId !== userId
+
+    // B. MODEL LOGIC
+        //const response = await permitsModel.create(req.body);
+        return res.status(200).json({ success: true, messageTitle: "true", messageText: "success" }); // response.path = file location
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, messageTitle: "false", messageText: "error"});
+    }
+};
+    
     /*
         📌 req.body: [Object: null prototype] {
         registro: 'Permiso',
@@ -55,71 +111,6 @@ exports.createPermitRequest = async (req, res) => {
         ]
 
     */
-
-        
-/*
-            const registro = $('#registro').val().trim(); 
-            const filtro = $('#filtro').val().trim();
-            const fechaYHoraInicio = new Date($('#fechaYHoraInicio').val().trim());
-            const fechaYHoraFinal = new Date($('#fechaYHoraFinal').val().trim());
-            const docPaths = [];
-            
-            // Cool validations XD
-            if (/[\{\}\:\$\=\'\*\[\]]/.test(registro) || /[\{\}\:\$\=\'\*\[\]]/.test(filtro)) {
-                Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
-                return;
-            } else if (!registro || !filtro || !fechaYHoraInicio || !fechaYHoraFinal || isNaN(fechaYHoraInicio.getTime()) || isNaN(fechaYHoraFinal.getTime())) {
-                Swal.showValidationMessage('Todos los campos son requeridos.');
-                return;
-            } else if (fechaYHoraInicio >= fechaYHoraFinal) { // Catch impossible timeframe
-                Swal.showValidationMessage('La hora de termino debe ser después de la hora de inicio.');
-                return;
-            } 
-
-            // Transform dates into readable
-            const formatReadableDateTime = (isoDate) => {
-                const date = new Date(isoDate);
-                const readableDate = date.toLocaleDateString('es-ES', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                });
-                const readableTime = date.toLocaleTimeString('es-ES', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                });
-                return `${readableDate}, ${readableTime}`;
-            };
-            const fechaInicio = formatReadableDateTime(fechaYHoraInicio.toISOString());
-            const fechaTermino = formatReadableDateTime(fechaYHoraFinal.toISOString());
-*/
-
-
-
-
-    return res.status(200).json({ success: true, message: "" }); 
-
-    /*
-    try {
-        //builtin validation inside the model.js
-        const response = await permitsModel.create(req.body);
-        return res.status(200).json({ success: true, message: "" }); 
-    } catch (error) {
-        if (error.name === 'ValidationError') {
-            return res.status(401).json({ success: false, messageTitle: "Modificación Detectada", messageText: "Se ha detectado un intento de actividad maliciosa." });
-        } 
-        return res.status(500).json({ success: false, messageTitle: "Algo salió mal :(" , messageText: "Favor de contactar a Soporte Técnico. (Error #031)"});
-    }
-        */
-
-
-
-};
-
-
-
-
-
 
 // REMADE CONTROLLERS
 exports.viewPermitsRowFile = async (req, res) => {
