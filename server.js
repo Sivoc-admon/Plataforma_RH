@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 const { authorize } = require('./utils/jwt');
 require('dotenv').config();
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); global.mongoose = mongoose;
 /*-------------*/
 
 /* Global middlewares */

@@ -8,6 +8,7 @@ const fs = require('fs');
 const PDFDocument = require('pdfkit'); // Assuming you are using pdfkit
 const crypto = require('crypto');
 
+
 const validator = require("../validators/permisos.validator"); // access via validator.{action}
 const express = require("express");
 const multer = require("multer");
@@ -21,70 +22,87 @@ exports.createPermitRequest = async (req, res) => {
     console.log("📌 req.files:", req.files); // Muestra los archivos subidos (PDFs)
 
     try {
+    // A. FILES VALIDATION (optional from user)
+        // skip if no files where added from the user
+        if (req.files.length > 0) {
+            const allowedExtensions = ['png', 'jpeg', 'jpg', 'pdf', 'doc', 'docx'];
+            const MAX_FILES = 3;
+            const MAX_SIZE_MB = 3 * 1024 * 1024; // 3MB en bytes
+            const allowedFileTypes = [
+                "image/png",
+                "image/jpeg",
+                "image/jpg",
+                "application/pdf",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ];
+            if (req.files.length > MAX_FILES) 
+                return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+            
+            for (const file of req.files) {
+                const { rawname, mimetype, size } = file;
 
-    /*
-Validar los tamaños de los archivos: Si recibes archivos con FormData, asegúrate de validar el tamaño máximo y tipo de archivo. Un atacante podría intentar subir un archivo malicioso (por ejemplo, un script o malware).
+                const originalname =  ((x) => x.replace(/[<>:"'/\\|?*]/g, "").substring(0, 51) || "unknown_file")(rawname);
+                if (originalname !== rawname)
+                    return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
 
-javascript
-Copiar
-Editar
-if (req.files && req.files.length > 0) {
-    const file = req.files[0]; // Suponiendo que es un solo archivo
-    if (file.size > MAX_FILE_SIZE) {
-        return res.status(400).json({ error: "El archivo es demasiado grande" });
-    }
-    if (!ALLOWED_FILE_TYPES.includes(file.mimetype)) {
-        return res.status(400).json({ error: "Tipo de archivo no permitido" });
-    }
-}
+                const fileExtension = originalname.split('.').pop().toLowerCase();
+                if (!allowedExtensions.includes(fileExtension)) 
+                    return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+                if (!allowedFileTypes.includes(mimetype)) 
+                    return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+                if (size > MAX_SIZE_MB) 
+                    return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+                if (!size)
+                    return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+            }
+        }
 
-    */
-
-    // A. VALIDATION
+    // B. BODY VALIDATION
         // 1. Validate field arrangement 
         const allowedFields = ["registro", "filtro", "fechaInicio", "fechaTermino"];
         const receivedFields = Object.keys(req.body);
         const hasExtraFields = receivedFields.some(field => !allowedFields.includes(field));
-        if (hasExtraFields) {
-            return res.status(401).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
-        }
+        if (hasExtraFields)
+            return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
 
         // 2. Validate field quality 
         const { registro, filtro, fechaInicio, fechaTermino } = req.body;
-        if (
-            !registro || !filtro || !fechaInicio || !fechaTermino ||
+        if (!registro || !filtro || !fechaInicio || !fechaTermino ||
             typeof registro !== "string" || typeof filtro !== "string" ||
-            typeof fechaInicio !== "string" || typeof fechaTermino !== "string" ||
-            !["Permiso", "Incapacidad"].includes(registro)
-        ) {
-            return res.status(401).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+            typeof fechaInicio !== "string" || typeof fechaTermino !== "string") {
+            return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
         }
 
         // 3. Validate dates
         const fechaInicioDate = new Date(fechaInicio);
         const fechaTerminoDate = new Date(fechaTermino);
         const today = new Date();
-        if (isNaN(fechaInicioDate.getTime()) || isNaN(fechaTerminoDate.getTime())) {
-            return res.status(401).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
-        }
+        if (isNaN(fechaInicioDate.getTime()) || isNaN(fechaTerminoDate.getTime())) 
+            return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
         const fechaInicioTime = fechaInicioDate.getTime();
         const fechaTerminoTime = fechaTerminoDate.getTime();
-        if (fechaInicioTime >= fechaTerminoTime || today > fechaInicioTime) {
-            return res.status(401).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
-        }
-        // Validar que si "registro" es "Incapacidad", la hora esté en 00:00
-        if (registro === "Incapacidad" && fechaInicioDate.getHours() !== 0) {
-            return res.status(401).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
-        }
+        if (fechaInicioTime >= fechaTerminoTime || today > fechaInicioTime) 
+            return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+        if (registro === "Incapacidad" && fechaInicioDate.getHours() !== 0) 
+            return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
 
-        // ya tenemos acceso al userId en el backed desde su token JWT, solo accede a la base de datos para verificar si existe y así res.locals.userId !== userId
 
-    // B. MODEL LOGIC
-        //const response = await permitsModel.create(req.body);
+    // C. MODEL LOGIC
+        // Una vez que se pasaron las validaciones DEBES crear un payload que pase la ultima validación de MOONGOSE
+        // en este caso sigue el modelo y no tanto los campos en la base de datos
+
+        // el res.locals.userId pues ya está validado ntp (1)
+        const response = await permitsModel.create(req.body);
+        // recuerda que el model lanza errores, trata de controla en especifico el error del model
         return res.status(200).json({ success: true, messageTitle: "true", messageText: "success" }); // response.path = file location
 
     } catch (error) {
         console.error(error);
+        // Controlled mongoose error (Data validation)
+        if (error instanceof mongoose.Error.ValidationError) 
+            return res.status(400).json({ success: false, messageTitle: "mongoose", messageText: "model"});
+        // Else, respond as internal error
         return res.status(500).json({ success: false, messageTitle: "false", messageText: "error"});
     }
 };

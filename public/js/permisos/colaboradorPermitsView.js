@@ -161,14 +161,21 @@ async function createPermitRequest(theInput) {
                         const fileExtension = file.name.split('.').pop().toLowerCase();
 
                         // Front-end validations
+                        if (!file.name) 
+                            return Swal.showValidationMessage("El archivo no tiene nombre.");
+                        if (file.name.length > 51) 
+                            return Swal.showValidationMessage("El nombre es muy largo");
+                        file.name = ((x) => x.replace(/[<>:"'/\\|?*]/g, ""))(file.name);
                         if (!allowedExtensions.includes(fileExtension)) 
-                            return Swal.showValidationMessage('Formato de archivo inválido.');
+                            return Swal.showValidationMessage("Formato de archivo inválido.");
                         if (file.size > maxSize) 
-                            return Swal.showValidationMessage(`El archivo ${file.name} excede el tamaño máximo de 3 MB.`);
+                            return Swal.showValidationMessage( DOMPurify.sanitize(`El archivo ${file.name} excede el tamaño máximo de 3 MB.`));
+                        if (file.size <= 0)
+                            return Swal.showValidationMessage("No se permiten añadir archivos vacios.");
                         if (archivosSeleccionados.length >= 3) 
                             return Swal.showValidationMessage("Solo se permiten ingresar 3 archivos.");
                         if (archivosSeleccionados.some(f => f.name === file.name)) 
-                            return Swal.showValidationMessage("Duplicado detectado");
+                            return Swal.showValidationMessage("El archivo ya se encuentra en la fila.");
                         Swal.resetValidationMessage();
                         archivosSeleccionados.push(file);
                     });
