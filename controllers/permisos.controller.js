@@ -17,46 +17,17 @@ const app = express();
 
 
 exports.createPermitRequest = async (req, res) => {
-    // El pdf se crea on successful exection.
+    // El pdf se crea
     console.log("📌 req.body:", req.body);   // Muestra los datos enviados (registro, filtro, userId, etc.)
     console.log("📌 req.files:", req.files); // Muestra los archivos subidos (PDFs)
+    console.log("📂 Archivos recibidos:", JSON.stringify(req.files, null, 2));
+
+    
 
     try {
-    // A. FILES VALIDATION (optional from user)
-        // skip if no files where added from the user
-        if (req.files.length > 0) {
-            const allowedExtensions = ['png', 'jpeg', 'jpg', 'pdf', 'doc', 'docx'];
-            const MAX_FILES = 3;
-            const MAX_SIZE_MB = 3 * 1024 * 1024; // 3MB en bytes
-            const allowedFileTypes = [
-                "image/png",
-                "image/jpeg",
-                "image/jpg",
-                "application/pdf",
-                "application/msword",
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            ];
-            if (req.files.length > MAX_FILES) 
-                return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
-            
-            for (const file of req.files) {
-                const { rawname, mimetype, size } = file;
+    // A. FILE VALIDATION is done in "configureFileUpload.js" as a multer middleware
 
-                const originalname =  ((x) => x.replace(/[<>:"'/\\|?*]/g, "").substring(0, 51) || "unknown_file")(rawname);
-                if (originalname !== rawname)
-                    return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
-
-                const fileExtension = originalname.split('.').pop().toLowerCase();
-                if (!allowedExtensions.includes(fileExtension)) 
-                    return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
-                if (!allowedFileTypes.includes(mimetype)) 
-                    return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
-                if (size > MAX_SIZE_MB) 
-                    return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
-                if (!size)
-                    return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
-            }
-        }
+    // todo xd, solo hacer que MULTER, CONTROLLER Y MOONGOOSE se coordinen al 100% y luego el payload y listo
 
     // B. BODY VALIDATION
         // 1. Validate field arrangement 
@@ -89,12 +60,45 @@ exports.createPermitRequest = async (req, res) => {
 
 
     // C. MODEL LOGIC
-        // Una vez que se pasaron las validaciones DEBES crear un payload que pase la ultima validación de MOONGOSE
-        // en este caso sigue el modelo y no tanto los campos en la base de datos
+        // 1. Build payload
+        const payload = {
+            userId: res.locals.userId,
+            registro: req.body.registro,
+            filtro: req.body.filtro,
+            fechaInicio: req.body.fechaInicio,
+            fechaTermino: req.body.fechaTermino,
 
-        // el res.locals.userId pues ya está validado ntp (1)
+            // SE TIENE QUE COMPLETAR EL FETCH DE UPLOAD PARA OBTENRE EL FILEPATH XD
+
+            
+            contact: {
+                email: "ana@example.com",
+                phone: "+123456789"
+            }
+        };
+        
+
+        /*
+
+            {
+                "userId": {
+                "$oid": "678015aab366e37052cf12bc"
+                },
+                "registro": "Permiso",
+                "filtro": "Cita Medica",
+                "fechaInicio": "8 de enero de 2025, 01:16",
+                "fechaTermino": "25 de enero de 2025, 01:16",
+                "docPaths": [],
+                "estatus": "Justificado",
+                "isSent": true,
+                "isVerified": true,
+                "__v": 0
+            }
+        */
+
+
+        // Execute mongoose action
         const response = await permitsModel.create(req.body);
-        // recuerda que el model lanza errores, trata de controla en especifico el error del model
         return res.status(200).json({ success: true, messageTitle: "true", messageText: "success" }); // response.path = file location
 
     } catch (error) {
@@ -499,28 +503,6 @@ exports.deleteFile = async (req, res) => {
 };
 
 
-exports.postFileUpload = async (req, res) => {
-    try {
-        // Check if files are present
-        if (!req.files?.length) {
-            return res.status(400).json({ success: false, message: "" });
-        }
-
-        // Save files to the database
-        let docResponses = [];
-        await Promise.all(
-            req.files.map(async (file) => {
-                const response = await filesModel.create(file);
-                docResponses.push(response);
-            })
-        );
-
-        return res.status(200).json({ success: true, message: docResponses });
-
-    } catch (error) {
-        return res.status(500).json({ success: false, message: "" });
-    }
-};
 
 /****************/
 /*************/

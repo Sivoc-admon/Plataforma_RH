@@ -13,8 +13,53 @@ const allowedFileTypes = [
     "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 ];
-const upload = configureFileUpload("uploads/permisos", allowedFileTypes);
-router.post("/createPermitRequest", upload.array('files', 3), controller.createPermitRequest);
+const allowedFileExtensions = ['png', 'jpeg', 'jpg', 'pdf', 'doc', 'docx'];
+const MAX_SIZE_MB = 3 * 1024 * 1024; // 3MB in bytes
+const upload = configureFileUpload("uploads/permisos", allowedFileTypes, allowedFileExtensions, MAX_SIZE_MB);
+
+
+// 📌 Middleware para asegurar que req.files siempre sea un array
+const ensureFilesArray = (req, res, next) => {
+    if (!req.files) {
+        req.files = [];
+    }
+    next();
+};
+
+router.post("/createPermitRequest", 
+    ensureFilesArray,
+    (req, res, next) => { 
+        upload.array("files", 3)(req, res, (err) => {
+            if (err) {
+                return res.status(400).json({ 
+                    success: false, 
+                    messageTitle: "Multer invalidation", 
+                    messageText: err.message 
+                });
+            }
+            next(); // Si no hay error, continuar con el controlador
+        });
+    },
+
+
+
+controller.createPermitRequest);
+
+
+
+
+
+///
+
+router.post("/createPermitRequest",  upload.array('files', 3), controller.createPermitRequest);
+
+
+// REMADE ROUTES
+router.get('/viewPermitsRowFile/:filename', controller.viewPermitsRowFile);
+router.post("/changeStatus", controller.changeStatus);
+
+
+
 
 
 // REMADE ROUTES
