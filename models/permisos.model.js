@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-// Expresión regular para el formato "5 de febrero de 2025, 22:52"
+// Regex. Example "5 de febrero de 2025, 22:52"
 const fechaRegex = /^(0?[1-9]|[12][0-9]|3[01])\s(de)\s(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s(de)\s(\d{4}),\s([01]?[0-9]|2[0-3]):([0-5][0-9])$/;
 
-// Modelo ejecuta las validaciones y además 
+// Schema
 const permitSchema = new mongoose.Schema({
     userId: { 
         type: mongoose.Schema.Types.ObjectId, 
@@ -53,5 +53,5 @@ const permitSchema = new mongoose.Schema({
     },
 });
 
-// Crear el modelo
+// Exportation
 module.exports = mongoose.model('permisos', permitSchema);

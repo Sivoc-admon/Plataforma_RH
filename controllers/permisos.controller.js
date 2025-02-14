@@ -15,31 +15,20 @@ const multer = require("multer");
 const app = express();
 
 
-
+// createPermitRequest : Colaborador
 exports.createPermitRequest = async (req, res) => {
-    // El pdf se crea
-    //console.log("📌 req.body:", req.body);   // Muestra los datos enviados (registro, filtro, userId, etc.)
-    //console.log("📌 req.files:", req.files); // Muestra los archivos subidos (PDFs)
-    //console.log("📂 Archivos recibidos:", JSON.stringify(req.files, null, 2));
-
-    
-
     try {
-    // 0. Sanitize everything before anything
-    // GLOBAL MIDDLEWARE, ABOSLUTELY NO MISTAKES ON SNANTITIZIAITON AND AUTOMTICACCC !!!!
-    
-    // A. FILE VALIDATION is done in "configureFileUpload.js" as a multer middleware
+        // A. FILE VALIDATION is done in "configureFileUpload.js" as a multer middleware
+        // -
 
-    // B. BODY VALIDATION
+        
+        // B. BODY VALIDATION
         // 1. Validate field arrangement 
         const allowedFields = ["registro", "filtro", "fechaInicio", "fechaTermino"];
         const receivedFields = Object.keys(req.body);
         const hasExtraFields = receivedFields.some(field => !allowedFields.includes(field));
         if (hasExtraFields)
             return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#001)" });
-
-        //Effective error messages are clear, concise, and provide a solution to the problem. They should help users fix the issue as quickly as possible. 
-
 
         // 2. Validate field quality 
         const { registro, filtro, fechaInicio, fechaTermino } = req.body;
@@ -53,36 +42,36 @@ exports.createPermitRequest = async (req, res) => {
         const fechaInicioDate = new Date(fechaInicio);
         const fechaTerminoDate = new Date(fechaTermino);
         const today = new Date();
-        if (isNaN(fechaInicioDate.getTime()) || isNaN(fechaTerminoDate.getTime())) 
+        if (isNaN(fechaInicioDate.getTime()) || isNaN(fechaTerminoDate.getTime()))
             return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#003)" });
         const fechaInicioTime = fechaInicioDate.getTime();
         const fechaTerminoTime = fechaTerminoDate.getTime();
-        if (fechaInicioTime >= fechaTerminoTime || today > fechaInicioTime || today > fechaTerminoTime) 
+        if (fechaInicioTime >= fechaTerminoTime || today > fechaInicioTime || today > fechaTerminoTime)
             return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#004)" });
-        if (registro === "Incapacidad" && fechaInicioDate.getHours() !== 0) 
+        if (registro === "Incapacidad" && fechaInicioDate.getHours() !== 0)
             return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#005)" });
 
 
-    // C. MODEL LOGIC
-    const formatReadableDateTime = (isoDate) => {
-        const date = new Date(isoDate);
-        let readableDate = date.toLocaleDateString('es-MX', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        });
-        let readableTime = date.toLocaleTimeString('es-MX', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
+        // C. MODEL LOGIC
+        // 0. Auxiliary functions
+        const formatReadableDateTime = (isoDate) => {
+            const date = new Date(isoDate);
+            let readableDate = date.toLocaleDateString('es-MX', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            });
+            let readableTime = date.toLocaleTimeString('es-MX', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
 
-        });
-       if (readableTime === "24:00") {
-            readableTime = "00:00";
-        }
-        return `${readableDate}, ${readableTime}`;
-    };
-
+            });
+            if (readableTime === "24:00") {
+                readableTime = "00:00";
+            }
+            return `${readableDate}, ${readableTime}`;
+        };
 
         // 1. Build payload
         let docResponses = [];
@@ -94,20 +83,9 @@ exports.createPermitRequest = async (req, res) => {
                 })
             );
         }
-        
         let paths = [];
-        for (const item of docResponses) 
-            paths.push(item._id);    
-        
-
-
-        // SON 2 PAYLOADS, UNO QUE SE FABRICA POR ARCHIVO Y LUEGO HACE CREATE POR CADA ARCHIVO 
-        // EL OTRO ES ESTE, ESTE ES EL FINAL, DOCPATHS SON LOS OBJECT IDS DEL CREATE DE CADA ARCHIVO
-        // docpathd came friom uplñoad to mongodfbvb
-
-        // to get payloads, you need to creat them first
-    
-        console.log("paths: " + paths);
+        for (const item of docResponses)
+            paths.push(item._id);
         const payload = {
             userId: res.locals.userId,
             registro: req.body.registro,
@@ -119,39 +97,40 @@ exports.createPermitRequest = async (req, res) => {
             isSent: false,
             isVerified: false,
         };
-        
-        // Execute mongoose action
+
+        // 2. Execute mongoose action
         const response = await permitsModel.create(payload);
         console.log(response);
-        return res.status(200).json({ success: true }); 
+        return res.status(200).json({ success: true });
 
     } catch (error) {
         console.error(error);
         // Controlled mongoose error (Data validation)
-        if (error instanceof mongoose.Error.ValidationError) 
+        if (error instanceof mongoose.Error.ValidationError)
             return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#006)" });
         // Else, respond as internal error
-        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#007)"});
+        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#007)" });
     }
 };
- 
+
+// viewPermitsRowFile : Colaborador, JefeInmediato, rHumanos
 exports.viewPermitsRowFile = async (req, res) => {
     try {
-    // A. BODY VALIDATION
+        // A. BODY VALIDATION
         // 1. Validate field quality 
         const { permitId, filename } = req.params;
         if (!permitId || !filename || typeof permitId !== "string" || typeof filename !== "string")
             return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#008)" });
-        if (!mongoose.Types.ObjectId.isValid(permitId)) 
+        if (!mongoose.Types.ObjectId.isValid(permitId))
             return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#009)" });
 
-    // B. MODEL VALIDATION
+        // B. MODEL VALIDATION
         // 1. Validate the permit has that file
-        const response = await permitsModel.findOne({_id : permitId })
-                                            .populate('docPaths', 'originalname filename');
+        const response = await permitsModel.findOne({ _id: permitId })
+            .populate('docPaths', 'originalname filename');
         const matchingDoc = response.docPaths.find(item => item.originalname === filename);
 
-    // C. MODEL LOGIC
+        // C. MODEL LOGIC
         // 1. Send the file with its serial name
         if (matchingDoc) {
             const filePath = path.join(__dirname, '..', 'uploads', 'permisos', matchingDoc.filename);
@@ -180,13 +159,13 @@ exports.changeStatus = async (req, res) => {
     try {
         const { permitId, estatus } = req.body;
         const updatedPermit = await permitsModel.findByIdAndUpdate(
-            permitId, 
-            { 
-                $set: { 
+            permitId,
+            {
+                $set: {
                     estatus: estatus,
-                } 
+                }
             },
-            { new: true } 
+            { new: true }
         );
         if (!updatedPermit) {
             return res.status(404).json({ success: false, message: "Permiso no encontrado" });
@@ -402,7 +381,7 @@ stream.on('finish', () => {
 
        
 */
-return res.status(200).json({ success: true, message: "" });
+    return res.status(200).json({ success: true, message: "" });
 
 
 };
@@ -412,13 +391,13 @@ return res.status(200).json({ success: true, message: "" });
 exports.postVerifyPermit = async (req, res) => {
     try {
         const response = await permitsModel.findByIdAndUpdate(
-            req.body._id, 
-            { 
-                $set: { 
+            req.body._id,
+            {
+                $set: {
                     isVerified: true,
-                } 
+                }
             },
-            { new: true } 
+            { new: true }
         );
         return res.status(200).json({ success: true, message: "" });
 
@@ -433,14 +412,14 @@ exports.postVerifyPermit = async (req, res) => {
 exports.postSendPermit = async (req, res) => {
     try {
         const response = await permitsModel.findByIdAndUpdate(
-            req.body._id, 
-            { 
-                $set: { 
+            req.body._id,
+            {
+                $set: {
                     isSent: true,
 
-                } 
+                }
             },
-            { new: true } 
+            { new: true }
         );
         return res.status(200).json({ success: true, message: "" });
 
@@ -467,19 +446,19 @@ exports.postEditPermit = async (req, res) => {
     try {
 
         const response = await permitsModel.findByIdAndUpdate(
-            req.body.permitId, 
-            { 
-                $set: { 
-                    registro: req.body.registro, 
+            req.body.permitId,
+            {
+                $set: {
+                    registro: req.body.registro,
                     filtro: req.body.filtro,
                     fechaInicio: req.body.fechaInicio,
                     fechaTermino: req.body.fechaTermino,
                     docPaths: req.body.docPaths
-                } 
+                }
             }, // Cambiar atributos
-            { new: true } 
+            { new: true }
         );
-    
+
         return res.status(200).json({ success: true, message: "" });
 
     } catch (error) {
@@ -489,23 +468,23 @@ exports.postEditPermit = async (req, res) => {
 
 };
 
-exports.deleteFile = async (req, res) => {   
-        try {            
-            const filePath = path.join(__dirname, '..', 'uploads', 'permisos', req.body.dbName);
-            fs.unlink(filePath, (err) => {
-                if (err) {
-                    console.error('Hubo un error al eliminar el archivo:', err);
-                    return res.status(500).json({ message: 'Hubo un error al eliminar el archivo' });
-                }
-            });
+exports.deleteFile = async (req, res) => {
+    try {
+        const filePath = path.join(__dirname, '..', 'uploads', 'permisos', req.body.dbName);
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                console.error('Hubo un error al eliminar el archivo:', err);
+                return res.status(500).json({ message: 'Hubo un error al eliminar el archivo' });
+            }
+        });
 
-            const response = await filesModel.deleteOne({ _id: req.body._id });
-            return res.status(200).json({ success: true, message: response });
-    
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ success: false, message: "" });
-        }
+        const response = await filesModel.deleteOne({ _id: req.body._id });
+        return res.status(200).json({ success: true, message: response });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "" });
+    }
 };
 
 
@@ -533,7 +512,7 @@ exports.accessPermitsModule = async (req, res) => {
             return res.render('permisos/colaboradorPermitsView.ejs', { permitsRows });
 
 
-        // Permits module for "jefeInmediato"
+            // Permits module for "jefeInmediato"
         } else if (res.locals.userPrivilege === "jefeInmediato") {
             // get all members from the team, map all their permits in a single array
             const team = await teamsSchema.find({ jefeInmediatoId: res.locals.userId }).select('-__v');
@@ -542,9 +521,9 @@ exports.accessPermitsModule = async (req, res) => {
                 const permitPromises = teamData.colaboradoresIds.map(userId => {
                     // populate inserts the object referenced inside the query (check permitsModel.js)
                     return permitsModel.find({ userId: userId, isSent: true })
-                            .populate('userId', 'nombre apellidoP apellidoM')
-                            .populate('docPaths', '_id originalname filename path') 
-                            .select('-__v');
+                        .populate('userId', 'nombre apellidoP apellidoM')
+                        .populate('docPaths', '_id originalname filename path')
+                        .select('-__v');
                 });
                 const permitsResults = await Promise.all(permitPromises);
                 permitsRows = permitsResults.flat(); // compact all permits as a single array
@@ -552,23 +531,23 @@ exports.accessPermitsModule = async (req, res) => {
             return res.render('permisos/jefeInmediatoPermitsView.ejs', { permitsRows });
 
 
-        // Permits module for "rHumanos"
+            // Permits module for "rHumanos"
         } else if (res.locals.userPrivilege === "rHumanos") {
             // get all permits regardless of the user but must be sent
-            permitsRows = await permitsModel.find({ isSent: true })                            
-                            .populate('userId', 'nombre apellidoP apellidoM area')
-                            .populate('docPaths', '_id originalname filename path') 
-                            .select('-__v');
+            permitsRows = await permitsModel.find({ isSent: true })
+                .populate('userId', 'nombre apellidoP apellidoM area')
+                .populate('docPaths', '_id originalname filename path')
+                .select('-__v');
             return res.render('permisos/rHumanosPermitsView.ejs', { permitsRows });
-        
-        
-        // Permits module for "direccion"
+
+
+            // Permits module for "direccion"
         } else if (res.locals.userPrivilege === "direccion") {
             // get all permits regardless of the user but must be sent
-            permitsRows = await permitsModel.find({ isSent: true })                            
-                            .populate('userId', 'nombre apellidoP apellidoM area')
-                            .populate('docPaths', '_id originalname filename path') 
-                            .select('-__v');
+            permitsRows = await permitsModel.find({ isSent: true })
+                .populate('userId', 'nombre apellidoP apellidoM area')
+                .populate('docPaths', '_id originalname filename path')
+                .select('-__v');
             return res.render('permisos/rHumanosPermitsView.ejs', { permitsRows });
         }
 
