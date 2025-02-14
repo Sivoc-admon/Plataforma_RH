@@ -9,25 +9,26 @@ const PDFDocument = require('pdfkit'); // Assuming you are using pdfkit
 const crypto = require('crypto');
 
 
-const validator = require("../validators/permisos.validator"); // access via validator.{action}
 const express = require("express");
 const multer = require("multer");
 
 const app = express();
 
 
+
 exports.createPermitRequest = async (req, res) => {
     // El pdf se crea
-    console.log("📌 req.body:", req.body);   // Muestra los datos enviados (registro, filtro, userId, etc.)
-    console.log("📌 req.files:", req.files); // Muestra los archivos subidos (PDFs)
-    console.log("📂 Archivos recibidos:", JSON.stringify(req.files, null, 2));
+    //console.log("📌 req.body:", req.body);   // Muestra los datos enviados (registro, filtro, userId, etc.)
+    //console.log("📌 req.files:", req.files); // Muestra los archivos subidos (PDFs)
+    //console.log("📂 Archivos recibidos:", JSON.stringify(req.files, null, 2));
 
     
 
     try {
+    // 0. Sanitize everything before anything
+    // GLOBAL MIDDLEWARE, ABOSLUTELY NO MISTAKES ON SNANTITIZIAITON AND AUTOMTICACCC !!!!
+    
     // A. FILE VALIDATION is done in "configureFileUpload.js" as a multer middleware
-
-    // todo xd, solo hacer que MULTER, CONTROLLER Y MOONGOOSE se coordinen al 100% y luego el payload y listo
 
     // B. BODY VALIDATION
         // 1. Validate field arrangement 
@@ -35,14 +36,17 @@ exports.createPermitRequest = async (req, res) => {
         const receivedFields = Object.keys(req.body);
         const hasExtraFields = receivedFields.some(field => !allowedFields.includes(field));
         if (hasExtraFields)
-            return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#001)" });
+
+        //Effective error messages are clear, concise, and provide a solution to the problem. They should help users fix the issue as quickly as possible. 
+
 
         // 2. Validate field quality 
         const { registro, filtro, fechaInicio, fechaTermino } = req.body;
         if (!registro || !filtro || !fechaInicio || !fechaTermino ||
             typeof registro !== "string" || typeof filtro !== "string" ||
             typeof fechaInicio !== "string" || typeof fechaTermino !== "string") {
-            return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#002)" });
         }
 
         // 3. Validate dates
@@ -50,112 +54,117 @@ exports.createPermitRequest = async (req, res) => {
         const fechaTerminoDate = new Date(fechaTermino);
         const today = new Date();
         if (isNaN(fechaInicioDate.getTime()) || isNaN(fechaTerminoDate.getTime())) 
-            return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#003)" });
         const fechaInicioTime = fechaInicioDate.getTime();
         const fechaTerminoTime = fechaTerminoDate.getTime();
-        if (fechaInicioTime >= fechaTerminoTime || today > fechaInicioTime) 
-            return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+        if (fechaInicioTime >= fechaTerminoTime || today > fechaInicioTime || today > fechaTerminoTime) 
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#004)" });
         if (registro === "Incapacidad" && fechaInicioDate.getHours() !== 0) 
-            return res.status(400).json({ success: false, messageTitle: "modified", messageText: "Se ha detectado un intento de actividad maliciosa." });
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#005)" });
 
 
     // C. MODEL LOGIC
+    const formatReadableDateTime = (isoDate) => {
+        const date = new Date(isoDate);
+        let readableDate = date.toLocaleDateString('es-MX', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+        let readableTime = date.toLocaleTimeString('es-MX', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+
+        });
+       if (readableTime === "24:00") {
+            readableTime = "00:00";
+        }
+        return `${readableDate}, ${readableTime}`;
+    };
+
+
         // 1. Build payload
+        let docResponses = [];
+        if (req.files.length > 0) {
+            await Promise.all(
+                req.files.map(async (file) => {
+                    const response = await filesModel.create(file);
+                    docResponses.push(response);
+                })
+            );
+        }
+        
+        let paths = [];
+        for (const item of docResponses) 
+            paths.push(item._id);    
+        
+
+
+        // SON 2 PAYLOADS, UNO QUE SE FABRICA POR ARCHIVO Y LUEGO HACE CREATE POR CADA ARCHIVO 
+        // EL OTRO ES ESTE, ESTE ES EL FINAL, DOCPATHS SON LOS OBJECT IDS DEL CREATE DE CADA ARCHIVO
+        // docpathd came friom uplñoad to mongodfbvb
+
+        // to get payloads, you need to creat them first
+    
+        console.log("paths: " + paths);
         const payload = {
             userId: res.locals.userId,
             registro: req.body.registro,
             filtro: req.body.filtro,
-            fechaInicio: req.body.fechaInicio,
-            fechaTermino: req.body.fechaTermino,
-
-            // SE TIENE QUE COMPLETAR EL FETCH DE UPLOAD PARA OBTENRE EL FILEPATH XD
-
-            
-            contact: {
-                email: "ana@example.com",
-                phone: "+123456789"
-            }
+            fechaInicio: formatReadableDateTime(req.body.fechaInicio),
+            fechaTermino: formatReadableDateTime(req.body.fechaTermino),
+            docPaths: paths,
+            estatus: "Pendiente",
+            isSent: false,
+            isVerified: false,
         };
         
-
-        /*
-
-            {
-                "userId": {
-                "$oid": "678015aab366e37052cf12bc"
-                },
-                "registro": "Permiso",
-                "filtro": "Cita Medica",
-                "fechaInicio": "8 de enero de 2025, 01:16",
-                "fechaTermino": "25 de enero de 2025, 01:16",
-                "docPaths": [],
-                "estatus": "Justificado",
-                "isSent": true,
-                "isVerified": true,
-                "__v": 0
-            }
-        */
-
-
         // Execute mongoose action
-        const response = await permitsModel.create(req.body);
-        return res.status(200).json({ success: true, messageTitle: "true", messageText: "success" }); // response.path = file location
+        const response = await permitsModel.create(payload);
+        console.log(response);
+        return res.status(200).json({ success: true }); 
 
     } catch (error) {
         console.error(error);
         // Controlled mongoose error (Data validation)
         if (error instanceof mongoose.Error.ValidationError) 
-            return res.status(400).json({ success: false, messageTitle: "mongoose", messageText: "model"});
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#006)" });
         // Else, respond as internal error
-        return res.status(500).json({ success: false, messageTitle: "false", messageText: "error"});
+        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#007)"});
     }
 };
-    
-    /*
-        📌 req.body: [Object: null prototype] {
-        registro: 'Permiso',
-        filtro: 'Cita Medica',
-        fechaInicio: '2025-02-10T11:05',
-        fechaTermino: '2025-04-05T11:05',
-        userId: '678015aab366e37052cf12bc'
-        }
-        📌 req.files: [
-        {
-            fieldname: 'files',
-            originalname: 'Semblanza (1).pdf',
-            encoding: '7bit',
-            mimetype: 'application/pdf',
-            destination: 'uploads/permisos',
-            filename: 'files-1738947966555-815359186.pdf',
-            path: 'uploads\\permisos\\files-1738947966555-815359186.pdf',
-            size: 842619
-        }
-        ]
-
-    */
-
-// REMADE CONTROLLERS
+ 
 exports.viewPermitsRowFile = async (req, res) => {
-
-    // ✅ Validation
-    const { error } = validator.viewPermitsRowFile(req.params.filename);
-    if (error) {
-        return res.status(400).json({ success: false, message: error.details.map(d => d.message).join(", ") });
-    }
-
-    // ✅ Model
     try {
-        const response = await permitsModel.findOne({});
-        const filePath = path.join(__dirname, '..', 'uploads', 'permisos', req.params.filename);
-        res.sendFile(filePath, (err) => {
-            if (err) {
-                res.status(404).send('Correct. No se encontró el archivo PDF.');
-            }
-        });
-    } catch (error) {
-        return res.status(500).send('Favor de contactar a Soporte Técnico. (Error #030)');
-    }
+    // A. BODY VALIDATION
+        // 1. Validate field quality 
+        const { permitId, filename } = req.params;
+        if (!permitId || !filename || typeof permitId !== "string" || typeof filename !== "string")
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#008)" });
+        if (!mongoose.Types.ObjectId.isValid(permitId)) 
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#009)" });
 
+    // B. MODEL VALIDATION
+        // 1. Validate the permit has that file
+        const response = await permitsModel.findOne({_id : permitId })
+                                            .populate('docPaths', 'originalname filename');
+        const matchingDoc = response.docPaths.find(item => item.originalname === filename);
+
+    // C. MODEL LOGIC
+        // 1. Send the file with its serial name
+        if (matchingDoc) {
+            const filePath = path.join(__dirname, '..', 'uploads', 'permisos', matchingDoc.filename);
+            res.sendFile(filePath, (err) => {
+                if (err) {
+                    res.status(404).send('No se encontró el archivo PDF.');
+                }
+            });
+        }
+
+    } catch (error) {
+        res.status(500).send('Tomar captura y favor de informar a soporte técnico. (#008)');
+    }
 };
 
 
@@ -165,10 +174,7 @@ exports.viewPermitsRowFile = async (req, res) => {
 
 exports.changeStatus = async (req, res) => {
     // ✅ Aplicar validación (FIXED)
-    const { error } = validator.changeStatus(req.body);
-    if (error) {
-        return res.status(400).json({ success: false, message: error.details.map(d => d.message).join(", ") });
-    }
+
 
     // ✅ Lógica del modelo 
     try {

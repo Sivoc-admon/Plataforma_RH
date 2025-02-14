@@ -40,22 +40,14 @@ router.post("/createPermitRequest",
             next(); // Si no hay error, continuar con el controlador
         });
     },
-
-
-
 controller.createPermitRequest);
 
-
-
-
-
-///
-
 router.post("/createPermitRequest",  upload.array('files', 3), controller.createPermitRequest);
+router.get('/viewPermitsRowFile/:permitId/:filename', controller.viewPermitsRowFile);
+
 
 
 // REMADE ROUTES
-router.get('/viewPermitsRowFile/:filename', controller.viewPermitsRowFile);
 router.post("/changeStatus", controller.changeStatus);
 
 

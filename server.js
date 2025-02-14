@@ -4,9 +4,11 @@ const path = require("path");
 const app = express();
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
-const { authorize } = require('./utils/jwt');
 require('dotenv').config();
 const mongoose = require('mongoose'); global.mongoose = mongoose;
+
+const { authorize } = require('./utils/jwt');
+const { sanitizeInputs } = require('./utils/sanitizeInputs');
 /*-------------*/
 
 /* Global middlewares */
@@ -33,6 +35,7 @@ app.set("view engine", "ejs");
 
 /* (Critical) (Before Routes) Decode JWT on every fetch to authorize any intent */
 app.use(authorize);
+app.use(sanitizeInputs); /* Then, remove all possible mongoDB noSQL attacks */
 /*-------------*/
 
 /* URLs */

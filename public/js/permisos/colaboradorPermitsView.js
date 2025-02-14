@@ -1,3 +1,8 @@
+// viewFile button
+async function viewPermitsRowFile(button) {
+    window.open(DOMPurify.sanitize(`/permisos/viewPermitsRowFile/${button.getAttribute('permitId')}/${button.getAttribute('filename')}`)); 
+};
+
 // createPermit button
 async function createPermitRequest(theInput) { 
     const registro = DOMPurify.sanitize(theInput);
@@ -22,7 +27,7 @@ async function createPermitRequest(theInput) {
                     <select id="filtro" class="input">
                         <option value="" hidden>Seleccione filtro</option>
                         <option value="Home Office">Home Office</option>
-                        <option value="Cita Medica">Cita Medica</option>
+                        <option value="Cita Médica">Cita Médica</option>
                         <option value="Asunto Familiar">Asunto Familiar</option>
                         <option value="Otro">Otro</option>
                     </select>
@@ -87,7 +92,7 @@ async function createPermitRequest(theInput) {
                     dateFormat: "Y-m-d\\TH:i:S",  // Formato ISO
                     time_24hr: true,
                     locale: "es",
-                    minDate: "today",  // No permitir fechas pasadas
+                    minDate: new Date().fp_incr(1),  // No permitir fechas pasadas
                     onChange: function (selectedDates, dateStr, instance) {
                         let fecha = selectedDates[0];  // Obtenemos la fecha seleccionada en fechaYHoraInicio
                         if (fecha) {
@@ -103,7 +108,7 @@ async function createPermitRequest(theInput) {
                     dateFormat: "Y-m-d\\TH:i:S",  // Formato ISO
                     time_24hr: true,
                     locale: "es",
-                    minDate: "today",  // La fecha mínima inicial de fechaYHoraFinal será "hoy"
+                    minDate: new Date().fp_incr(2),  // La fecha mínima inicial de fechaYHoraFinal será "hoy"
                     onChange: function (selectedDates, dateStr, instance) {
                         let fecha = selectedDates[0];  // Obtenemos la fecha seleccionada
                         if (fecha) {
@@ -183,8 +188,6 @@ async function createPermitRequest(theInput) {
                 });
 
                 function updateFileList() {
-                    // console.log("Current list: "); archivosSeleccionados.forEach(file => console.log(file));
-
                     const subidosDiv = document.getElementById("subidos");
                     subidosDiv.innerHTML = DOMPurify.sanitize("");
                     archivosSeleccionados.forEach((file, index) => {
@@ -198,7 +201,7 @@ async function createPermitRequest(theInput) {
                                 </button>
                             </div>
                             <div class="column" style="align-self:center; justify-self:center;">
-                                <p>${file.name} ${(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                <p>${file.name}</p>
                             </div>
                         `);
                         subidosDiv.appendChild(fileItem);
@@ -314,7 +317,7 @@ async function editPermit(button) { // async function to perform fetch chain
                 <select id="filtro" class="input">
                     <option value="${permitObject.filtro}" hidden>${permitObject.filtro}</option>
                     <option value="Home Office">Home Office</option>
-                    <option value="Cita Medica">Cita Medica</option>
+                    <option value="Cita Médica">Cita Médica</option>
                     <option value="Asunto Familiar">Asunto Familiar</option>
                     <option value="Otro">Otro</option>
                 </select> 
