@@ -69,9 +69,7 @@
                                 <% if (!permit.docPaths || permit.docPaths.length === 0) { %>
                                     No hay documentos
                                 <% } else { %>
-
                                     <% permit.docPaths.forEach(doc => { %>
-
                                         <div class="columns is-centered">
                                             <div class="column">
                                                 <button class="default-button-css table-button-css" permitId="<%= permit._id %>" filename="<%= doc.originalname %>" onclick="viewPermitsRowFile(this)" >
@@ -83,7 +81,6 @@
                                             </div>
                                         </div>
                                     <% }) %>
-
                                 <% } %>
                             </td>
 
@@ -109,19 +106,19 @@
                                 <% if (!permit.isSent) { %>
                                         <div class="columns is-centered">
                                             <div class="column">
-                                                <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="editPermit(this)">
+                                                <button class="default-button-css table-button-css" permitId="<%= permit._id %>" onclick="editPermit(this)">
                                                     <i class="fa-solid fa-pencil"></i>
                                                 </button>
                                             </div>
 
                                             <div class="column">
-                                                <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="deletePermit(this)">
+                                                <button class="default-button-css table-button-css" permitId="<%= permit._id %>" onclick="deletePermit(this)">
                                                     <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </div>
 
                                             <div class="column">
-                                                <button class="default-button-css table-button-css" permitObject="<%= JSON.stringify(permit) %>" onclick="sendPermit(this)">
+                                                <button class="default-button-css table-button-css" permitId="<%= permit._id %>" onclick="sendPermit(this)">
                                                     <i class="fa-solid fa-check" style="font-size: 1.552rem;"></i>
                                                 </button>
                                             </div>

@@ -9,13 +9,7 @@ const PDFDocument = require('pdfkit'); // Assuming you are using pdfkit
 const crypto = require('crypto');
 
 
-const express = require("express");
-const multer = require("multer");
-
-const app = express();
-
-
-// createPermitRequest : Colaborador
+// createPermitRequest : Colaborador : Done
 exports.createPermitRequest = async (req, res) => {
     try {
         // A. FILE VALIDATION is done in "configureFileUpload.js" as a multer middleware
@@ -104,16 +98,13 @@ exports.createPermitRequest = async (req, res) => {
         return res.status(200).json({ success: true });
 
     } catch (error) {
-        console.error(error);
-        // Controlled mongoose error (Data validation)
         if (error instanceof mongoose.Error.ValidationError)
             return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#006)" });
-        // Else, respond as internal error
         return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#007)" });
     }
 };
 
-// viewPermitsRowFile : Colaborador, JefeInmediato, rHumanos
+// viewPermitsRowFile : Colaborador, JefeInmediato, rHumanos : Done
 exports.viewPermitsRowFile = async (req, res) => {
     try {
         // A. BODY VALIDATION
@@ -146,9 +137,78 @@ exports.viewPermitsRowFile = async (req, res) => {
     }
 };
 
+// editPermit : Colaborador : ---
+exports.editPermit_getInfo = async (req, res) => {
+    try {
+        const permitId = req.body.permitId;
+        // A. BODY VALIDATION
+        // 2. Validate field quality 
+        const { registro, filtro, fechaInicio, fechaTermino } = req.body;
+        if (!registro || !filtro || !fechaInicio || !fechaTermino ||
+            typeof registro !== "string" || typeof filtro !== "string" ||
+            typeof fechaInicio !== "string" || typeof fechaTermino !== "string") {
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#002)" });
+        }
 
+        // 1. Validate field quality 
+        if (!permitId || !filename || typeof permitId !== "string" || typeof filename !== "string")
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#008)" });
+        if (!mongoose.Types.ObjectId.isValid(permitId))
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#009)" });
 
+        // B. MODEL VALIDATION
+        // 1. Validate the permit has that file
+        const response = await permitsModel.findOne({ _id: permitId })
+            .populate('docPaths', 'originalname filename');
+        const matchingDoc = response.docPaths.find(item => item.originalname === filename);
 
+        // C. MODEL LOGIC
+        // 1. Send the file with its serial name
+        if (matchingDoc) {
+            const filePath = path.join(__dirname, '..', 'uploads', 'permisos', matchingDoc.filename);
+            res.sendFile(filePath, (err) => {
+                if (err) {
+                    res.status(404).send('No se encontró el archivo PDF.');
+                }
+            });
+        }
+
+    } catch (error) {
+        res.status(500).send('Tomar captura y favor de informar a soporte técnico. (#008)');
+    }
+};
+// editPermit : Colaborador : ---
+exports.editPermit_postInfo = async (req, res) => {
+    try {
+        // A. BODY VALIDATION
+        // 1. Validate field quality 
+        const { permitId, filename } = req.params;
+        if (!permitId || !filename || typeof permitId !== "string" || typeof filename !== "string")
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#008)" });
+        if (!mongoose.Types.ObjectId.isValid(permitId))
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#009)" });
+
+        // B. MODEL VALIDATION
+        // 1. Validate the permit has that file
+        const response = await permitsModel.findOne({ _id: permitId })
+            .populate('docPaths', 'originalname filename');
+        const matchingDoc = response.docPaths.find(item => item.originalname === filename);
+
+        // C. MODEL LOGIC
+        // 1. Send the file with its serial name
+        if (matchingDoc) {
+            const filePath = path.join(__dirname, '..', 'uploads', 'permisos', matchingDoc.filename);
+            res.sendFile(filePath, (err) => {
+                if (err) {
+                    res.status(404).send('No se encontró el archivo PDF.');
+                }
+            });
+        }
+
+    } catch (error) {
+        res.status(500).send('Tomar captura y favor de informar a soporte técnico. (#008)');
+    }
+};
 
 
 exports.changeStatus = async (req, res) => {

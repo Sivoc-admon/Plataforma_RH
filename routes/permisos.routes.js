@@ -1,10 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const controller = require('../controllers/permisos.controller');
-
-
-// 📌 Route specifically designed
 const configureFileUpload = require("../utils/configureFileUpload");
+
+// File upload validation & configuration
+const ensureFilesArray = (req, res, next) => {
+    if (!req.files)
+        req.files = [];
+    next();
+};
+const allowedFileExtensions = ['png', 'jpeg', 'jpg', 'pdf', 'doc', 'docx'];
+const MAX_SIZE_MB = 3 * 1024 * 1024; // 3MB in bytes
 const allowedFileTypes = [
     "image/png",
     "image/jpeg",
@@ -13,19 +19,9 @@ const allowedFileTypes = [
     "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 ];
-const allowedFileExtensions = ['png', 'jpeg', 'jpg', 'pdf', 'doc', 'docx'];
-const MAX_SIZE_MB = 3 * 1024 * 1024; // 3MB in bytes
+
+// createPermitRequest : Colaborador : Done
 const upload = configureFileUpload("uploads/permisos", allowedFileTypes, allowedFileExtensions, MAX_SIZE_MB);
-
-
-// 📌 Middleware para asegurar que req.files siempre sea un array
-const ensureFilesArray = (req, res, next) => {
-    if (!req.files) {
-        req.files = [];
-    }
-    next();
-};
-
 router.post("/createPermitRequest", 
     ensureFilesArray,
     (req, res, next) => { 
@@ -42,13 +38,19 @@ router.post("/createPermitRequest",
     },
 controller.createPermitRequest);
 
-router.post("/createPermitRequest",  upload.array('files', 3), controller.createPermitRequest);
+// viewPermitsRowFile : Colaborador, JefeInmediato, rHumanos : Done
 router.get('/viewPermitsRowFile/:permitId/:filename', controller.viewPermitsRowFile);
+
+// editPermit : Colaborador : ---
+router.post('/editPermit/getInfo', controller.editPermit_getInfo);
+router.post('/editPermit/postInfo', controller.editPermit_postInfo);
+
 
 
 
 // REMADE ROUTES
 router.post("/changeStatus", controller.changeStatus);
+
 
 
 
