@@ -155,9 +155,10 @@ exports.editPermit_getInfo = async (req, res) => {
 
         return res.status(200).json({ success: true, message: response});
     } catch (error) {
-        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Espera un poco y vuelvelo a intentar. (#012)" });
+        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#012)" });
     }
 };
+
 // editPermit : Colaborador : ---
 exports.editPermit_postInfo = async (req, res) => {
     try {
@@ -190,6 +191,53 @@ exports.editPermit_postInfo = async (req, res) => {
         res.status(500).send('Tomar captura y favor de informar a soporte técnico. (#008)');
     }
 };
+
+// deletePermit : Colaborador : Done
+exports.deletePermit = async (req, res) => {
+    try {
+        // A. BODY VALIDATION
+        // 1. Validate field quality 
+        const permitId = req.body.permitId;
+        if (!permitId || typeof permitId !== "string")
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#018)" });
+
+        // B. MODEL LOGIC
+        // 1. Validate that the permit is eligible for deletion and also exists
+        const response = await permitsModel.findOne({ _id: permitId, isSent: false, isVerified: false })
+            .populate('docPaths', 'filename');
+        if (!response)
+            return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#022)" });
+        
+        // 2. For each file that the permit has remove the database entry and the file itself
+        for (const item of response.docPaths) {
+            const filePath = path.join(__dirname, '..', 'uploads', 'permisos', item.filename);
+            fs.unlink(filePath, (err) => {
+                if (err)
+                    return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico.(#022)" });
+            });
+            const itemResponse = await filesModel.deleteOne({ _id: item._id });
+            if (!itemResponse)
+                return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#023)" });
+        }
+
+        // 3. Remove the information of the permit inside the collection
+        const deletionResponse = await permitsModel.deleteOne({ _id: permitId });
+        if (!deletionResponse)
+            return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#024)" });
+    
+        return res.status(200).json({ success: true, message: "" });
+
+    } catch (error) {
+        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#025)" });
+    }
+};
+
+
+
+
+
+
+
 
 
 exports.changeStatus = async (req, res) => {
@@ -471,17 +519,7 @@ exports.postSendPermit = async (req, res) => {
 
 };
 
-exports.deletePermit = async (req, res) => {
-    try {
-        const response = await permitsModel.deleteOne({ _id: req.body._id });
-        return res.status(200).json({ success: true, message: "" });
 
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
-    }
-
-};
 
 exports.postEditPermit = async (req, res) => {
     try {
@@ -509,24 +547,7 @@ exports.postEditPermit = async (req, res) => {
 
 };
 
-exports.deleteFile = async (req, res) => {
-    try {
-        const filePath = path.join(__dirname, '..', 'uploads', 'permisos', req.body.dbName);
-        fs.unlink(filePath, (err) => {
-            if (err) {
-                console.error('Hubo un error al eliminar el archivo:', err);
-                return res.status(500).json({ message: 'Hubo un error al eliminar el archivo' });
-            }
-        });
 
-        const response = await filesModel.deleteOne({ _id: req.body._id });
-        return res.status(200).json({ success: true, message: response });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
-    }
-};
 
 
 

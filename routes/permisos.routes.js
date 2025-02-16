@@ -45,6 +45,8 @@ router.get('/viewPermitsRowFile/:permitId/:filename', controller.viewPermitsRowF
 router.post('/editPermit/getInfo', controller.editPermit_getInfo);
 router.post('/editPermit/postInfo', controller.editPermit_postInfo);
 
+// deletePermit : Colaborador : Done
+router.delete('/deletePermit', controller.deletePermit);
 
 
 
@@ -73,9 +75,9 @@ router.get("/accessPermitsModule", controller.accessPermitsModule);
 //router.get('/downloadFile/:filename', controller.getFileDownload);
 
 
-router.delete('/deleteFile', controller.deleteFile);
+
+
 router.post("/editPermit", controller.postEditPermit);
-router.delete('/deletePermit', controller.deletePermit);
 router.post("/sendPermit", controller.postSendPermit);
 
 
