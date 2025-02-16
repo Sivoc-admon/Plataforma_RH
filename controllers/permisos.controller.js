@@ -8,7 +8,6 @@ const fs = require('fs');
 const PDFDocument = require('pdfkit'); // Assuming you are using pdfkit
 const crypto = require('crypto');
 
-
 // createPermitRequest : Colaborador : Done
 exports.createPermitRequest = async (req, res) => {
     try {
@@ -159,39 +158,6 @@ exports.editPermit_getInfo = async (req, res) => {
     }
 };
 
-// editPermit : Colaborador : ---
-exports.editPermit_postInfo = async (req, res) => {
-    try {
-        // A. BODY VALIDATION
-        // 1. Validate field quality 
-        const { permitId, filename } = req.params;
-        if (!permitId || !filename || typeof permitId !== "string" || typeof filename !== "string")
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#008)" });
-        if (!mongoose.Types.ObjectId.isValid(permitId))
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#009)" });
-
-        // B. MODEL VALIDATION
-        // 1. Validate the permit has that file
-        const response = await permitsModel.findOne({ _id: permitId })
-            .populate('docPaths', 'originalname filename').select('-__v');
-        const matchingDoc = response.docPaths.find(item => item.originalname === filename);
-
-        // C. MODEL LOGIC
-        // 1. Send the file with its serial name
-        if (matchingDoc) {
-            const filePath = path.join(__dirname, '..', 'uploads', 'permisos', matchingDoc.filename);
-            res.sendFile(filePath, (err) => {
-                if (err) {
-                    res.status(404).send('No se encontró el archivo PDF.');
-                }
-            });
-        }
-
-    } catch (error) {
-        res.status(500).send('Tomar captura y favor de informar a soporte técnico. (#008)');
-    }
-};
-
 // deletePermit : Colaborador : Done
 exports.deletePermit = async (req, res) => {
     try {
@@ -232,11 +198,65 @@ exports.deletePermit = async (req, res) => {
     }
 };
 
+// sendPermit : Colaborador : Done
+exports.sendPermit = async (req, res) => {
+    try {
+        // A. BODY VALIDATION
+        // 1. Validate field quality 
+        const permitId = req.body.permitId;
+        if (!permitId || typeof permitId !== "string")
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#026)" });
 
+        // B. MODEL LOGIC
+        // 1. Validate that the permit is eligible for sending and also exists
+        const response = await permitsModel.findOne({ _id: permitId, isSent: false, isVerified: false });
+        if (!response)
+            return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#027)" });
+    
+        // 2. Set isSent to true
+        const updateResponse = await permitsModel.findByIdAndUpdate(permitId, { $set: { isSent: true } }, { new: true });
+        if (!updateResponse)
+            return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#028)" });
+    
+        return res.status(200).json({ success: true, message: "" });
 
+    } catch (error) {
+        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#029)" });
+    }
+};
 
+// editPermit : Colaborador : ---
+exports.editPermit_postInfo = async (req, res) => {
+    try {
+        // A. BODY VALIDATION
+        // 1. Validate field quality 
+        const { permitId, filename } = req.params;
+        if (!permitId || !filename || typeof permitId !== "string" || typeof filename !== "string")
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#008)" });
+        if (!mongoose.Types.ObjectId.isValid(permitId))
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#009)" });
 
+        // B. MODEL VALIDATION
+        // 1. Validate the permit has that file
+        const response = await permitsModel.findOne({ _id: permitId })
+            .populate('docPaths', 'originalname filename').select('-__v');
+        const matchingDoc = response.docPaths.find(item => item.originalname === filename);
 
+        // C. MODEL LOGIC
+        // 1. Send the file with its serial name
+        if (matchingDoc) {
+            const filePath = path.join(__dirname, '..', 'uploads', 'permisos', matchingDoc.filename);
+            res.sendFile(filePath, (err) => {
+                if (err) {
+                    res.status(404).send('No se encontró el archivo PDF.');
+                }
+            });
+        }
+
+    } catch (error) {
+        res.status(500).send('Tomar captura y favor de informar a soporte técnico. (#008)');
+    }
+};
 
 
 
@@ -498,27 +518,6 @@ exports.postVerifyPermit = async (req, res) => {
 };
 
 
-exports.postSendPermit = async (req, res) => {
-    try {
-        const response = await permitsModel.findByIdAndUpdate(
-            req.body._id,
-            {
-                $set: {
-                    isSent: true,
-
-                }
-            },
-            { new: true }
-        );
-        return res.status(200).json({ success: true, message: "" });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
-    }
-
-};
-
 
 
 exports.postEditPermit = async (req, res) => {
@@ -546,21 +545,14 @@ exports.postEditPermit = async (req, res) => {
     }
 
 };
-
-
-
-
-
 /****************/
-/*************/
-/**********/
-/*******/
-/****/
-/**/
+/*********/
+/***/
 
 
 
-/* --- VIEWS LOGIC --- */
+/* --- VIEWS --- */
+// accessPermitsModule : Colaborador, JefeInmediato, rHumanos : Done
 exports.accessPermitsModule = async (req, res) => {
     try {
         let permitsRows = "";
@@ -621,8 +613,5 @@ exports.accessPermitsModule = async (req, res) => {
     }
 };
 /****************/
-/*************/
-/**********/
-/*******/
-/****/
-/**/
+/*********/
+/***/

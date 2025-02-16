@@ -800,7 +800,6 @@ Swal.fire({
 
 // deletePermit : Done
 async function deletePermit(button) {
-    const permitObject = JSON.parse(button.getAttribute('permitObject'));
     Swal.fire({
         html: DOMPurify.sanitize(`
             <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
@@ -850,18 +849,15 @@ async function deletePermit(button) {
 };
 
 
-// sendPermit button
+// sendPermit : Done
 async function sendPermit(button) {
-    const permitObject = JSON.parse(button.getAttribute('permitObject'));
-
     Swal.fire({
-        html: `
-                <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
-                    <i class="fa-solid fa-check" style="margin-right:0.9rem;"></i>Enviar permiso
-                </h2>
-                <p>¿Estás seguro que deseas enviar este permiso para aprobación? (Esta acción no se puede deshacer)</p>
-
-                `,
+        html: DOMPurify.sanitize(`
+            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
+                <i class="fa-solid fa-check" style="margin-right:0.9rem;"></i>Enviar permiso
+            </h2>
+            <p>¿Estás seguro que deseas enviar este permiso para aprobación? (Esta acción no se puede deshacer)</p>
+        `),
         confirmButtonText: 'Confirmar',
         cancelButtonText: 'Cancelar',
         cancelButtonColor: '#f0466e',
@@ -872,56 +868,32 @@ async function sendPermit(button) {
             confirmButton: 'default-button-css',
             cancelButton: 'default-button-css',
         },
-
         preConfirm: async () => {
             try {
-
-
+                // 1. Fetch with permitId
+                const permitId = button.getAttribute('permitId');
                 const response = await fetch('/permisos/sendPermit', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        _id: permitObject._id,
+                        permitId: permitId,
                     })
                 });
 
-
+                // 2. Show response
                 const data = await response.json();
-
-                // Catch from Controller "/sendPermit"
-                if (!data.success) {
-                    Swal.fire({
-                        title: 'Algo salió mal :(',
-                        icon: 'error',
-                        width: "500px",
-                        text: 'Favor de contactar a Soporte Técnico. (Error #052)'
-                    });
-                    return; // sendPermit() failed execution
-                } else {
-                    Swal.fire({
-                        title: 'Permiso enviado',
-                        icon: 'success',
-                        width: "500px",
-                        text: 'Se ha enviado el permiso correctamente.'
-                    }).then(() => {
-                        location.reload(); // reload after popup
-                    });
-                    return; // sendPermit() successful execution
-                }
-
-
-                // Catch from Fetch #01
-            } catch (error) {
-                Swal.fire({
-                    title: 'Algo salió mal :(',
-                    icon: 'error',
-                    width: "500px",
-                    text: 'Favor de contactar a Soporte Técnico. (Error #051)'
+                await Swal.fire({
+                    title: data.success ? 'Permiso enviado' : data.messageTitle,
+                    icon: data.success ? 'success' : 'error',
+                    text: data.success ? 'Se ha enviado el permiso correctamente.' : data.messageText,
+                    width: "500px"
                 });
-                console.error('Hubo un error:', error);
-                return; // sendPermit() failed execution
+                location.reload();
+
+            } catch (error) {
+                location.reload();
             }
         }
     })
