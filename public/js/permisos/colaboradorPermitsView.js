@@ -272,12 +272,9 @@ async function createPermitRequest(theInput) {
 
 // editPermit button : ---
 async function editPermit(button) {
-
-    // A. FETCH DATA
-    let permitData = "";
-    const permitId = JSON.parse(button.getAttribute('permitId'));
-    console.log("permitId: " + permitId);
     try {
+        // A. FETCH DATA
+        const permitId = button.getAttribute('permitId');
         const permitResponse = await fetch('/permisos/editPermit/getInfo', {
             method: 'POST',
             headers: {
@@ -287,14 +284,20 @@ async function editPermit(button) {
                 permitId: permitId,
             })
         });
-        permitData = await permitResponse.json();
-    // Just reload
-    } catch (error) {
-        location.reload();
-    }
+        const permitData = await permitResponse.json();
+        if (!permitData.success)
+            return Swal.fire({
+                title: permitData.messageTitle,
+                icon: 'error',
+                text: permitData.messageText,
+            });
 
+    /*
+:{"_id":"6796a567dbfbef1cf4be0454",
+"userId":"678015aab366e37052cf12bc","registro":"Permiso","filtro":"Cita Medica","fechaInicio":"14 de enero de 2025, 15:12","fechaTermino":"1 de febrero de 2025, 15:12",
+"docPaths":[{"_id":"6796a566dbfbef1cf4be0452","originalname":"Mundo yoto (1).pdf"}],"estatus":"Pendiente","isSent":false,"isVerified":false,"__v":0}}
+    */
     
-    console.log(permitData);
     // B. EDIT ON POP-UP
     Swal.fire({
         html: DOMPurify.sanitize(`
@@ -307,14 +310,14 @@ async function editPermit(button) {
                 <!-- Field -->
                 <div class="column">
                     <label class="label">Tipo de registro</label>
-                    <input type="text" id="registro" class="input" value="${registro}" style=" background: var(--cyan);" required readOnly>
+                    <input type="text" id="registro" class="input" value="${permitData.message.registro}" style=" background: var(--cyan);" required readOnly>
                 </div>
 
                 <!-- Field -->
                 <div class="column">
                     <label class="label">Filtro de permiso</label>
                     <select id="filtro" class="input">
-                        <option value="" hidden>Seleccione filtro</option>
+                        <option value="${permitData.message.filtro}" hidden>${permitData.message.filtro}</option>
                         <option value="Home Office">Home Office</option>
                         <option value="Cita Médica">Cita Médica</option>
                         <option value="Asunto Familiar">Asunto Familiar</option>
@@ -375,179 +378,9 @@ async function editPermit(button) {
             cancelButton: 'default-button-css',
         },
         didOpen: () => {
-            /* Front-end Date Setup */
-            const fechaYHoraInicio = flatpickr("#fechaYHoraInicio", {
-                enableTime: (registro !== "Incapacidad"),
-                dateFormat: "Y-m-d\\TH:i:S",  // Formato ISO
-                time_24hr: true,
-                locale: "es",
-                minDate: new Date().fp_incr(1),  // No permitir fechas pasadas
-                onChange: function (selectedDates, dateStr, instance) {
-                    let fecha = selectedDates[0];  // Obtenemos la fecha seleccionada en fechaYHoraInicio
-                    if (fecha) {
-                        let nuevaFecha = new Date(fecha);
-                        nuevaFecha.setHours(nuevaFecha.getHours() + 24)
-                        fechaYHoraFinal.set("minDate", nuevaFecha);
-                    }
-                },
-                maxDate: "",
-            });
-            const fechaYHoraFinal = flatpickr("#fechaYHoraFinal", {
-                enableTime: (registro !== "Incapacidad"),
-                dateFormat: "Y-m-d\\TH:i:S",  // Formato ISO
-                time_24hr: true,
-                locale: "es",
-                minDate: new Date().fp_incr(2),  // La fecha mínima inicial de fechaYHoraFinal será "hoy"
-                onChange: function (selectedDates, dateStr, instance) {
-                    let fecha = selectedDates[0];  // Obtenemos la fecha seleccionada
-                    if (fecha) {
-                        let nuevaFecha = new Date(fecha);
-                        nuevaFecha.setHours(nuevaFecha.getHours() - 24)
-                        fechaYHoraInicio.set("maxDate", nuevaFecha);
-                    }
-                },
-            });
-            const formatReadableDateTime = (isoDate) => {
-                const date = new Date(isoDate);
-                const readableDate = date.toLocaleDateString('es-MX', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                });
-                const readableTime = date.toLocaleTimeString('es-MX', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-
-                });
-                if (registro === "Incapacidad") return `${readableDate}`;
-                return `${readableDate}, ${readableTime}`;
-            };
-
-            const fechaYHoraInicioDisplay = document.getElementById("fechaYHoraInicioDisplay");
-            const dateInputIn = document.getElementById("fechaYHoraInicio");
-            fechaYHoraInicioDisplay.addEventListener("click", (event) => {
-                event.preventDefault(); // Previene el comportamiento predeterminado
-                dateInputIn.click(); // Muestra el selector de fecha
-            });
-            dateInputIn.addEventListener("input", () => {
-                fechaYHoraInicioDisplay.value = formatReadableDateTime(dateInputIn.value);
-            });
-
-            const fechaYHoraFinalDisplay = document.getElementById("fechaYHoraFinalDisplay");
-            const dateInputOut = document.getElementById("fechaYHoraFinal");
-            fechaYHoraFinalDisplay.addEventListener("click", (event) => {
-                event.preventDefault(); // Previene el comportamiento predeterminado
-                dateInputOut.click(); // Muestra el selector de fecha
-            });
-            dateInputOut.addEventListener("input", () => {
-                fechaYHoraFinalDisplay.value = formatReadableDateTime(dateInputOut.value);
-            });
-            /* Front-end Date Setup */
-
-            /* Front-end File Setup */
-            // let archivosSeleccionados = []; function level scope
-            document.getElementById("files").addEventListener("change", function () {
-                const files = Array.from(this.files);
-                const allowedExtensions = ['png', 'jpeg', 'jpg', 'pdf', 'doc', 'docx'];
-                const maxSize = 3 * 1024 * 1024; // 3 MB
-                files.forEach(file => {
-                    const fileExtension = file.name.split('.').pop().toLowerCase();
-
-                    // Front-end validations
-                    if (!file.name)
-                        return Swal.showValidationMessage("El archivo no tiene nombre.");
-                    if (file.name.length > 51)
-                        return Swal.showValidationMessage("El nombre es muy largo");
-                    file.name = ((x) => x.replace(/[<>:"'/\\|?*]/g, ""))(file.name);
-                    if (!allowedExtensions.includes(fileExtension))
-                        return Swal.showValidationMessage("Formato de archivo inválido.");
-                    if (file.size > maxSize)
-                        return Swal.showValidationMessage(DOMPurify.sanitize(`El archivo ${file.name} excede el tamaño máximo de 3 MB.`));
-                    if (file.size <= 0)
-                        return Swal.showValidationMessage("No se permiten añadir archivos vacios.");
-                    if (archivosSeleccionados.length >= 3)
-                        return Swal.showValidationMessage("Solo se permiten ingresar 3 archivos.");
-                    if (archivosSeleccionados.some(f => f.name === file.name))
-                        return Swal.showValidationMessage("El archivo ya se encuentra en la fila.");
-                    Swal.resetValidationMessage();
-                    archivosSeleccionados.push(file);
-                });
-                updateFileList();
-            });
-
-            function updateFileList() {
-                const subidosDiv = document.getElementById("subidos");
-                subidosDiv.innerHTML = DOMPurify.sanitize("");
-                archivosSeleccionados.forEach((file, index) => {
-                    const fileItem = document.createElement("div");
-                    fileItem.classList.add("fil3e-item", "columns", "is-vcentered");
-                    fileItem.style.marginTop = "0.6rem";
-                    fileItem.innerHTML = DOMPurify.sanitize(`
-                            <div>
-                                <button class="default-button-css table-button-css delete-file" data-index="${index}">
-                                    <i class="fa-solid fa-xmark"></i>
-                                </button>
-                            </div>
-                            <div class="column" style="align-self:center; justify-self:center;">
-                                <p>${file.name}</p>
-                            </div>
-                        `);
-                    subidosDiv.appendChild(fileItem);
-                });
-                document.querySelectorAll(".delete-file").forEach(button => {
-                    button.addEventListener("click", function () {
-                        const index = parseInt(this.getAttribute("data-index"));
-                        deletePermitFromArrayAndHtml(index);
-                    });
-                });
-            }
-            function deletePermitFromArrayAndHtml(index) {
-                archivosSeleccionados.splice(index, 1);
-                Swal.resetValidationMessage();
-                updateFileList();
-            }
-            /* Front-end File Setup */
-
         },
         preConfirm: async () => { // Single Fetch
             try {
-                // 0. Prepare the values
-                const filtro = $('#filtro').val();
-                const fechaInicio = $('#fechaYHoraInicio').val();
-                const fechaTermino = $('#fechaYHoraFinal').val();
-                const fechaInicioDate = new Date(fechaInicio);
-                const fechaTerminoDate = new Date(fechaTermino);
-
-                // 1. Front-end pre-fetch validation
-                if (!registro || !filtro || !fechaInicio || !fechaTermino || isNaN(fechaInicioDate.getTime()) || isNaN(fechaTerminoDate.getTime())) {
-                    return Swal.showValidationMessage('Todos los campos son requeridos.');
-                }
-
-                // 2. Build formData
-                const formData = new FormData();
-                formData.append("registro", registro);
-                formData.append("filtro", filtro);
-                formData.append("fechaInicio", fechaInicio);
-                formData.append("fechaTermino", fechaTermino);
-
-                for (let file of archivosSeleccionados) {
-                    formData.append("files", file);
-                }
-
-                // 3. Fetch formData
-                const response = await fetch('/permisos/createPermitRequest', {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                // 4. Show response
-                const data = await response.json();
-                const { title, icon, text } = data.success
-                    ? { title: 'Permiso creado', icon: 'success', text: 'Se añadió el permiso correctamente.' }
-                    : { title: data.messageTitle, icon: 'error', text: data.messageText };
-                await Swal.fire({ title, icon, width: "500px", text });
-                location.reload();
 
                 // Just reload
             } catch (error) {
@@ -561,7 +394,9 @@ async function editPermit(button) {
     // C. POST METHOD
 
 
-
+    } catch (error) {
+        location.reload();
+    }
 };
 
 

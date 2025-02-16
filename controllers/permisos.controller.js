@@ -118,7 +118,7 @@ exports.viewPermitsRowFile = async (req, res) => {
         // B. MODEL VALIDATION
         // 1. Validate the permit has that file
         const response = await permitsModel.findOne({ _id: permitId })
-            .populate('docPaths', 'originalname filename');
+            .populate('docPaths', 'originalname filename').select('-__v');
         const matchingDoc = response.docPaths.find(item => item.originalname === filename);
 
         // C. MODEL LOGIC
@@ -137,44 +137,25 @@ exports.viewPermitsRowFile = async (req, res) => {
     }
 };
 
-// editPermit : Colaborador : ---
+// editPermit : Colaborador : Done
 exports.editPermit_getInfo = async (req, res) => {
     try {
-        const permitId = req.body.permitId;
         // A. BODY VALIDATION
-        // 2. Validate field quality 
-        const { registro, filtro, fechaInicio, fechaTermino } = req.body;
-        if (!registro || !filtro || !fechaInicio || !fechaTermino ||
-            typeof registro !== "string" || typeof filtro !== "string" ||
-            typeof fechaInicio !== "string" || typeof fechaTermino !== "string") {
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#002)" });
-        }
-
         // 1. Validate field quality 
-        if (!permitId || !filename || typeof permitId !== "string" || typeof filename !== "string")
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#008)" });
-        if (!mongoose.Types.ObjectId.isValid(permitId))
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#009)" });
+        const permitId = req.body.permitId;
+        if (!permitId || typeof permitId !== "string")
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#011)" });
 
-        // B. MODEL VALIDATION
-        // 1. Validate the permit has that file
-        const response = await permitsModel.findOne({ _id: permitId })
-            .populate('docPaths', 'originalname filename');
-        const matchingDoc = response.docPaths.find(item => item.originalname === filename);
+        // B. MODEL LOGIC
+        // 1. Validate that the permit is eligible for edition and also exists
+        const response = await permitsModel.findOne({ _id: permitId, isSent: false, isVerified: false})
+            .populate('docPaths', 'originalname').select('-__v');
+        if (!response)
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#013)" });
 
-        // C. MODEL LOGIC
-        // 1. Send the file with its serial name
-        if (matchingDoc) {
-            const filePath = path.join(__dirname, '..', 'uploads', 'permisos', matchingDoc.filename);
-            res.sendFile(filePath, (err) => {
-                if (err) {
-                    res.status(404).send('No se encontró el archivo PDF.');
-                }
-            });
-        }
-
+        return res.status(200).json({ success: true, message: response});
     } catch (error) {
-        res.status(500).send('Tomar captura y favor de informar a soporte técnico. (#008)');
+        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Espera un poco y vuelvelo a intentar. (#012)" });
     }
 };
 // editPermit : Colaborador : ---
@@ -191,7 +172,7 @@ exports.editPermit_postInfo = async (req, res) => {
         // B. MODEL VALIDATION
         // 1. Validate the permit has that file
         const response = await permitsModel.findOne({ _id: permitId })
-            .populate('docPaths', 'originalname filename');
+            .populate('docPaths', 'originalname filename').select('-__v');
         const matchingDoc = response.docPaths.find(item => item.originalname === filename);
 
         // C. MODEL LOGIC
@@ -567,8 +548,7 @@ exports.accessPermitsModule = async (req, res) => {
         if (res.locals.userPrivilege === "colaborador") {
             // get all permits from a single user
             permitsRows = await permitsModel.find({ userId: res.locals.userId })
-                .populate('docPaths', '_id originalname filename') // Esto llena docPaths con los datos de la colección 'archivos'
-                .select('-__v');
+                .populate('docPaths', '_id originalname filename').select('-__v');
             return res.render('permisos/colaboradorPermitsView.ejs', { permitsRows });
 
 
