@@ -1,8 +1,6 @@
-// Importar el modelo para utilizarlo
 const filesModel = require("../models/files.model");
 const permitsModel = require("../models/permisos.model");
 const teamsSchema = require("../models/equipos.model");
-
 const path = require('path');
 const fs = require('fs');
 const PDFDocument = require('pdfkit'); // Assuming you are using pdfkit
@@ -14,7 +12,7 @@ exports.createPermitRequest = async (req, res) => {
         // A. FILE VALIDATION is done in "configureFileUpload.js" as a multer middleware
         // -
 
-        
+
         // B. BODY VALIDATION
         // 1. Validate field arrangement 
         const allowedFields = ["registro", "filtro", "fechaInicio", "fechaTermino"];
@@ -93,7 +91,6 @@ exports.createPermitRequest = async (req, res) => {
 
         // 2. Execute mongoose action
         const response = await permitsModel.create(payload);
-        console.log(response);
         return res.status(200).json({ success: true });
 
     } catch (error) {
@@ -147,12 +144,12 @@ exports.editPermit_getInfo = async (req, res) => {
 
         // B. MODEL LOGIC
         // 1. Validate that the permit is eligible for edition and also exists
-        const response = await permitsModel.findOne({ _id: permitId, isSent: false, isVerified: false})
+        const response = await permitsModel.findOne({ _id: permitId, isSent: false, isVerified: false })
             .populate('docPaths', 'originalname').select('-__v');
         if (!response)
             return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#013)" });
 
-        return res.status(200).json({ success: true, message: response});
+        return res.status(200).json({ success: true, message: response });
     } catch (error) {
         return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#012)" });
     }
@@ -173,7 +170,7 @@ exports.deletePermit = async (req, res) => {
             .populate('docPaths', 'filename');
         if (!response)
             return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#022)" });
-        
+
         // 2. For each file that the permit has remove the database entry and the file itself
         for (const item of response.docPaths) {
             const filePath = path.join(__dirname, '..', 'uploads', 'permisos', item.filename);
@@ -182,15 +179,13 @@ exports.deletePermit = async (req, res) => {
                     return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico.(#022)" });
             });
             const itemResponse = await filesModel.deleteOne({ _id: item._id });
-            if (!itemResponse)
-                return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#023)" });
         }
 
         // 3. Remove the information of the permit inside the collection
         const deletionResponse = await permitsModel.deleteOne({ _id: permitId });
         if (!deletionResponse)
             return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#024)" });
-    
+
         return res.status(200).json({ success: true, message: "" });
 
     } catch (error) {
@@ -212,12 +207,12 @@ exports.sendPermit = async (req, res) => {
         const response = await permitsModel.findOne({ _id: permitId, isSent: false, isVerified: false });
         if (!response)
             return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#027)" });
-    
+
         // 2. Set isSent to true
         const updateResponse = await permitsModel.findByIdAndUpdate(permitId, { $set: { isSent: true } }, { new: true });
         if (!updateResponse)
             return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#028)" });
-    
+
         return res.status(200).json({ success: true, message: "" });
 
     } catch (error) {
@@ -225,36 +220,159 @@ exports.sendPermit = async (req, res) => {
     }
 };
 
-// editPermit : Colaborador : ---
+// editPermit : Colaborador : Done
 exports.editPermit_postInfo = async (req, res) => {
+    //console.log("req.body:", req.body);
+    //console.log("req.files:", JSON.stringify(req.files));
+
     try {
-        // A. BODY VALIDATION
-        // 1. Validate field quality 
-        const { permitId, filename } = req.params;
-        if (!permitId || !filename || typeof permitId !== "string" || typeof filename !== "string")
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#008)" });
-        if (!mongoose.Types.ObjectId.isValid(permitId))
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#009)" });
+        // A. FILE VALIDATION is done in "configureFileUpload.js" as a multer middleware
 
-        // B. MODEL VALIDATION
-        // 1. Validate the permit has that file
-        const response = await permitsModel.findOne({ _id: permitId })
-            .populate('docPaths', 'originalname filename').select('-__v');
-        const matchingDoc = response.docPaths.find(item => item.originalname === filename);
+        // B. BODY VALIDATION
+        // 1. Validate field arrangement 
+        const allowedFields = ["permitId", "filtro", "fechaInicio", "fechaTermino", "archivosSeleccionados", "files"];
+        const receivedFields = Object.keys(req.body);
+        const hasExtraFields = receivedFields.some(field => !allowedFields.includes(field));
+        if (hasExtraFields)
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#035)" });
 
-        // C. MODEL LOGIC
-        // 1. Send the file with its serial name
-        if (matchingDoc) {
-            const filePath = path.join(__dirname, '..', 'uploads', 'permisos', matchingDoc.filename);
-            res.sendFile(filePath, (err) => {
-                if (err) {
-                    res.status(404).send('No se encontró el archivo PDF.');
-                }
+        // 2. Validate field quality 
+        const { permitId, filtro, fechaInicio, fechaTermino, archivosSeleccionados } = req.body;
+        if ([permitId, filtro, fechaInicio, fechaTermino, archivosSeleccionados].some(field => typeof field !== "string") || !permitId)
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#036)" });
+
+        // GET ORIGINAL PERMIT
+        const permitData = await permitsModel.findOne({ _id: permitId, isSent: false, isVerified: false })
+            .populate('docPaths', 'filename originalname').select('-__v');
+        if (!permitData)
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar.(#034)" });
+        if (permitData.userId != res.locals.userId)
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar.(#45)" });
+
+
+        // 1. Auxiliary functions
+        const formatReadableDateTime = (isoDate) => {
+            const date = new Date(isoDate);
+            let readableDate = date.toLocaleDateString('es-MX', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            });
+            let readableTime = date.toLocaleTimeString('es-MX', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+
+            });
+            if (readableTime === "24:00") {
+                readableTime = "00:00";
+            }
+            return `${readableDate}, ${readableTime}`;
+        };
+        function formatFecha(fechaString) {
+            const meses = {
+                enero: '01', febrero: '02', marzo: '03', abril: '04', mayo: '05', junio: '06',
+                julio: '07', agosto: '08', septiembre: '09', octubre: '10', noviembre: '11', diciembre: '12'
+            };
+            if (permitData.registro === "Incapacidad" && fechaInicioDate.getHours() !== 0) {
+                // Ajusta la hora a 00:00 si la condición se cumple
+                fechaString = fechaString.replace(/(\d{1,2}) de (\w+) de (\d{4}), (\d{2}):(\d{2})/, function (_, dia, mes, anio) {
+                    return `${dia.padStart(2, '0')} de ${mes} de ${anio}, 00:00`; // Regresar la hora con 00:00
+                });
+            }
+            return fechaString.replace(/(\d{1,2}) de (\w+) de (\d{4}), (\d{2}):(\d{2})/, function (_, dia, mes, anio, hora, minuto) {
+                return new Date(`${anio}-${meses[mes] || '01'}-${dia.padStart(2, '0')}T${hora}:${minuto}`);
             });
         }
 
+        // 2. Validate dates
+        const fechaInicioDate = new Date(fechaInicio);
+        const fechaTerminoDate = new Date(fechaTermino);
+        const today = new Date();
+        const getTimestamp = (fecha, fechaFromPermit) => {
+            let formattedFecha = formatFecha(fechaFromPermit);
+            let date = new Date(formattedFecha);
+            return !isNaN(date.getTime()) ? date.getTime() : new Date(fecha).getTime();
+        };
+        let fechaInicioTime = getTimestamp(fechaInicio, permitData.fechaInicio);
+        let fechaTerminoTime = getTimestamp(fechaTermino, permitData.fechaTermino);
+        if (fechaInicioTime > fechaTerminoTime || today > fechaInicioTime || today > fechaTerminoTime) {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#038)"
+            });
+        }
+        if (permitData.registro === "Incapacidad" &&
+            (new Date(fechaInicioTime).getHours() !== 0 || new Date(fechaTerminoTime).getHours() !== 0)) {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#039)"
+            });
+        }
+        fechaInicioTime = formatFecha(permitData.fechaInicio); fechaInicioTime = new Date(fechaInicioTime); fechaInicioTime = fechaInicioTime.getTime();
+        if (!isNaN(fechaInicioDate.getTime()))
+            fechaInicioTime = fechaInicioDate.getTime();
+        fechaTerminoTime = formatFecha(permitData.fechaTermino); fechaTerminoTime = new Date(fechaTerminoTime); fechaTerminoTime = fechaTerminoTime.getTime();
+        if (!isNaN(fechaTerminoDate.getTime()))
+            fechaTerminoTime = fechaTerminoDate.getTime();
+        if (fechaInicioTime >= fechaTerminoTime || today > fechaInicioTime || today > fechaTerminoTime)
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#038)" });
+
+
+        // C. MODEL LOGIC
+        // 1. Delete unused 'edited out' files from the permit
+        const parsedFilesArray = JSON.parse(archivosSeleccionados);
+        console.log("parsedFilesArray: " + parsedFilesArray);
+        for (const item of permitData.docPaths) {
+            const isFinalist = parsedFilesArray.find(file => file.name == item.originalname);
+            if (!isFinalist) {
+                const filePath = path.join(__dirname, '..', 'uploads', 'permisos', item.filename);
+                fs.unlink(filePath, (err) => {
+                    if (err)
+                       return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico.(#055)" });
+                });
+                const itemResponse = await filesModel.deleteOne({ _id: item._id });
+            }
+        }
+
+        // 2. If there is new files, update the files collection and add them to the payload
+        let docResponses = [];
+        if (req.files.length > 0) {
+            await Promise.all(
+                req.files.map(async (file) => {
+                    const response = await filesModel.create(file);
+                    docResponses.push(response);
+                })
+            );
+        }
+        let paths = [];
+        for (const item of docResponses)
+            paths.push(item._id);
+
+
+        // 3. Execute mongoose action
+        const payload = {};
+        if (filtro) payload.filtro = filtro;
+        if (fechaInicio) payload.fechaInicio = formatReadableDateTime(fechaInicioTime);
+        if (fechaTermino) payload.fechaTermino = formatReadableDateTime(fechaTerminoTime);
+        if (paths && paths.length) payload.docPaths = paths;
+
+        const responseUpdate = await permitsModel.findByIdAndUpdate(
+            permitId,
+            {
+                $set: payload
+            },
+            { new: true }
+        );
+
+        return res.status(200).json({ success: true });
+
     } catch (error) {
-        res.status(500).send('Tomar captura y favor de informar a soporte técnico. (#008)');
+        if (error instanceof mongoose.Error.ValidationError)
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#006)" });
+        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#040)" });
     }
 };
 
@@ -508,35 +626,6 @@ exports.postVerifyPermit = async (req, res) => {
             },
             { new: true }
         );
-        return res.status(200).json({ success: true, message: "" });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
-    }
-
-};
-
-
-
-
-exports.postEditPermit = async (req, res) => {
-    try {
-
-        const response = await permitsModel.findByIdAndUpdate(
-            req.body.permitId,
-            {
-                $set: {
-                    registro: req.body.registro,
-                    filtro: req.body.filtro,
-                    fechaInicio: req.body.fechaInicio,
-                    fechaTermino: req.body.fechaTermino,
-                    docPaths: req.body.docPaths
-                }
-            }, // Cambiar atributos
-            { new: true }
-        );
-
         return res.status(200).json({ success: true, message: "" });
 
     } catch (error) {

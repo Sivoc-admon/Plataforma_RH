@@ -89,7 +89,7 @@ async function createPermitRequest(theInput) {
             /* Front-end Date Setup */
             const fechaYHoraInicio = flatpickr("#fechaYHoraInicio", {
                 enableTime: (registro !== "Incapacidad"),
-                dateFormat: "Y-m-d\\TH:i:S",  // Formato ISO
+                dateFormat: "Y-m-d\\TH:i",  // Formato ISO
                 time_24hr: true,
                 locale: "es",
                 minDate: new Date().fp_incr(1),  // No permitir fechas pasadas
@@ -105,7 +105,7 @@ async function createPermitRequest(theInput) {
             });
             const fechaYHoraFinal = flatpickr("#fechaYHoraFinal", {
                 enableTime: (registro !== "Incapacidad"),
-                dateFormat: "Y-m-d\\TH:i:S",  // Formato ISO
+                dateFormat: "Y-m-d\\TH:i",  // Formato ISO
                 time_24hr: true,
                 locale: "es",
                 minDate: new Date().fp_incr(2),  // La fecha mínima inicial de fechaYHoraFinal será "hoy"
@@ -192,7 +192,7 @@ async function createPermitRequest(theInput) {
                 subidosDiv.innerHTML = DOMPurify.sanitize("");
                 archivosSeleccionados.forEach((file, index) => {
                     const fileItem = document.createElement("div");
-                    fileItem.classList.add("fil3e-item", "columns", "is-vcentered");
+                    fileItem.classList.add("file-item", "columns", "is-vcentered");
                     fileItem.style.marginTop = "0.6rem";
                     fileItem.innerHTML = DOMPurify.sanitize(`
                             <div>
@@ -201,7 +201,7 @@ async function createPermitRequest(theInput) {
                                 </button>
                             </div>
                             <div class="column" style="align-self:center; justify-self:center;">
-                                <p>${file.name}</p>
+                                <p>${file.name || "Tomar captura y favor de informar a soporte técnico. (#032)"}</p>
                             </div>
                         `);
                     subidosDiv.appendChild(fileItem);
@@ -259,7 +259,7 @@ async function createPermitRequest(theInput) {
                     icon: data.success ? 'success' : 'error',
                     text: data.success ? 'Se añadió el permiso correctamente.' : data.messageText,
                     width: "500px"
-                });              
+                });
                 location.reload();
 
             } catch (error) {
@@ -272,6 +272,8 @@ async function createPermitRequest(theInput) {
 
 // editPermit button : ---
 async function editPermit(button) {
+    let archivosSeleccionados = []; // function level array
+    let inicio, final, limite;
     try {
         // A. FETCH DATA
         const permitId = button.getAttribute('permitId');
@@ -292,81 +294,74 @@ async function editPermit(button) {
                 text: permitData.messageText,
             });
 
-        /*
-    :{"_id":"6796a567dbfbef1cf4be0454",
-    "userId":"678015aab366e37052cf12bc","registro":"Permiso","filtro":"Cita Medica","fechaInicio":"14 de enero de 2025, 15:12","fechaTermino":"1 de febrero de 2025, 15:12",
-    "docPaths":[{"_id":"6796a566dbfbef1cf4be0452","originalname":"Mundo yoto (1).pdf"}],"estatus":"Pendiente","isSent":false,"isVerified":false,"__v":0}}
-        */
-
         // B. EDIT ON POP-UP
         Swal.fire({
             html: DOMPurify.sanitize(`
-        <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
-            <i class="fa-solid fa-pencil" style="margin-right:0.9rem;"></i>Editar Permiso
-        </h2>
+                <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
+                    <i class="fa-solid fa-pencil" style="margin-right:0.9rem;"></i>Editar Permiso
+                </h2>
 
-        <div class="columns is-multiline">
-            <div class="column">
-                <!-- Field -->
-                <div class="column">
-                    <label class="label">Tipo de registro</label>
-                    <input type="text" id="registro" class="input" value="${permitData.message.registro}" style=" background: var(--cyan);" required readOnly>
-                </div>
+                <div class="columns is-multiline">
+                    <div class="column">
+                        <!-- Field -->
+                        <div class="column">
+                            <label class="label">Tipo de registro</label>
+                            <input type="text" id="registro" class="input" value="${permitData.message.registro}" style=" background: var(--cyan);" required readOnly>
+                        </div>
 
-                <!-- Field -->
-                <div class="column">
-                    <label class="label">Filtro de permiso</label>
-                    <select id="filtro" class="input">
-                        <option value="${permitData.message.filtro}" hidden>${permitData.message.filtro}</option>
-                        <option value="Home Office">Home Office</option>
-                        <option value="Cita Médica">Cita Médica</option>
-                        <option value="Asunto Familiar">Asunto Familiar</option>
-                        <option value="Otro">Otro</option>
-                    </select>
-                </div>
+                        <!-- Field -->
+                        <div class="column">
+                            <label class="label">Filtro de permiso</label>
+                            <select id="filtro" class="input">
+                                <option value="${permitData.message.filtro}" hidden>${permitData.message.filtro}</option>
+                                <option value="Home Office">Home Office</option>
+                                <option value="Cita Médica">Cita Médica</option>
+                                <option value="Asunto Familiar">Asunto Familiar</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
 
 
-                <!-- Field -->
-                <div class="column">
-                    <label class="label">Fecha inicio</label>
-                        <!-- 200 iq (Must be placed in this order) -->
-                        <input type="text" id="fechaYHoraInicio" style="opacity: 0; position: absolute;" required readOnly>
-                        <input type="text" id="fechaYHoraInicioDisplay" value="Seleccione una fecha" class="input" readOnly />
-                </div>
+                        <!-- Field -->
+                        <div class="column">
+                            <label class="label">Fecha inicio</label>
+                                <!-- 200 iq (Must be placed in this order) -->
+                                <input type="text" id="fechaYHoraInicio" style="opacity: 0; position: absolute;" required readOnly>
+                                <input type="text" id="fechaYHoraInicioDisplay" class="input" readOnly />
+                        </div>
 
-                <!-- Field -->
-                <div class="column">
-                    <label class="label">Fecha Termino</label>
-                        <!-- 200 iq (Must be placed in this order) -->
-                        <input type="text" id="fechaYHoraFinal" style="opacity: 0; position: absolute;" required readOnly>
-                        <input type="text" id="fechaYHoraFinalDisplay" value="Seleccione una fecha" class="input" readOnly />
-                </div>
-            </div>
+                        <!-- Field -->
+                        <div class="column">
+                            <label class="label">Fecha Termino</label>
+                                <!-- 200 iq (Must be placed in this order) -->
+                                <input type="text" id="fechaYHoraFinal" style="opacity: 0; position: absolute;" required readOnly>
+                                <input type="text" id="fechaYHoraFinalDisplay" class="input" readOnly />
+                        </div>
+                    </div>
 
-            <!-- Field -->
-            <div class="column">
-                <div class="column">
-                    <label class="label">Agregar archivos (opcional)</label>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div class="file has-name is-boxed" style="flex: 1;">
-                            <label class="input"
-                                style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-right:0.3rem; font-family: var(--font);">
-                                <i class="fas fa-upload" style="margin: 0rem 0.3rem; font-size: 1.1rem;"></i>
-                                <span>Subir archivo</span>
-                                <input type="file" name="files" class="file-input" id="files" style="display: none;" multiple
-                                    onChange="validateUpload()" />
-                            </label>
+                    <!-- Field -->
+                    <div class="column">
+                        <div class="column">
+                            <label class="label">Agregar archivos (opcional)</label>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div class="file has-name is-boxed" style="flex: 1;">
+                                    <label class="input"
+                                        style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-right:0.3rem; font-family: var(--font);">
+                                        <i class="fas fa-upload" style="margin: 0rem 0.3rem; font-size: 1.1rem;"></i>
+                                        <span>Subir archivo</span>
+                                        <input type="file" name="files" class="file-input" id="files" style="display: none;" multiple
+                                            onChange="validateUpload()" />
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <label class="label">Archivos seleccionados</label>
+                            <ul id="subidos" style="margin:0.6rem; padding-top:1rem;"></ul>
                         </div>
                     </div>
                 </div>
-                <div class="column">
-                    <label class="label">Archivos seleccionados</label>
-                    <ul id="subidos" style="margin:0.6rem; padding-top:1rem;"></ul>
-                </div>
-            </div>
-        </div>
-
-        `),
+            `),
             confirmButtonText: 'Guardar',
             cancelButtonText: 'Cancelar',
             cancelButtonColor: '#f0466e',
@@ -378,15 +373,220 @@ async function editPermit(button) {
                 cancelButton: 'default-button-css',
             },
             didOpen: () => {
+                /* Front-end Date Setup */
+                const formatReadableDateTime = (isoDate) => {
+                    const date = new Date(isoDate);
+                    const readableDate = date.toLocaleDateString('es-MX', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                    });
+                    const readableTime = date.toLocaleTimeString('es-MX', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+
+                    });
+                    if (permitData.message.registro === "Incapacidad") return `${readableDate}`;
+                    return `${readableDate}, ${readableTime}`;
+                };
+                function formatFecha(fechaString) {
+                    const meses = {
+                        enero: '01', febrero: '02', marzo: '03', abril: '04', mayo: '05', junio: '06',
+                        julio: '07', agosto: '08', septiembre: '09', octubre: '10', noviembre: '11', diciembre: '12'
+                    };
+                
+                    return fechaString.replace(/(\d{1,2}) de (\w+) de (\d{4}), (\d{2}):(\d{2})/, function(_, dia, mes, anio, hora, minuto) {
+                        return new Date(`${anio}-${meses[mes] || '01'}-${dia.padStart(2, '0')}T${hora}:${minuto}`);
+                    });
+                }   
+                function incrementarFecha(fecha, dias) {
+                    return new Date(fecha.getTime() + dias * 24 * 60 * 60 * 1000);
+                }
+                
+                inicio = new Date(formatFecha(permitData.message.fechaInicio));
+                final = new Date(formatFecha(permitData.message.fechaTermino));
+                limite = incrementarFecha(new Date(), 1); // Hoy + 1 día (24h)
+
+                if (inicio < limite) 
+                    Swal.showValidationMessage("La fecha de inicio no puede ser menor a las próximas 24 horas.");
+
+                const fechaYHoraInicio = flatpickr("#fechaYHoraInicio", {
+                    enableTime: (permitData.message.registro !== "Incapacidad"),
+                    dateFormat: "Y-m-d\\TH:i",
+                    time_24hr: true,
+                    locale: "es",
+                    minDate: new Date().fp_incr(1),
+                    onChange: function (selectedDates) {
+                        if (selectedDates.length > 0) {
+                            let nuevaFecha = new Date(selectedDates[0]);
+                            nuevaFecha.setHours(nuevaFecha.getHours() + 24);
+                            fechaYHoraFinal.set("minDate", nuevaFecha);
+                        }
+                    }
+                });
+
+                const fechaYHoraFinal = flatpickr("#fechaYHoraFinal", {
+                    enableTime: (permitData.message.registro !== "Incapacidad"),
+                    dateFormat: "Y-m-d\\TH:i",
+                    time_24hr: true,
+                    locale: "es",
+                    minDate: new Date().fp_incr(2),
+                    onChange: function (selectedDates) {
+                        if (selectedDates.length > 0) {
+                            let nuevaFecha = new Date(selectedDates[0]);
+                            nuevaFecha.setHours(nuevaFecha.getHours() - 24);
+                            fechaYHoraInicio.set("maxDate", nuevaFecha);
+                        }
+                    }
+                });
+
+                const fechaYHoraInicioDisplay = document.getElementById("fechaYHoraInicioDisplay");
+                const dateInputIn = document.getElementById("fechaYHoraInicio");
+                fechaYHoraInicioDisplay.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    dateInputIn.click();
+                });
+                dateInputIn.addEventListener("input", () => {
+                    inicio = fechaYHoraInicioDisplay.value = formatReadableDateTime(dateInputIn.value);
+                    Swal.resetValidationMessage();
+                });
+                if (permitData.message.registro !== "Incapacidad") {
+                    fechaYHoraInicioDisplay.value = permitData.message.fechaInicio;
+                } else {
+                    const x = permitData.message.fechaInicio;
+                    fechaYHoraInicioDisplay.value = x.replace(/,.*$/, '');
+                }
+
+                const fechaYHoraFinalDisplay = document.getElementById("fechaYHoraFinalDisplay");
+                const dateInputOut = document.getElementById("fechaYHoraFinal");
+                fechaYHoraFinalDisplay.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    dateInputOut.click();
+                });
+                dateInputOut.addEventListener("input", () => {
+                    final = fechaYHoraFinalDisplay.value = formatReadableDateTime(dateInputOut.value);
+                    Swal.resetValidationMessage();
+                });
+                if (permitData.message.registro !== "Incapacidad") {
+                    fechaYHoraFinalDisplay.value = permitData.message.fechaTermino;
+                } else {
+                    const x = permitData.message.fechaTermino;
+                    fechaYHoraFinalDisplay.value = x.replace(/,.*$/, '');
+                }
+                /* Front-end Date Setup */
+
+                /* Front-end File Setup */
+                const originalDocs = permitData.message.docPaths;
+                if (originalDocs && originalDocs.length > 0) 
+                    originalDocs.forEach(doc => archivosSeleccionados.push( { name: doc.originalname }));
+
+                document.getElementById("files").addEventListener("change", function () {
+                    const files = Array.from(this.files);
+                    const allowedExtensions = ['png', 'jpeg', 'jpg', 'pdf', 'doc', 'docx'];
+                    const maxSize = 3 * 1024 * 1024; // 3 MB
+                    files.forEach(file => {
+                        const fileExtension = file.name.split('.').pop().toLowerCase();
+
+                        // Front-end validations
+                        if (!file.name)
+                            return Swal.showValidationMessage("El archivo no tiene nombre.");
+                        if (file.name.length > 51)
+                            return Swal.showValidationMessage("El nombre es muy largo");
+                        file.name = ((x) => x.replace(/[<>:"'/\\|?*]/g, ""))(file.name);
+                        if (!allowedExtensions.includes(fileExtension))
+                            return Swal.showValidationMessage("Formato de archivo inválido.");
+                        if (file.size > maxSize)
+                            return Swal.showValidationMessage(DOMPurify.sanitize(`El archivo ${file.name} excede el tamaño máximo de 3 MB.`));
+                        if (file.size <= 0)
+                            return Swal.showValidationMessage("No se permiten añadir archivos vacios.");
+                        if (archivosSeleccionados.length >= 3)
+                            return Swal.showValidationMessage("Solo se permiten ingresar 3 archivos.");
+                        if (archivosSeleccionados.some(f => f.name === file.name))
+                            return Swal.showValidationMessage("El archivo ya se encuentra en la fila.");
+                        Swal.resetValidationMessage();
+                        archivosSeleccionados.push(file);
+                    });
+                    updateFileList();
+                });
+
+                function updateFileList() {
+                    const subidosDiv = document.getElementById("subidos");
+                    subidosDiv.innerHTML = DOMPurify.sanitize("");
+                    archivosSeleccionados.forEach((file, index) => {
+                        const fileItem = document.createElement("div");
+                        fileItem.classList.add("file-item", "columns", "is-vcentered");
+                        fileItem.style.marginTop = "0.6rem";
+                        fileItem.innerHTML = DOMPurify.sanitize(`
+                            <div>
+                                <button class="default-button-css table-button-css delete-file" data-index="${index}">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <div class="column" style="align-self:center; justify-self:center;">
+                                <p>${file.name || "Tomar captura y favor de informar a soporte técnico. (#033)"}</p>
+                            </div>
+                        `);
+                        subidosDiv.appendChild(fileItem);
+                    });
+                    document.querySelectorAll(".delete-file").forEach(button => {
+                        button.addEventListener("click", function () {
+                            const index = parseInt(this.getAttribute("data-index"));
+                            deletePermitFromArrayAndHtml(index);
+                        });
+                    });
+                }
+                function deletePermitFromArrayAndHtml(index) {
+                    archivosSeleccionados.splice(index, 1);
+                    Swal.resetValidationMessage();
+                    updateFileList();
+                }
+                updateFileList();
+                /* Front-end File Setup */
+
             },
             preConfirm: async () => { // Single Fetch
                 try {
+                    if (inicio < limite) 
+                        return Swal.showValidationMessage("La fecha de inicio no puede ser menor a las próximas 24 horas.");
+                    if (final < inicio) 
+                        return Swal.showValidationMessage("La fecha de termino no puede ser menor a la fecha de inicio.");
 
-                    // Just reload
+
+                    // 0. Prepare the values
+                    const filtro = $('#filtro').val();
+                    const fechaInicio = $('#fechaYHoraInicio').val();
+                    const fechaTermino = $('#fechaYHoraFinal').val();
+
+                    // 1. Build formData
+                    const formData = new FormData();
+                    formData.append("permitId", permitId);
+                    formData.append("filtro", filtro);
+                    formData.append("fechaInicio", fechaInicio);
+                    formData.append("fechaTermino", fechaTermino);
+                    formData.append("archivosSeleccionados", JSON.stringify(archivosSeleccionados));
+                    for (let file of archivosSeleccionados) 
+                        formData.append("files", file);
+                    
+                    // 2. Fetch formData
+                    const response = await fetch('/permisos/editPermit/postInfo', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    // 4. Show response
+                    const data = await response.json();
+                    await Swal.fire({ // await works as .then() right there
+                        title: data.success ? 'Permiso editado' : data.messageTitle,
+                        icon: data.success ? 'success' : 'error',
+                        text: data.success ? 'Se ha editado el permiso correctamente.' : data.messageText,
+                        width: "500px"
+                    });
+                    location.reload();
+
                 } catch (error) {
                     location.reload();
                 }
-
             }
         })
 

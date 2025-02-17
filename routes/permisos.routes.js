@@ -41,9 +41,23 @@ controller.createPermitRequest);
 // viewPermitsRowFile : Colaborador, JefeInmediato, rHumanos : Done
 router.get('/viewPermitsRowFile/:permitId/:filename', controller.viewPermitsRowFile);
 
-// editPermit : Colaborador : ---
+// editPermit : Colaborador : Done
 router.post('/editPermit/getInfo', controller.editPermit_getInfo);
-router.post('/editPermit/postInfo', controller.editPermit_postInfo);
+router.post('/editPermit/postInfo', 
+    ensureFilesArray,
+    (req, res, next) => { 
+        upload.array("files", 3)(req, res, (err) => {
+            if (err) {
+                return res.status(400).json({ 
+                    success: false, 
+                    messageTitle: "Multer invalidation", 
+                    messageText: err.message 
+                });
+            }
+            next(); // Si no hay error, continuar con el controlador
+        });
+    },
+    controller.editPermit_postInfo);
 
 // deletePermit : Colaborador : Done
 router.delete('/deletePermit', controller.deletePermit);
@@ -97,11 +111,6 @@ router.post("/changeStatus", controller.changeStatus);
 router.get("/accessPermitsModule", controller.accessPermitsModule);
 
 //router.get('/downloadFile/:filename', controller.getFileDownload);
-
-
-
-
-router.post("/editPermit", controller.postEditPermit);
 
 
 

@@ -25,7 +25,7 @@ const configureUpload = (uploadDir, allowedTypes, allowedExtensions, MAX_SIZE_MB
 
     // File filter with enhanced security validations
     const fileFilter = (req, file, cb) => {
-
+    
             // Check number of files
             if (req.files.length > MAX_FILES) {
                 return cb(new Error("1Se ha detectado un intento de actividad maliciosa."));
@@ -49,7 +49,6 @@ const configureUpload = (uploadDir, allowedTypes, allowedExtensions, MAX_SIZE_MB
             }
 
             cb(null, true);
-
     };
 
     // Configure multer middleware with all validations

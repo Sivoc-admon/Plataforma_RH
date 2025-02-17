@@ -71,13 +71,11 @@
                                 <% } else { %>
                                     <% permit.docPaths.forEach(doc => { %>
                                         <div class="columns is-vcentered is-mobile">
-                                            <!-- Columna del Botón -->
                                             <div class="column is-narrow">
                                                 <button class="default-button-css table-button-css" permitId="<%= permit._id %>" filename="<%= doc.originalname %>" onclick="viewPermitsRowFile(this)">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </button>
                                             </div>
-                                        
                                             <div class="column" style="padding-left:0 !important; display: flex; align-items: center;">
                                                 <span style="display: inline-block; max-width: 108px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                                     <%= doc.originalname %>
