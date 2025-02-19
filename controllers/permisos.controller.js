@@ -5,100 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const PDFDocument = require('pdfkit'); // Assuming you are using pdfkit
 const crypto = require('crypto');
-
-// createPermitRequest : Colaborador : Done
-exports.createPermitRequest = async (req, res) => {
-    try {
-        // A. FILE VALIDATION is done in "configureFileUpload.js" as a multer middleware
-        // -
-
-
-        // B. BODY VALIDATION
-        // 1. Validate field arrangement 
-        const allowedFields = ["registro", "filtro", "fechaInicio", "fechaTermino"];
-        const receivedFields = Object.keys(req.body);
-        const hasExtraFields = receivedFields.some(field => !allowedFields.includes(field));
-        if (hasExtraFields)
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#001)" });
-
-        // 2. Validate field quality 
-        const { registro, filtro, fechaInicio, fechaTermino } = req.body;
-        if (!registro || !filtro || !fechaInicio || !fechaTermino ||
-            typeof registro !== "string" || typeof filtro !== "string" ||
-            typeof fechaInicio !== "string" || typeof fechaTermino !== "string") {
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#002)" });
-        }
-
-        // 3. Validate dates
-        const fechaInicioDate = new Date(fechaInicio);
-        const fechaTerminoDate = new Date(fechaTermino);
-        const today = new Date();
-        if (isNaN(fechaInicioDate.getTime()) || isNaN(fechaTerminoDate.getTime()))
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#003)" });
-        const fechaInicioTime = fechaInicioDate.getTime();
-        const fechaTerminoTime = fechaTerminoDate.getTime();
-        if (fechaInicioTime >= fechaTerminoTime || today > fechaInicioTime || today > fechaTerminoTime)
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#004)" });
-        if (registro === "Incapacidad" && fechaInicioDate.getHours() !== 0)
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#005)" });
-
-
-        // C. MODEL LOGIC
-        // 0. Auxiliary functions
-        const formatReadableDateTime = (isoDate) => {
-            const date = new Date(isoDate);
-            let readableDate = date.toLocaleDateString('es-MX', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            });
-            let readableTime = date.toLocaleTimeString('es-MX', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-
-            });
-            if (readableTime === "24:00") {
-                readableTime = "00:00";
-            }
-            return `${readableDate}, ${readableTime}`;
-        };
-
-        // 1. Build payload
-        let docResponses = [];
-        if (req.files.length > 0) {
-            await Promise.all(
-                req.files.map(async (file) => {
-                    const response = await filesModel.create(file);
-                    docResponses.push(response);
-                })
-            );
-        }
-        let paths = [];
-        for (const item of docResponses)
-            paths.push(item._id);
-        const payload = {
-            userId: res.locals.userId,
-            registro: req.body.registro,
-            filtro: req.body.filtro,
-            fechaInicio: formatReadableDateTime(req.body.fechaInicio),
-            fechaTermino: formatReadableDateTime(req.body.fechaTermino),
-            docPaths: paths,
-            estatus: "Pendiente",
-            isSent: false,
-            isVerified: false,
-        };
-
-        // 2. Execute mongoose action
-        const response = await permitsModel.create(payload);
-        return res.status(200).json({ success: true });
-
-    } catch (error) {
-        if (error instanceof mongoose.Error.ValidationError)
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#006)" });
-        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#007)" });
-    }
-};
+const { json } = require("body-parser");
 
 // viewPermitsRowFile : Colaborador, JefeInmediato, rHumanos : Done
 exports.viewPermitsRowFile = async (req, res) => {
@@ -133,25 +40,77 @@ exports.viewPermitsRowFile = async (req, res) => {
     }
 };
 
-// editPermit : Colaborador : Done
-exports.editPermit_getInfo = async (req, res) => {
+// createPermitRequest : Colaborador : Done
+exports.createPermitRequest = async (req, res) => {
     try {
-        // A. BODY VALIDATION
-        // 1. Validate field quality 
-        const permitId = req.body.permitId;
-        if (!permitId || typeof permitId !== "string")
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#011)" });
+        // A. FILE VALIDATION is done in "configureFileUpload.js" as a multer middleware
 
-        // B. MODEL LOGIC
-        // 1. Validate that the permit is eligible for edition and also exists
-        const response = await permitsModel.findOne({ _id: permitId, isSent: false, isVerified: false })
-            .populate('docPaths', 'originalname').select('-__v');
-        if (!response)
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#013)" });
+        // B. BODY VALIDATION
+        // 1. Validate field arrangement 
+        const allowedFields = ["registro", "filtro", "fechaInicio", "fechaTermino"];
+        const receivedFields = Object.keys(req.body);
+        const hasExtraFields = receivedFields.some(field => !allowedFields.includes(field));
+        if (hasExtraFields)
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#001)" });
 
-        return res.status(200).json({ success: true, message: response });
+        // 2. Validate field quality 
+        const { registro, filtro, fechaInicio, fechaTermino } = req.body;
+        if (!registro || !filtro || !fechaInicio || !fechaTermino ||
+            typeof registro !== "string" || typeof filtro !== "string" ||
+            typeof fechaInicio !== "string" || typeof fechaTermino !== "string") {
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#002)" });
+        }
+
+        // 3. Validate dates
+        const fechaInicioDate = new Date(fechaInicio);
+        const fechaTerminoDate = new Date(fechaTermino);
+        const today = new Date();
+        if (isNaN(fechaInicioDate.getTime()) || isNaN(fechaTerminoDate.getTime()))
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#003)" });
+        const fechaInicioTime = fechaInicioDate.getTime();
+        const fechaTerminoTime = fechaTerminoDate.getTime();
+        if (fechaInicioTime >= fechaTerminoTime || today > fechaInicioTime || today > fechaTerminoTime)
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#004)" });
+        if (registro === "Incapacidad" && fechaInicioDate.getHours() !== 0)
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#005)" });
+
+
+        // C. MODEL LOGIC
+
+        // 1. Build payload
+        let docResponses = [];
+        if (req.files.length > 0) {
+            await Promise.all(
+                req.files.map(async (file) => {
+                    const response = await filesModel.create(file);
+                    docResponses.push(response);
+                })
+            );
+        }
+        let paths = [];
+        for (const item of docResponses)
+            paths.push(item._id);
+        const payload = {
+            userId: res.locals.userId,
+            registro: req.body.registro,
+            filtro: req.body.filtro,
+            fechaInicio: fechaInicio,
+            fechaTermino: fechaTermino,
+            docPaths: paths,
+            estatus: "Pendiente",
+            isSent: false,
+            isVerified: false,
+        };
+
+        // 2. Execute mongoose action
+        await permitsModel.create(payload);
+        return res.status(200).json({ success: true });
+
     } catch (error) {
-        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#012)" });
+        //console.error(error);
+        if (error instanceof mongoose.Error.ValidationError)
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#006)" });
+        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#007)" });
     }
 };
 
@@ -221,160 +180,166 @@ exports.sendPermit = async (req, res) => {
 };
 
 // editPermit : Colaborador : Done
-exports.editPermit_postInfo = async (req, res) => {
-    //console.log("req.body:", req.body);
-    //console.log("req.files:", JSON.stringify(req.files));
-
+exports.editPermit_getInfo = async (req, res) => {
     try {
-        // A. FILE VALIDATION is done in "configureFileUpload.js" as a multer middleware
+        const { permitId } = req.body;
 
-        // B. BODY VALIDATION
-        // 1. Validate field arrangement 
+        if (!permitId || typeof permitId !== "string") {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#011)"
+            });
+        }
+
+        const permit = await permitsModel.findOne({
+            _id: permitId,
+            isSent: false,
+            isVerified: false
+        }).populate('docPaths', 'originalname').select('-__v');
+
+        if (!permit) {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#013)"
+            });
+        }
+
+        return res.status(200).json({ success: true, message: permit });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            messageTitle: "Error",
+            messageText: "Tomar captura y favor de informar a soporte técnico. (#012)"
+        });
+    }
+};
+
+// editPermit : Colaborador : Done
+exports.editPermit_postInfo = async (req, res) => {
+    try {
+        // Validate request fields
         const allowedFields = ["permitId", "filtro", "fechaInicio", "fechaTermino", "archivosSeleccionados", "files"];
         const receivedFields = Object.keys(req.body);
-        const hasExtraFields = receivedFields.some(field => !allowedFields.includes(field));
-        if (hasExtraFields)
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#035)" });
+        
+        if (receivedFields.some(field => !allowedFields.includes(field))) {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#035)"
+            });
+        }
 
-        // 2. Validate field quality 
         const { permitId, filtro, fechaInicio, fechaTermino, archivosSeleccionados } = req.body;
-        if ([permitId, filtro, fechaInicio, fechaTermino, archivosSeleccionados].some(field => typeof field !== "string") || !permitId)
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#036)" });
 
-        // GET ORIGINAL PERMIT
-        const permitData = await permitsModel.findOne({ _id: permitId, isSent: false, isVerified: false })
-            .populate('docPaths', 'filename originalname').select('-__v');
-        if (!permitData)
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar.(#034)" });
-        if (permitData.userId != res.locals.userId)
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar.(#45)" });
-
-
-        // 1. Auxiliary functions
-        const formatReadableDateTime = (isoDate) => {
-            const date = new Date(isoDate);
-            let readableDate = date.toLocaleDateString('es-MX', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            });
-            let readableTime = date.toLocaleTimeString('es-MX', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-
-            });
-            if (readableTime === "24:00") {
-                readableTime = "00:00";
-            }
-            return `${readableDate}, ${readableTime}`;
-        };
-        function formatFecha(fechaString) {
-            const meses = {
-                enero: '01', febrero: '02', marzo: '03', abril: '04', mayo: '05', junio: '06',
-                julio: '07', agosto: '08', septiembre: '09', octubre: '10', noviembre: '11', diciembre: '12'
-            };
-            if (permitData.registro === "Incapacidad" && fechaInicioDate.getHours() !== 0) {
-                // Ajusta la hora a 00:00 si la condición se cumple
-                fechaString = fechaString.replace(/(\d{1,2}) de (\w+) de (\d{4}), (\d{2}):(\d{2})/, function (_, dia, mes, anio) {
-                    return `${dia.padStart(2, '0')} de ${mes} de ${anio}, 00:00`; // Regresar la hora con 00:00
-                });
-            }
-            return fechaString.replace(/(\d{1,2}) de (\w+) de (\d{4}), (\d{2}):(\d{2})/, function (_, dia, mes, anio, hora, minuto) {
-                return new Date(`${anio}-${meses[mes] || '01'}-${dia.padStart(2, '0')}T${hora}:${minuto}`);
-            });
-        }
-
-        // 2. Validate dates
-        const fechaInicioDate = new Date(fechaInicio);
-        const fechaTerminoDate = new Date(fechaTermino);
-        const today = new Date();
-        const getTimestamp = (fecha, fechaFromPermit) => {
-            let formattedFecha = formatFecha(fechaFromPermit);
-            let date = new Date(formattedFecha);
-            return !isNaN(date.getTime()) ? date.getTime() : new Date(fecha).getTime();
-        };
-        let fechaInicioTime = getTimestamp(fechaInicio, permitData.fechaInicio);
-        let fechaTerminoTime = getTimestamp(fechaTermino, permitData.fechaTermino);
-        if (fechaInicioTime > fechaTerminoTime || today > fechaInicioTime || today > fechaTerminoTime) {
+        if ([permitId, filtro, fechaInicio, fechaTermino, archivosSeleccionados].some(
+            field => typeof field !== "string") || !permitId) {
             return res.status(400).json({
                 success: false,
                 messageTitle: "¡Repámpanos!",
-                messageText: "Espera un poco y vuelvelo a intentar. (#038)"
+                messageText: "Espera un poco y vuelvelo a intentar. (#036)"
             });
         }
-        if (permitData.registro === "Incapacidad" &&
-            (new Date(fechaInicioTime).getHours() !== 0 || new Date(fechaTerminoTime).getHours() !== 0)) {
+
+        const permitData = await permitsModel.findOne({
+            _id: permitId,
+            isSent: false,
+            isVerified: false
+        }).populate('docPaths', '_id filename originalname').select('-__v');
+
+        if (!permitData) {
             return res.status(400).json({
                 success: false,
                 messageTitle: "¡Repámpanos!",
-                messageText: "Espera un poco y vuelvelo a intentar. (#039)"
+                messageText: "Espera un poco y vuelvelo a intentar.(#034)"
             });
         }
-        fechaInicioTime = formatFecha(permitData.fechaInicio); fechaInicioTime = new Date(fechaInicioTime); fechaInicioTime = fechaInicioTime.getTime();
-        if (!isNaN(fechaInicioDate.getTime()))
-            fechaInicioTime = fechaInicioDate.getTime();
-        fechaTerminoTime = formatFecha(permitData.fechaTermino); fechaTerminoTime = new Date(fechaTerminoTime); fechaTerminoTime = fechaTerminoTime.getTime();
-        if (!isNaN(fechaTerminoDate.getTime()))
-            fechaTerminoTime = fechaTerminoDate.getTime();
-        if (fechaInicioTime >= fechaTerminoTime || today > fechaInicioTime || today > fechaTerminoTime)
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#038)" });
 
+        if (permitData.userId != res.locals.userId) {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar.(#45)"
+            });
+        }
 
-        // C. MODEL LOGIC
-        // 1. Delete unused 'edited out' files from the permit
+        // (skip) validate dates
+        // (skip) validate dates
+        // (skip) validate dates
+   
+        // First, add the new files._id into the payload
         const parsedFilesArray = JSON.parse(archivosSeleccionados);
-        console.log("parsedFilesArray: " + parsedFilesArray);
+        let paths = [];
+        if (req.files && req.files.length > 0) {
+            const docResponses = await Promise.all(
+                req.files.map(file => filesModel.create(file))
+            );
+            paths = docResponses.map(doc => doc._id);
+        }
+
+        // Second, delete non-finalists and save the object for the finalists
         for (const item of permitData.docPaths) {
-            const isFinalist = parsedFilesArray.find(file => file.name == item.originalname);
+            const isFinalist = parsedFilesArray.find(file => file.name === item.originalname);
             if (!isFinalist) {
                 const filePath = path.join(__dirname, '..', 'uploads', 'permisos', item.filename);
-                fs.unlink(filePath, (err) => {
-                    if (err)
-                       return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico.(#055)" });
-                });
-                const itemResponse = await filesModel.deleteOne({ _id: item._id });
+                try {
+                    await fs.promises.unlink(filePath);
+                    await filesModel.deleteOne({ _id: item._id });
+                } catch (err) {
+                    return res.status(500).json({
+                        success: false,
+                        messageTitle: "Error",
+                        messageText: "Tomar captura y favor de informar a soporte técnico.(#055)"
+                    });
+                }
+            } else {
+                paths.push(item._id); // conservar los items previos porque es finalista pues
             }
         }
 
-        // 2. If there is new files, update the files collection and add them to the payload
-        let docResponses = [];
-        if (req.files.length > 0) {
-            await Promise.all(
-                req.files.map(async (file) => {
-                    const response = await filesModel.create(file);
-                    docResponses.push(response);
-                })
-            );
-        }
-        let paths = [];
-        for (const item of docResponses)
-            paths.push(item._id);
 
+        // Update permit
+        const payload = {
+            ...(filtro && { filtro }),
+            ...(fechaInicio && { fechaInicio: fechaInicio }),
+            ...(fechaTermino && { fechaTermino: fechaTermino }),
+            ...(paths.length > 0 && { docPaths: paths })
+        };
 
-        // 3. Execute mongoose action
-        const payload = {};
-        if (filtro) payload.filtro = filtro;
-        if (fechaInicio) payload.fechaInicio = formatReadableDateTime(fechaInicioTime);
-        if (fechaTermino) payload.fechaTermino = formatReadableDateTime(fechaTerminoTime);
-        if (paths && paths.length) payload.docPaths = paths;
-
-        const responseUpdate = await permitsModel.findByIdAndUpdate(
+        await permitsModel.findByIdAndUpdate(
             permitId,
-            {
-                $set: payload
-            },
+            { $set: payload },
             { new: true }
         );
 
         return res.status(200).json({ success: true });
 
     } catch (error) {
-        if (error instanceof mongoose.Error.ValidationError)
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#006)" });
-        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#040)" });
+        if (error instanceof mongoose.Error.ValidationError) {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#006)"
+            });
+        }
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            messageTitle: "Error",
+            messageText: "Tomar captura y favor de informar a soporte técnico. (#040)"
+        });
     }
 };
+
+
+
+
+
+
+
+
 
 
 
@@ -405,44 +370,6 @@ exports.changeStatus = async (req, res) => {
     }
 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -567,17 +494,6 @@ stream.on('finish', () => {
     });
 });
 
-
-
-
-
-
-
-
-
-
-
-
             if (permitsRows.length === 0) {
                 // TODO, download mesaje warning no hay información para pdf
                 return res.status(404).json({ success: false, message: 'No users found to export.' });
@@ -638,58 +554,81 @@ exports.postVerifyPermit = async (req, res) => {
 /*********/
 /***/
 
-
+/* --- AUX --- */
+const formatReadableDateTime = (isoDate) => {
+    const date = new Date(isoDate);
+    const readableDate = date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+    const readableTime = date.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+    return `${readableDate}, ${readableTime}`;
+};
+/****************/
+/*********/
+/***/
 
 /* --- VIEWS --- */
-// accessPermitsModule : Colaborador, JefeInmediato, rHumanos : Done
 exports.accessPermitsModule = async (req, res) => {
     try {
         let permitsRows = "";
 
         // Permits module for "colaborador"
         if (res.locals.userPrivilege === "colaborador") {
-            // get all permits from a single user
             permitsRows = await permitsModel.find({ userId: res.locals.userId })
-                .populate('docPaths', '_id originalname filename').select('-__v');
+                .populate('docPaths', '_id originalname filename')
+                .select('-__v');
+            
+            // Format dates for each permit
+            permitsRows = permitsRows.map(permit => ({
+                ...permit.toObject(),
+                fechaInicio: formatReadableDateTime(permit.fechaInicio),
+                fechaTermino: formatReadableDateTime(permit.fechaTermino)
+            }));
+            
             return res.render('permisos/colaboradorPermitsView.ejs', { permitsRows });
 
-
-            // Permits module for "jefeInmediato"
+        // Permits module for "jefeInmediato"
         } else if (res.locals.userPrivilege === "jefeInmediato") {
-            // get all members from the team, map all their permits in a single array
             const team = await teamsSchema.find({ jefeInmediatoId: res.locals.userId }).select('-__v');
             if (team.length > 0) {
-                const teamData = team[0]; // use the first team as string init for appends
+                const teamData = team[0];
                 const permitPromises = teamData.colaboradoresIds.map(userId => {
-                    // populate inserts the object referenced inside the query (check permitsModel.js)
                     return permitsModel.find({ userId: userId, isSent: true })
                         .populate('userId', 'nombre apellidoP apellidoM')
                         .populate('docPaths', '_id originalname filename path')
                         .select('-__v');
                 });
                 const permitsResults = await Promise.all(permitPromises);
-                permitsRows = permitsResults.flat(); // compact all permits as a single array
+                permitsRows = permitsResults.flat();
+                
+                // Format dates for each permit
+                permitsRows = permitsRows.map(permit => ({
+                    ...permit.toObject(),
+                    fechaInicio: formatReadableDateTime(permit.fechaInicio),
+                    fechaTermino: formatReadableDateTime(permit.fechaTermino)
+                }));
             }
             return res.render('permisos/jefeInmediatoPermitsView.ejs', { permitsRows });
 
-
-            // Permits module for "rHumanos"
-        } else if (res.locals.userPrivilege === "rHumanos") {
-            // get all permits regardless of the user but must be sent
+        // Permits module for "rHumanos" or "direccion"
+        } else if (res.locals.userPrivilege === "rHumanos" || res.locals.userPrivilege === "direccion") {
             permitsRows = await permitsModel.find({ isSent: true })
                 .populate('userId', 'nombre apellidoP apellidoM area')
                 .populate('docPaths', '_id originalname filename path')
                 .select('-__v');
-            return res.render('permisos/rHumanosPermitsView.ejs', { permitsRows });
-
-
-            // Permits module for "direccion"
-        } else if (res.locals.userPrivilege === "direccion") {
-            // get all permits regardless of the user but must be sent
-            permitsRows = await permitsModel.find({ isSent: true })
-                .populate('userId', 'nombre apellidoP apellidoM area')
-                .populate('docPaths', '_id originalname filename path')
-                .select('-__v');
+            
+            // Format dates for each permit
+            permitsRows = permitsRows.map(permit => ({
+                ...permit.toObject(),
+                fechaInicio: formatReadableDateTime(permit.fechaInicio),
+                fechaTermino: formatReadableDateTime(permit.fechaTermino)
+            }));
+            
             return res.render('permisos/rHumanosPermitsView.ejs', { permitsRows });
         }
 

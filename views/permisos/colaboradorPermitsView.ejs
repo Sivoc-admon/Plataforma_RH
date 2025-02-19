@@ -30,12 +30,12 @@
             </div>
         </div>
 
+        <% if (permitsRows.length !== 0) { %>
         <div class="field">
             <div class="control">
                 <input class="input" type="text" id="searchInput" placeholder="Buscar por nombre, apellido o área" onkeyup="filterTable()">
             </div>
         </div>
-
         <table class="table is-fullwidth is-hoverable">
             <thead>
                 <tr style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue));">
@@ -48,8 +48,6 @@
                     <th class="has-text-centered">Acciones</th>
                 </tr>
             </thead>
-
-            <% if (permitsRows.length !== 0) { %>
                 <tbody id="tableBody"> 
                     <% permitsRows.forEach(permit=> { %>
                         <tr>
@@ -140,13 +138,14 @@
                     <% }); %>
             </tbody>
         </table>
-        <% } else { %>
-            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">No existen permisos a la fecha.</h2>
-        <% }; %>
+
         <div class="pagination" >
             <button class="default-button-css" onclick="prevPage()">Anterior</button>
             <button class="default-button-css" onclick="nextPage()">Siguiente</button>
         </div>
 
+        <% } else { %>
+            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">Agrega tu primer permiso para mostrar el tablero ✅</h2>
+        <% }; %>
 
     </div>

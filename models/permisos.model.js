@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 // Regex. Example "5 de febrero de 2025, 22:52"
-const fechaRegex = /^(0?[1-9]|[12][0-9]|3[01])\s(de)\s(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s(de)\s(\d{4}),\s([01]?[0-9]|2[0-3]):([0-5][0-9])$/;
+const fechaRegex = /^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d)$/;
 
 // Schema
 const permitSchema = new mongoose.Schema({
