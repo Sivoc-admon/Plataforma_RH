@@ -680,7 +680,7 @@ exports.accessPermitsModule = async (req, res) => {
                 const teamData = team[0];
                 const permitPromises = teamData.colaboradoresIds.map(userId => {
                     return permitsModel.find({ userId: userId, isSent: true })
-                        .populate('userId', 'nombre apellidoP apellidoM')
+                        .populate('userId', 'nombre apellidoP apellidoM area')
                         .populate('docPaths', '_id originalname filename path')
                         .select('-__v');
                 });

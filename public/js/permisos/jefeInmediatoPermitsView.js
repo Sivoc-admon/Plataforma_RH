@@ -1,6 +1,3 @@
-// VALIDATOR - this is the only and First view to get validation and XSS protection.
-// TODO, implement that quality onto the next features but do not rework until MVP finished. 
-
 // viewPermitsRowFile : Done
 async function viewPermitsRowFile(button) {
     window.open(DOMPurify.sanitize(`/permisos/viewPermitsRowFile/${button.getAttribute('permitId')}/${button.getAttribute('filename')}`));
