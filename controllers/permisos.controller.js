@@ -265,24 +265,31 @@ exports.editPermit_postInfo = async (req, res) => {
             });
         }
 
-        // (skip) validate dates
-        // (skip) validate dates
-        // (skip) validate dates
-   
-        // First, add the new files._id into the payload
-        const parsedFilesArray = JSON.parse(archivosSeleccionados);
-        let paths = [];
-        if (req.files && req.files.length > 0) {
-            const docResponses = await Promise.all(
-                req.files.map(file => filesModel.create(file))
-            );
-            paths = docResponses.map(doc => doc._id);
-        }
+        // (skip) validate filtro
+        // (skip) validate filtro
+        // (skip) validate filtro
 
-        // Second, delete non-finalists and save the object for the finalists
-        for (const item of permitData.docPaths) {
-            const isFinalist = parsedFilesArray.find(file => file.name === item.originalname);
-            if (!isFinalist) {
+        // (skip) validate dates
+        // (skip) validate dates
+        // (skip) validate dates
+
+        let paths = [];
+        const dataArray = permitData.docPaths;
+        const parsedFilesArray = JSON.parse(archivosSeleccionados);
+        const reqFilesObject = req.files;
+
+        // First, process each item in dataArray (current files in DB)
+        for (const item of dataArray) {
+            // Check if this file is being replaced by a new upload
+            const isBeingReplaced = reqFilesObject.some(file => file.originalname === item.originalname);
+            // Check if this file was selected to keep
+            const isSelected = parsedFilesArray.some(file => file.name === item.originalname);
+        
+            // Delete if:
+            // - File is being replaced by new upload OR
+            // - File wasn't selected to keep
+            if (isBeingReplaced || !isSelected) {
+                console.log("Deleting: ", item);
                 const filePath = path.join(__dirname, '..', 'uploads', 'permisos', item.filename);
                 try {
                     await fs.promises.unlink(filePath);
@@ -295,19 +302,26 @@ exports.editPermit_postInfo = async (req, res) => {
                     });
                 }
             } else {
-                paths.push(item._id); // conservar los items previos porque es finalista pues
+                // Keep file if it's selected and not being replaced
+                paths.push(item);
             }
         }
-
-
-        // Update permit
+        
+        // Add new files to paths
+        if (req.files && req.files.length > 0) {
+            const docResponses = await Promise.all(
+                req.files.map(file => filesModel.create(file))
+            );
+            paths = [...paths, ...docResponses];  // Combine old and new files
+        }
+        
         const payload = {
             ...(filtro && { filtro }),
             ...(fechaInicio && { fechaInicio: fechaInicio }),
             ...(fechaTermino && { fechaTermino: fechaTermino }),
             ...(paths.length > 0 && { docPaths: paths })
         };
-
+        
         await permitsModel.findByIdAndUpdate(
             permitId,
             { $set: payload },

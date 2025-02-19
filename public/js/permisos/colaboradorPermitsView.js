@@ -465,7 +465,8 @@ async function editPermit(button) {
                     const fechaInicio = document.getElementById('fechaYHoraInicio').value;
                     const fechaTermino = document.getElementById('fechaYHoraFinal').value;
                 
-                    if (!filtro || !fechaInicio || !fechaTermino) return Swal.showValidationMessage('Todos los campos son requeridos.');
+                    console.log("filtro: " + filtro);
+                    if (!filtro) return Swal.showValidationMessage('Todos los campos son requeridos.');
                 
                     // Set all dates to midnight to compare only the dates
                     const currentDate = new Date();
@@ -619,4 +620,4 @@ async function sendPermit(button) {
             }
         }
     })
-};
+};  
