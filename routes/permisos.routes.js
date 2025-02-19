@@ -65,13 +65,16 @@ router.delete('/deletePermit', controller.deletePermit);
 // sendPermit : Colaborador : Done
 router.post("/sendPermit", controller.sendPermit);
 
-// changeStatus : jefeInmediato : Done
+// changeStatus : jefeInmediato, rHumanos : Done
 router.post("/changeStatus", controller.changeStatus);
+
+// changeStatus : jefeInmediato, rHumanos : Done
+router.post("/verifyPermit", controller.verifyPermit);
 
 
 // TODO
 router.get("/downloadPDF", controller.getDownloadPDF);
-router.post("/verifyPermit", controller.postVerifyPermit);
+// getExcelPDF
 
 
 // accessPermitsModule : Colaborador, JefeInmediato, rHumanos : Done

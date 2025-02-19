@@ -363,7 +363,7 @@ exports.changeStatus = async (req, res) => {
 
         // 2. Get current permit data and validate if the new estatus
         const permitData = await permitsModel.findOne({ _id: permitId });
-        
+
         if (!permitData) return res.status(400).json({
             success: false,
             messageTitle: "¡Repámpanos!",
@@ -378,6 +378,7 @@ exports.changeStatus = async (req, res) => {
             });
         }
 
+        // 3. Execute mongoose action 
         const updatedPermit = await permitsModel.findByIdAndUpdate(
             permitId,
             {
@@ -409,10 +410,40 @@ exports.changeStatus = async (req, res) => {
     }
 };
 
-exports.postVerifyPermit = async (req, res) => {
+// verifyPermit : jefeInmediato, rHumanos : ---
+exports.verifyPermit = async (req, res) => {
     try {
-        const response = await permitsModel.findByIdAndUpdate(
-            req.body._id,
+        const { permitId } = req.body; 
+
+        // 1. Verify request quality
+        if (!permitId || typeof permitId !== "string") {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#068)"
+            });
+        }
+
+        // 2. Get current permit data and validate if the new estatus
+        const permitData = await permitsModel.findOne({ _id: permitId });
+
+        if (!permitData) return res.status(400).json({
+            success: false,
+            messageTitle: "¡Repámpanos!",
+            messageText: "Espera un poco y vuelvelo a intentar. (#067)"
+        });
+
+        if (!permitData.isSent || permitData.isVerified) {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#066)"
+            });
+        }
+
+        // 3. Execute mongoose action 
+        const updatedPermit = await permitsModel.findByIdAndUpdate(
+            permitId,
             {
                 $set: {
                     isVerified: true,
@@ -420,11 +451,25 @@ exports.postVerifyPermit = async (req, res) => {
             },
             { new: true, runValidators: true }
         );
+        if (!updatedPermit) {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#065)"
+            });
+        }
+
         return res.status(200).json({ success: true, message: "" });
 
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
+        if (error instanceof mongoose.Error.ValidationError) {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#069)"
+            });
+        }
+        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#070)" });
     }
 
 };

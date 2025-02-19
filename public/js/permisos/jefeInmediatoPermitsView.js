@@ -3,7 +3,7 @@
 
 // viewPermitsRowFile : Done
 async function viewPermitsRowFile(button) {
-    window.open(DOMPurify.sanitize(`/permisos/viewPermitsRowFile/${button.getAttribute('permitId')}/${button.getAttribute('filename')}`)); 
+    window.open(DOMPurify.sanitize(`/permisos/viewPermitsRowFile/${button.getAttribute('permitId')}/${button.getAttribute('filename')}`));
 };
 
 // changeStatus : Done
@@ -41,7 +41,7 @@ async function changeStatus(button) {
         },
 
         preConfirm: async () => {
-            const estatus = $('#estatus').val().trim(); 
+            const estatus = $('#estatus').val().trim();
             try {
                 const response = await fetch('/permisos/changeStatus', {
                     method: 'POST',
@@ -54,24 +54,16 @@ async function changeStatus(button) {
                     })
                 });
                 const data = await response.json();
-                if (data.success) 
-                    return Swal.fire({
-                        title: 'Estatus cambiado',
-                        icon: 'success',
-                        width: "500px",
-                        text: 'Se ha cambiado el estatus correctamente'
-                    }).then(() => {
-                        location.reload();
-                    });
 
-                return Swal.fire({
-                        title: data.messageTitle,
-                        icon: 'error',
-                        width: "500px",
-                        text: data.messageText,
-                    }).then(() => {
-                        location.reload();
-                    });
+
+                await Swal.fire({
+                    title: data.success ? 'Estatus cambiado' : data.messageTitle,
+                    icon: data.success ? 'success' : 'error',
+                    text: data.success ? 'Se ha cambiado el estatus correctamente.' : data.messageText,
+                    width: "500px"
+                });
+                
+                location.reload();
 
             } catch (error) {
                 location.reload();
@@ -80,7 +72,7 @@ async function changeStatus(button) {
     })
 };
 
-// verifyPermit : ---
+// verifyPermit : Done
 async function verifyPermit(button) {
     const permitId = button.getAttribute('permitId');
     const currentStatus = button.getAttribute('currentStatus');
@@ -112,51 +104,28 @@ async function verifyPermit(button) {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        _id: permitObject._id,
+                        permitId: permitId,
                     })
                 });
-                
-                
                 const data = await response.json();
 
-                // Catch from Controller "/verifyPermit"
-                if (!data.success) {
-                    Swal.fire({
-                        title: 'Algo salió mal :(',
-                        icon: 'error',
-                        width: "500px",
-                        text: 'Favor de contactar a Soporte Técnico. (Error #052)'
-                    });
-                    return; // verifyPermit() failed execution
-                } else {
-                    Swal.fire({
-                        title: 'Permiso aceptado',
-                        icon: 'success',
-                        width: "500px",
-                        text: 'Se ha enviado el permiso correctamente.'
-                    }).then(() => {
-                        location.reload(); // reload after popup
-                    });
-                    return; // verifyPermit() successful execution
-                }
-               
-
-                // Catch from Fetch #01
-            } catch (error) {
-                Swal.fire({
-                    title: 'Algo salió mal :(',
-                    icon: 'error',
-                    width: "500px",
-                    text: 'Favor de contactar a Soporte Técnico. (Error #051)'
+                await Swal.fire({
+                    title: data.success ? 'Permiso verificado' : data.messageTitle,
+                    icon: data.success ? 'success' : 'error',
+                    text: data.success ? 'Se ha enviado el permiso correctamente.' : data.messageText,
+                    width: "500px"
                 });
-                console.error('Hubo un error:', error);
-                return; // verifyPermit() failed execution
+                
+                location.reload();
+
+            } catch (error) {
+                location.reload();
             }
         }
     })
 };
 
-// downloadPDF button
+// downloadPDF ????? : ??? --
 async function downloadPDF() {
     try {
         const response = await fetch('/permisos/downloadPDF', {
