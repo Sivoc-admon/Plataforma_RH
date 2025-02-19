@@ -1,13 +1,12 @@
 // VALIDATOR - this is the only and First view to get validation and XSS protection.
 // TODO, implement that quality onto the next features but do not rework until MVP finished. 
 
-// viewFile button
+// viewPermitsRowFile : Done
 async function viewPermitsRowFile(button) {
     window.open(DOMPurify.sanitize(`/permisos/viewPermitsRowFile/${button.getAttribute('permitId')}/${button.getAttribute('filename')}`)); 
 };
 
-
-// changeStatus button
+// changeStatus : Done
 async function changeStatus(button) {
     const permitId = button.getAttribute('permitId');
     const currentStatus = button.getAttribute('currentStatus');
@@ -55,57 +54,43 @@ async function changeStatus(button) {
                     })
                 });
                 const data = await response.json();
-
-                // Catch from Controller "/changeStatus" 
-                if (!data.success) {
-                    Swal.fire({
-                        title: 'Modificación reportada',
-                        icon: 'error',
-                        width: "500px",
-                        text: data.message
-                    }).then(() => {
-                        location.reload();
-                    });
-                    return; // changeStatus() execution
-                } else {
-                    Swal.fire({
+                if (data.success) 
+                    return Swal.fire({
                         title: 'Estatus cambiado',
                         icon: 'success',
                         width: "500px",
-                        text: 'Se ha enviado el permiso correctamente.'
+                        text: 'Se ha cambiado el estatus correctamente'
                     }).then(() => {
-                        location.reload(); 
+                        location.reload();
                     });
-                    return; // changeStatus() execution
-                }
-               
 
-                // Catch from Fetch #01
+                return Swal.fire({
+                        title: data.messageTitle,
+                        icon: 'error',
+                        width: "500px",
+                        text: data.messageText,
+                    }).then(() => {
+                        location.reload();
+                    });
+
             } catch (error) {
-                Swal.fire({
-                    title: 'Algo salió mal :(',
-                    icon: 'error',
-                    width: "500px",
-                    text: 'Favor de contactar a Soporte Técnico. (Error #054)'
-                });
-                console.error('Hubo un error:', error);
-                return; // changeStatus() failed execution
+                location.reload();
             }
         }
     })
 };
 
-
-// verifyPermit button
+// verifyPermit : ---
 async function verifyPermit(button) {
-    const permitObject = JSON.parse(button.getAttribute('permitObject'));
+    const permitId = button.getAttribute('permitId');
+    const currentStatus = button.getAttribute('currentStatus');
 
     Swal.fire({
         html: DOMPurify.sanitize(`
         <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
-            <i class="fa-solid fa-check" style="margin-right:0.9rem;"></i>Aceptar permiso
+            <i class="fa-solid fa-check" style="margin-right:0.9rem;"></i>Enviar permiso
         </h2>
-        <p>¿Estás seguro que deseas aceptar/verificar este permiso para aprobación? (Esta acción no se puede deshacer)</p>
+        <p>¿Estás seguro que deseas enviar este permiso con el estatus de "${currentStatus}" al colaborador? (Esta acción no se puede deshacer)</p>
 
         `),
         confirmButtonText: 'Confirmar',

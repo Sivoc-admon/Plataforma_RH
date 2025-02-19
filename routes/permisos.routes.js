@@ -62,66 +62,19 @@ router.post('/editPermit/postInfo',
 // deletePermit : Colaborador : Done
 router.delete('/deletePermit', controller.deletePermit);
 
-// sendPermit : Colaborador : ---
+// sendPermit : Colaborador : Done
 router.post("/sendPermit", controller.sendPermit);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// REMADE ROUTES
+// changeStatus : jefeInmediato : Done
 router.post("/changeStatus", controller.changeStatus);
 
 
-
-
-
-
-
-// REMADE ROUTES
-router.get('/viewPermitsRowFile/:filename', controller.viewPermitsRowFile);
-router.post("/changeStatus", controller.changeStatus);
-
-
-
-
-// CHANGES:
-// going to implement res.sendFile(); res.download(); and 'GET /descargar/file-1736156695153-456034020.jpg' fetches.
-// forgor gitkeeps and ignores xd
-// Rutas
-
-// accessPermitsModule : Colaborador, JefeInmediato, rHumanos : Done
-router.get("/accessPermitsModule", controller.accessPermitsModule);
-
-//router.get('/downloadFile/:filename', controller.getFileDownload);
-
-
-
+// TODO
+router.get("/downloadPDF", controller.getDownloadPDF);
 router.post("/verifyPermit", controller.postVerifyPermit);
 
 
-router.get("/downloadPDF", controller.getDownloadPDF);
-
-
-
-
-// Ruta para cargar archivos
+// accessPermitsModule : Colaborador, JefeInmediato, rHumanos : Done
+router.get("/accessPermitsModule", controller.accessPermitsModule);
   
 module.exports = router;

@@ -45,7 +45,7 @@ exports.postEditUser = async (req, res) => {
         const response = await usersModel.findByIdAndUpdate(
             userId, 
             { $set: { estaActivo: false } }, // Change attribute
-            { new: true } 
+            { new: true } , runValidators: true
         );
         */
 
@@ -83,7 +83,7 @@ exports.postUserDeactivation = async (req, res) => {
         const response = await usersModel.findByIdAndUpdate(
             userId, 
             { $set: { estaActivo: false } }, // Change attribute
-            { new: true } 
+            { new: true, runValidators: true } 
         );
 
         // If for some reason user not found, send 404
@@ -107,7 +107,7 @@ exports.postUserActivation = async (req, res) => {
         const response = await usersModel.findByIdAndUpdate(
             userId, 
             { $set: { estaActivo: true } }, // Change attribute
-            { new: true } 
+            { new: true, runValidators: true } 
         );
 
         // If for some reason user not found, send 404
@@ -133,7 +133,7 @@ exports.postUserChangePrivilege = async (req, res) => {
         const response = await usersModel.findByIdAndUpdate(
             userId, 
             { $set: { privilegio: newPrivilege } }, // Change attribute
-            { new: true } 
+            { new: true , runValidators: true } 
         );
 
         // if for some reason user not found, send 404

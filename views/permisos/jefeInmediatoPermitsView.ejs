@@ -27,7 +27,7 @@
         </div>
 
 
-
+        <% if (permitsRows.length !== 0) { %>
         <div class="field">
             <div class="control">
                 <input class="input" type="text" id="searchInput" placeholder="Buscar por nombre, apellido o área" onkeyup="filterTable()">
@@ -49,7 +49,7 @@
                 </tr>
             </thead>
 
-            <% if (permitsRows.length !== 0) { %>
+
             <tbody id="tableBody"> 
                 <% permitsRows.forEach(permit=> { %>
                     <tr>
@@ -73,22 +73,20 @@
                             <% if (!permit.docPaths || permit.docPaths.length === 0) { %>
                                 No hay documentos
                             <% } else { %>
-
-
                                 <% permit.docPaths.forEach(doc => { %>
-
-                                    <div class="columns is-centered">
-                                        <div class="column">
-                                            <button class="default-button-css table-button-css" permitId="<%= permit._id %>" filename="<%= doc.originalname %>" onclick="viewPermitsRowFile(this)" >
+                                    <div class="columns is-vcentered is-mobile">
+                                        <div class="column is-narrow">
+                                            <button class="default-button-css table-button-css" permitId="<%= permit._id %>" filename="<%= doc.originalname %>" onclick="viewPermitsRowFile(this)">
                                                 <i class="fa-solid fa-eye"></i>
                                             </button>
                                         </div>
-                                        <div class="column" style="align-self: center; justify-self: center;">
-                                            <%= doc.originalname %>
+                                        <div class="column" style="padding-left:0 !important; display: flex; align-items: center;">
+                                            <span style="display: inline-block; max-width: 108px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                <%= doc.originalname %>
+                                            </span>
                                         </div>
-                                    </div>
-                                <% }) %>
-
+                                    </div>                                        
+                                <% }) %>      
                             <% } %>
                             
                         </td>
@@ -115,12 +113,12 @@
                                 <div class="columns is-centered">
                                     <div class="column is-narrow">
                                         <button class="default-button-css table-button-css" permitId="<%= permit._id %>" currentStatus="<%= permit.estatus %>" onclick="changeStatus(this)" >
-                                            <i class="fa-solid fa-gear"></i>
+                                            <i class="fa-solid fa-rotate"></i>
                                         </button>
                                     </div>
 
                                     <div class="column is-narrow">
-                                        <button class="default-button-css table-button-css" permitId="<%= permit._id %>" onclick="verifyPermit(this)">
+                                        <button class="default-button-css table-button-css" permitId="<%= permit._id %>" currentStatus="<%= permit.estatus %>" onclick="verifyPermit(this)">
                                             <i class="fa-solid fa-check"></i>
                                         </button>
                                     </div>
@@ -133,12 +131,11 @@
                 <% }); %>
             </tbody>
         </table>
-        <% } else { %>
-            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">No existen permisos a la fecha.</h2>
-        <% }; %>
         <div class="pagination" >
             <button class="default-button-css" onclick="prevPage()">Anterior</button>
             <button class="default-button-css" onclick="nextPage()">Siguiente</button>
         </div>
-
+        <% } else { %>
+            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">Tu equipo aún no agrega ningún permiso ✅</h2>
+        <% }; %>
     </div>
