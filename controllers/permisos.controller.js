@@ -104,7 +104,6 @@ exports.createPermitRequest = async (req, res) => {
         return res.status(200).json({ success: true });
 
     } catch (error) {
-        //console.error(error);
         if (error instanceof mongoose.Error.ValidationError)
             return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#006)" });
         return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#007)" });
@@ -286,7 +285,6 @@ exports.editPermit_postInfo = async (req, res) => {
             // - File is being replaced by new upload OR
             // - File wasn't selected to keep
             if (isBeingReplaced || !isSelected) {
-                console.log("Deleting: ", item);
                 const filePath = path.join(__dirname, '..', 'uploads', 'permisos', item.filename);
                 try {
                     await fs.promises.unlink(filePath);
@@ -335,7 +333,6 @@ exports.editPermit_postInfo = async (req, res) => {
                 messageText: "Espera un poco y vuelvelo a intentar. (#006)"
             });
         }
-        console.error(error);
         return res.status(500).json({
             success: false,
             messageTitle: "Error",
@@ -659,7 +656,6 @@ exports.downloadPDF = async (req, res) => {
         doc.end();
 
     } catch (error) {
-        console.error(error);
         res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
 };
@@ -740,12 +736,9 @@ exports.downloadExcel = async (req, res) => {
         res.end();
 
     } catch (error) {
-        console.error(error);
         res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
 };
-
-
 /****************/
 /*********/
 /***/
@@ -834,7 +827,6 @@ exports.accessPermitsModule = async (req, res) => {
         return res.redirect("/login");
 
     } catch (error) {
-        console.error(error);
         res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
 };

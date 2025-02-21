@@ -10,24 +10,25 @@
 
         <% if (permitsRows.length !==0) { %>
 
-            
-        <div class="columns" style="margin-top: 1rem;">
+            <div class="columns" style="margin-top: 1rem;">
 
-            <div class="column is-centered" style="text-align: center;">
-                <button class="default-button-css functionality-button-css" onclick="downloadPDF()">
-                    <i class="fa-solid fa-download default-icon-button-css"></i>
-                    <p>Descargar PDF</p>
-                </button>
+                <div class="column is-centered" style="text-align: center;">
+                    <button class="default-button-css functionality-button-css" onclick="downloadPDF()">
+                        <i class="fa-solid fa-download default-icon-button-css"></i>
+                        <p>Descargar PDF</p>
+                    </button>
+                </div>
+
+                <div class="column is-centered" style="text-align: center;">
+                    <button class="default-button-css functionality-button-css" onclick="downloadExcel()">
+                        <i class="fa-solid fa-download default-icon-button-css"></i>
+                        <p>Descargar Excel</p>
+                    </button>
+                </div>
+
             </div>
 
-            <div class="column is-centered" style="text-align: center;">
-                <button class="default-button-css functionality-button-css" onclick="downloadExcel()">
-                    <i class="fa-solid fa-download default-icon-button-css"></i>
-                    <p>Descargar Excel</p>
-                </button>
-            </div>
 
-        </div>
 
             <div class="field">
                 <div class="control">
@@ -123,7 +124,8 @@
                                     <div class="columns is-centered">
                                         <div class="column">
                                             <button class="default-button-css table-button-css"
-                                                permitObject="<%= JSON.stringify(permit) %>"
+                                                permitId="<%= permit._id %>"
+                                                currentStatus="<%= permit.estatus %>"
                                                 onclick="changeStatus(this)">
                                                 <i class="fa-solid fa-gear"></i>
                                             </button>
@@ -131,7 +133,8 @@
 
                                         <div class="column">
                                             <button class="default-button-css table-button-css"
-                                                permitObject="<%= JSON.stringify(permit) %>"
+                                                permitId="<%= permit._id %>"
+                                                currentStatus="<%= permit.estatus %>"
                                                 onclick="verifyPermit(this)">
                                                 <i class="fa-solid fa-check"></i>
                                             </button>
@@ -154,5 +157,4 @@
                 <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">Ningún colaborador
                     ha agregado ningún permiso ✅</h2>
                 <% }; %>
-
     </div>

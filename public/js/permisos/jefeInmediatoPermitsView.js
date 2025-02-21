@@ -3,7 +3,7 @@ async function viewPermitsRowFile(button) {
     window.open(DOMPurify.sanitize(`/permisos/viewPermitsRowFile/${button.getAttribute('permitId')}/${button.getAttribute('filename')}`));
 };
 
-// changeStatus : Done
+// changeStatus : ---
 async function changeStatus(button) {
     const permitId = button.getAttribute('permitId');
     const currentStatus = button.getAttribute('currentStatus');
@@ -69,7 +69,7 @@ async function changeStatus(button) {
     })
 };
 
-// verifyPermit : Done
+// verifyPermit : ---
 async function verifyPermit(button) {
     const permitId = button.getAttribute('permitId');
     const currentStatus = button.getAttribute('currentStatus');

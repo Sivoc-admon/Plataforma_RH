@@ -14,9 +14,8 @@ const authorize = (req, res, next) => {
 
     const token = req.cookies.__psmxoflxpspgolxps_mid;
 
-    if (["/login", "/login/POSTAUTH","/Unauthorized", "/logout"].includes(req.url)) {
+    if (["/login", "/login/POSTAUTH","/Unauthorized", "/logout"].includes(req.url) || req.url.startsWith("/uploads/"))
         return next();     
-    }
 
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -32,30 +31,30 @@ const authorize = (req, res, next) => {
         res.locals.userArea = decoded.area;
         res.locals.userId = decoded.userId;
 
-        
         // if you arrive to the lobby you dont need any privileges, but do need a jwt
         if (req.url === "/login/inicio") {
             return next();
 
         // if you do want to execute ANYTHING it must past the IAM test
         } else {
-            
-            // iam . (decoded.privilegio) . (url 1st portion, "/usuarios/agregar" = usuarios) . (url 2nd portion, "/usuarios/agregar" = agregar)
-/*
             // construct the IAM path dynamically by extracting portions of the URL
             const urlParts = req.url.split('/').filter(part => part); 
             const originModule = urlParts[0] || ''; 
             const actionToExecute = urlParts[1] || '';
             const privilege = decoded.privilegio;
             const permissionPath = iam?.[privilege]?.[originModule]?.[actionToExecute];
+
+            /*
+            console.log("originModule : " + originModule);
+            console.log("privilege : " + privilege);
+            console.log("actionToExecute : " + actionToExecute);
+            console.log("permissionPath: " + permissionPath);
+            */
                     
             // if not enough permissions then detect Unauthorized
-            if (!permissionPath) {
-                return res.redirect("/Unauthorized");
-            }           
-                */  
+            if (!permissionPath) 
+                return res.redirect("/Unauthorized");               
         }
-
         return next();
     } catch (error) {
         //console.error('Token verification failed:', error);

@@ -1,55 +1,15 @@
 {
-    "CATALOGO (1 auth x 1 route)": {
-        "usuarios": {
-            "accessUsersModule": null,
-            "downloadExcelUsers": null,
-            "downloadPDFUsers": null,
-            "restoreUsersView": null,
-            "addUser": null,
-            "uploadFile": null,
-            "deactivateUser": null,
-            "activateUser": null,
-            "doesEmailExists": null,
-            "changePrivilege": null,
-            "editUser": null
-        },
-        "permisos": {
-            "accessPermitsModule": null,
-            "createPermitRequest": null,
-            "uploadFile": null,
-            "downloadFile": null,
-            "deleteFile": null,
-            "deletePermit": null,
-            "editPermit": null,
-            "sendPermit": null,
-            "changeStatus": null,
-            "verifyPermit": null,
-            "downloadPDF": null,
-            "downloadExcel": null
-        },
-        "vacaciones": {
-            "downloadPDF": null,
-            "downloadExcel": null,
-            "createVacationRequest": null,
-            "authorizeVacationRequest": null,
-            "viewVacationsTable": null,
-            "viewVacationsSelf": null
-        },
-        "cursos": {
-            "downloadPDF": null,
-            "downloadExcel": null,
-            "createCourseRequest": null,
-            "authorizeCourseRequest": null,
-            "viewCoursesTable": null,
-            "viewCoursesSelf": null
-        }
-    },
     "direccion": {
         "usuarios": {
 
         },
         "permisos": {
-
+            "accessPermitsModule": true,
+            "viewPermitsRowFile": true,
+            "changeStatus": true,
+            "verifyPermit": true,
+            "downloadPDF": true,
+            "downloadExcel": true
         },
         "vacaciones": {
           
@@ -63,15 +23,8 @@
             "accessUsersModule": true
         },
         "permisos": {
-            "viewPermitsRowFile": true,
-
-
-
-
-
-
             "accessPermitsModule": true,
-            "downloadFile": true,
+            "viewPermitsRowFile": true,
             "changeStatus": true,
             "verifyPermit": true,
             "downloadPDF": true,
@@ -90,7 +43,7 @@
         },
         "permisos": {
             "accessPermitsModule": true,
-            "downloadFile": true,
+            "viewPermitsRowFile": true,
             "changeStatus": true,
             "verifyPermit": true,
             "downloadPDF": true,
@@ -110,11 +63,9 @@
         "permisos": {
             "accessPermitsModule": true,
             "createPermitRequest": true,
-            "uploadFile": true,
-            "downloadFile": true,
-            "deleteFile": true,
-            "deletePermit": true,
+            "viewPermitsRowFile": true,
             "editPermit": true,
+            "deletePermit": true,
             "sendPermit": true
         },
         "vacaciones": {
