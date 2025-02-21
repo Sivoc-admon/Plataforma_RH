@@ -126,18 +126,28 @@ async function verifyPermit(button) {
 async function downloadPDF() {
     try {
         window.location.href = '/permisos/downloadPDF';
+        Swal.fire({
+            title: 'PDF descargado',
+            icon: 'success',
+            width: "500px",
+            text: 'El archivo se descargó correctamente.'
+        });
     } catch (error) {
-        console.error('Error downloading file:', error);
         location.reload();
     }
 };
 
 // downloadExcel : ---
-async function downloadPDF() {
+async function downloadExcel() {
     try {
-        window.location.href = '/permisos/downloadPDF';
+        window.location.href = '/permisos/downloadExcel';
+        Swal.fire({
+            title: 'Excel descargado',
+            icon: 'success',
+            width: "500px",
+            text: 'El archivo se descargó correctamente.'
+        });
     } catch (error) {
-        console.error('Error downloading file:', error);
         location.reload();
     }
 };

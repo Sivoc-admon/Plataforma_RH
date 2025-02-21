@@ -122,23 +122,10 @@ async function verifyPermit(button) {
     })
 };
 
-// downloadPDF ????? : ??? --
+// downloadPDF : Done
 async function downloadPDF() {
     try {
-        const response = await fetch('/permisos/downloadPDF', {
-            method: 'GET',
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const blob = await response.blob();
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = 'permisos.pdf';
-        link.click();
-
+        window.location.href = '/permisos/downloadPDF';
         Swal.fire({
             title: 'PDF descargado',
             icon: 'success',
@@ -146,12 +133,21 @@ async function downloadPDF() {
             text: 'El archivo se descargó correctamente.'
         });
     } catch (error) {
-        console.error('Error downloading file:', error);
+        location.reload();
+    }
+};
+
+// downloadExcel : ---
+async function downloadExcel() {
+    try {
+        window.location.href = '/permisos/downloadExcel';
         Swal.fire({
-            title: 'Algo salió mal :(',
-            icon: 'error',
+            title: 'Excel descargado',
+            icon: 'success',
             width: "500px",
-            text: 'Favor de contactar a Soporte Técnico. (Error #019)'
+            text: 'El archivo se descargó correctamente.'
         });
+    } catch (error) {
+        location.reload();
     }
 };

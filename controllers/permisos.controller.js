@@ -165,7 +165,7 @@ exports.sendPermit = async (req, res) => {
             return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#027)" });
 
         // 2. Set isSent to true
-        const updateResponse = await permitsModel.findByIdAndUpdate(permitId, { $set: { isSent: true } }, { new: true, runValidators: true});
+        const updateResponse = await permitsModel.findByIdAndUpdate(permitId, { $set: { isSent: true } }, { new: true, runValidators: true });
         if (!updateResponse)
             return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#028)" });
 
@@ -220,7 +220,7 @@ exports.editPermit_postInfo = async (req, res) => {
         // Validate request fields
         const allowedFields = ["permitId", "filtro", "fechaInicio", "fechaTermino", "archivosSeleccionados", "files"];
         const receivedFields = Object.keys(req.body);
-        
+
         if (receivedFields.some(field => !allowedFields.includes(field))) {
             return res.status(400).json({
                 success: false,
@@ -281,7 +281,7 @@ exports.editPermit_postInfo = async (req, res) => {
             const isBeingReplaced = reqFilesObject.some(file => file.originalname === item.originalname);
             // Check if this file was selected to keep
             const isSelected = parsedFilesArray.some(file => file.name === item.originalname);
-        
+
             // Delete if:
             // - File is being replaced by new upload OR
             // - File wasn't selected to keep
@@ -303,7 +303,7 @@ exports.editPermit_postInfo = async (req, res) => {
                 paths.push(item);
             }
         }
-        
+
         // Add new files to paths
         if (req.files && req.files.length > 0) {
             const docResponses = await Promise.all(
@@ -311,18 +311,18 @@ exports.editPermit_postInfo = async (req, res) => {
             );
             paths = [...paths, ...docResponses];  // Combine old and new files
         }
-        
+
         const payload = {
             ...(filtro && { filtro }),
             ...(fechaInicio && { fechaInicio: fechaInicio }),
             ...(fechaTermino && { fechaTermino: fechaTermino }),
             ...(paths.length > 0 && { docPaths: paths })
         };
-        
+
         await permitsModel.findByIdAndUpdate(
             permitId,
             { $set: payload },
-            { new: true, runValidators: true}
+            { new: true, runValidators: true }
         );
 
         return res.status(200).json({ success: true });
@@ -410,7 +410,7 @@ exports.changeStatus = async (req, res) => {
 // verifyPermit : jefeInmediato, rHumanos : Done
 exports.verifyPermit = async (req, res) => {
     try {
-        const { permitId } = req.body; 
+        const { permitId } = req.body;
 
         // 1. Verify request quality
         if (!permitId || typeof permitId !== "string") {
@@ -471,7 +471,7 @@ exports.verifyPermit = async (req, res) => {
 
 };
 
-// downloadPDF : jefeInmediato, rHumanos : --- 
+// downloadPDF : jefeInmediato, rHumanos : Done 
 exports.downloadPDF = async (req, res) => {
     try {
         let permitsRows = "";
@@ -532,8 +532,6 @@ exports.downloadPDF = async (req, res) => {
             .fillColor('#7F8C8D')
             .text('Generado el: ' + new Date().toLocaleDateString('es-MX'), 50, 60, { align: 'center' });
 
-
-
         // Table configuration
         const startY = 100;
         const rowHeight = 54;
@@ -541,13 +539,13 @@ exports.downloadPDF = async (req, res) => {
         // Add horizontal line
         const startX = 39; // Punto de inicio de la tabla
         const tableWidth = columnWidths.reduce((sum, width) => sum + width, 0); // Suma de todas las columnas
-        
+
         doc.strokeColor('#BDC3C7')
             .lineWidth(1)
             .moveTo(startX, startY - 20)  // Línea justo arriba de la tabla
             .lineTo(startX + tableWidth, startY - 20) // Final de la línea según el ancho total de la tabla
             .stroke();
-        
+
         // 
         const headers = ['Nombre del colaborador', 'Área del colaborador', 'Descripción del permiso', 'Fecha y hora de inicio', 'Fecha y hora de término', 'Documentos agregados', 'Estatus actual del permiso', 'Estado de verificación'];
         let currentY = startY;
@@ -617,9 +615,6 @@ exports.downloadPDF = async (req, res) => {
                 permit.isVerified ? 'Interacción cerrado' : 'Interacción abierto'
             ];
 
-
-    
-
             rowData.forEach((text, i) => {
                 // Draw cell borders
                 drawCellBorders(currentX, currentY, columnWidths[i], rowHeight);
@@ -667,11 +662,89 @@ exports.downloadPDF = async (req, res) => {
         console.error(error);
         res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
-
-
-
-
 };
+
+// downloadExcel : jefeInmediato, rHumanos : Done 
+exports.downloadExcel = async (req, res) => {
+    const ExcelJS = require('exceljs');
+    try {
+        let permitsRows = [];
+
+        if (res.locals.userPrivilege === "jefeInmediato") {
+            const team = await teamsSchema.find({ jefeInmediatoId: res.locals.userId }).select('-__v');
+            if (team.length > 0) {
+                const teamData = team[0];
+                const permitPromises = teamData.colaboradoresIds.map(userId => {
+                    return permitsModel.find({ userId: userId, isSent: true })
+                        .populate('userId', 'nombre apellidoP apellidoM area')
+                        .populate('docPaths', '_id originalname filename path')
+                        .select('-__v');
+                });
+                const permitsResults = await Promise.all(permitPromises);
+                permitsRows = permitsResults.flat();
+            }
+        } else if (res.locals.userPrivilege === "rHumanos") {
+            permitsRows = await permitsModel.find({ isSent: true })
+                .populate('userId', 'nombre apellidoP apellidoM area')
+                .populate('docPaths', '_id originalname filename path')
+                .select('-__v');
+        } else {
+            return res.redirect("/login");
+        }
+
+        if (permitsRows.length === 0) {
+            return res.status(404).json({ success: false, message: 'No users found to export.' });
+        }
+
+        // 📌 Crear un nuevo archivo Excel
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Permisos');
+
+        // 📌 Definir encabezados
+        worksheet.columns = [
+            { header: 'Nombre del colaborador', key: 'nombre', width: 25 },
+            { header: 'Área', key: 'area', width: 20 },
+            { header: 'Descripción del permiso', key: 'descripcion', width: 30 },
+            { header: 'Fecha y hora de inicio', key: 'fechaInicio', width: 25 },
+            { header: 'Fecha y hora de término', key: 'fechaTermino', width: 25 },
+            { header: 'Documentos agregados', key: 'documentos', width: 30 },
+            { header: 'Estatus', key: 'estatus', width: 20 },
+            { header: 'Estado de verificación', key: 'verificacion', width: 20 }
+        ];
+
+        // 📌 Llenar las filas con los datos
+        permitsRows.forEach(permit => {
+            worksheet.addRow({
+                nombre: `${permit.userId.nombre} ${permit.userId.apellidoP} ${permit.userId.apellidoM}`,
+                area: permit.userId.area,
+                descripcion: `${permit.registro} para ${permit.filtro}`,
+                fechaInicio: formatReadableDateTime(permit.fechaInicio),
+                fechaTermino: formatReadableDateTime(permit.fechaTermino),
+                documentos: permit.docPaths?.length ? permit.docPaths.map(doc => doc.originalname).join(', ') : 'No hay documentos',
+                estatus: permit.estatus,
+                verificacion: permit.isVerified ? 'Interacción cerrada' : 'Interacción abierta'
+            });
+        });
+
+        // 📌 Aplicar estilos al encabezado
+        worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        worksheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF34495E' } };
+        worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
+
+        // 📌 Configurar las respuestas HTTP
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=permisos.xlsx');
+
+        // 📌 Enviar el archivo
+        await workbook.xlsx.write(res);
+        res.end();
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
+    }
+};
+
 
 /****************/
 /*********/
@@ -707,17 +780,17 @@ exports.accessPermitsModule = async (req, res) => {
             permitsRows = await permitsModel.find({ userId: res.locals.userId })
                 .populate('docPaths', '_id originalname filename')
                 .select('-__v');
-            
+
             // Format dates for each permit
             permitsRows = permitsRows.map(permit => ({
                 ...permit.toObject(),
                 fechaInicio: formatReadableDateTime(permit.fechaInicio),
                 fechaTermino: formatReadableDateTime(permit.fechaTermino)
             }));
-            
+
             return res.render('permisos/colaboradorPermitsView.ejs', { permitsRows });
 
-        // Permits module for "jefeInmediato"
+            // Permits module for "jefeInmediato"
         } else if (res.locals.userPrivilege === "jefeInmediato") {
             const team = await teamsSchema.find({ jefeInmediatoId: res.locals.userId }).select('-__v');
             if (team.length > 0) {
@@ -730,7 +803,7 @@ exports.accessPermitsModule = async (req, res) => {
                 });
                 const permitsResults = await Promise.all(permitPromises);
                 permitsRows = permitsResults.flat();
-                
+
                 // Format dates for each permit
                 permitsRows = permitsRows.map(permit => ({
                     ...permit.toObject(),
@@ -740,20 +813,20 @@ exports.accessPermitsModule = async (req, res) => {
             }
             return res.render('permisos/jefeInmediatoPermitsView.ejs', { permitsRows });
 
-        // Permits module for "rHumanos" or "direccion"
+            // Permits module for "rHumanos" or "direccion"
         } else if (res.locals.userPrivilege === "rHumanos" || res.locals.userPrivilege === "direccion") {
             permitsRows = await permitsModel.find({ isSent: true })
                 .populate('userId', 'nombre apellidoP apellidoM area')
                 .populate('docPaths', '_id originalname filename path')
                 .select('-__v');
-            
+
             // Format dates for each permit
             permitsRows = permitsRows.map(permit => ({
                 ...permit.toObject(),
                 fechaInicio: formatReadableDateTime(permit.fechaInicio),
                 fechaTermino: formatReadableDateTime(permit.fechaTermino)
             }));
-            
+
             return res.render('permisos/rHumanosPermitsView.ejs', { permitsRows });
         }
 

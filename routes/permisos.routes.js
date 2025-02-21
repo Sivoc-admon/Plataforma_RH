@@ -75,7 +75,7 @@ router.post("/verifyPermit", controller.verifyPermit);
 router.get("/downloadPDF", controller.downloadPDF);
 
 // verifyPermit : jefeInmediato, rHumanos : ---
-// router.get("/downloadExcel", controller.downloadExcel);
+router.get("/downloadExcel", controller.downloadExcel);
 
 // accessPermitsModule : Colaborador, JefeInmediato, rHumanos : Done
 router.get("/accessPermitsModule", controller.accessPermitsModule);
