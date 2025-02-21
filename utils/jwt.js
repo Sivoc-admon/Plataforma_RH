@@ -27,7 +27,7 @@ const authorize = (req, res, next) => {
         }
         
         res.locals.userName = decoded.name;
-        res.locals.userPhoto = decoded.foto.replace("public", "");
+        res.locals.userPhoto = decoded.foto.replace("public", ""); // uploads . usuarios
         res.locals.userPrivilege = decoded.privilegio;
         res.locals.userArea = decoded.area;
         res.locals.userId = decoded.userId;

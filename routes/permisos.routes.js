@@ -71,11 +71,11 @@ router.post("/changeStatus", controller.changeStatus);
 // changeStatus : jefeInmediato, rHumanos : Done
 router.post("/verifyPermit", controller.verifyPermit);
 
+// verifyPermit : jefeInmediato, rHumanos : ---
+router.get("/downloadPDF", controller.downloadPDF);
 
-// TODO
-router.get("/downloadPDF", controller.getDownloadPDF);
-// getExcelPDF
-
+// verifyPermit : jefeInmediato, rHumanos : ---
+// router.get("/downloadExcel", controller.downloadExcel);
 
 // accessPermitsModule : Colaborador, JefeInmediato, rHumanos : Done
 router.get("/accessPermitsModule", controller.accessPermitsModule);

@@ -8,6 +8,9 @@
     <div class="inside-content-css">
         <h1> Módulo Permisos</h1>
 
+        <% if (permitsRows.length !==0) { %>
+
+            
         <div class="columns" style="margin-top: 1rem;">
 
             <div class="column is-centered" style="text-align: center;">
@@ -26,8 +29,6 @@
 
         </div>
 
-        <% if (permitsRows.length !==0) { %>
-
             <div class="field">
                 <div class="control">
                     <input class="input" type="text" id="searchInput" placeholder="Buscar por nombre, apellido o área"
@@ -43,7 +44,7 @@
                         <th class="has-text-centered">Área del colaborador</th>
                         <th class="has-text-centered">Registro y Filtro del permiso</th>
                         <th class="has-text-centered">Fecha y hora de inicio</th>
-                        <th class="has-text-centered">Fecha y hora de termino</th>
+                        <th class="has-text-centered">Fecha y hora de término</th>
                         <th class="has-text-centered">Documentos agregados</th>
                         <th class="has-text-centered">Estatus del permiso actual</th>
                         <th class="has-text-centered">Acciones disponibles</th>

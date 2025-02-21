@@ -3,9 +3,6 @@ const permitsModel = require("../models/permisos.model");
 const teamsSchema = require("../models/equipos.model");
 const path = require('path');
 const fs = require('fs');
-const PDFDocument = require('pdfkit'); // Assuming you are using pdfkit
-const crypto = require('crypto');
-const { json } = require("body-parser");
 
 // viewPermitsRowFile : Colaborador, JefeInmediato, rHumanos : Done
 exports.viewPermitsRowFile = async (req, res) => {
@@ -410,7 +407,7 @@ exports.changeStatus = async (req, res) => {
     }
 };
 
-// verifyPermit : jefeInmediato, rHumanos : ---
+// verifyPermit : jefeInmediato, rHumanos : Done
 exports.verifyPermit = async (req, res) => {
     try {
         const { permitId } = req.body; 
@@ -474,15 +471,8 @@ exports.verifyPermit = async (req, res) => {
 
 };
 
-
-
-
-
-
-
-
-exports.getDownloadPDF = async (req, res) => {
-    /*
+// downloadPDF : jefeInmediato, rHumanos : --- 
+exports.downloadPDF = async (req, res) => {
     try {
         let permitsRows = "";
 
@@ -491,130 +481,187 @@ exports.getDownloadPDF = async (req, res) => {
             // get all members from the team, map all their permits in a single array
             const team = await teamsSchema.find({ jefeInmediatoId: res.locals.userId }).select('-__v');
             if (team.length > 0) {
-                const teamData = team[0]; // use the first team as string init for appends
+                const teamData = team[0];
                 const permitPromises = teamData.colaboradoresIds.map(userId => {
-                    // populate inserts the object referenced inside the query (check permitsModel.js)
                     return permitsModel.find({ userId: userId, isSent: true })
-                            .populate('userId', 'nombre apellidoP apellidoM')
-                            .populate('docPaths', '_id originalname filename path') 
-                            .select('-__v');
+                        .populate('userId', 'nombre apellidoP apellidoM area')
+                        .populate('docPaths', '_id originalname filename path')
+                        .select('-__v');
                 });
                 const permitsResults = await Promise.all(permitPromises);
-                permitsRows = permitsResults.flat(); // compact all permits as a single array
+                permitsRows = permitsResults.flat();
             }
-
-
-
-
-
-
-
-            const PDFDocument = require('pdfkit');
-const fs = require('fs');
-const crypto = require('crypto');
-
-// Crear un nuevo documento PDF
-const doc = new PDFDocument();
-const filename = crypto.randomUUID() + ".pdf";
-const outputFilePath = `./uploads/temp/${filename}`;
-
-// Escribir el archivo PDF en el sistema de archivos
-const stream = fs.createWriteStream(outputFilePath);
-doc.pipe(stream);
-
-// Definir los encabezados de la tabla
-const headers = ['Colaborador', 'Tipo Permiso', 'Fecha inicio', 'Fecha termino', 'Consultar docs', 'Estatus', 'Acciones'];
-const columnWidths = [150, 120, 100, 100, 120, 100, 100]; // Ancho de las columnas
-const startX = 50; // X de inicio
-let startY = doc.y;
-
-// Función para dibujar los encabezados
-function drawTableHeader() {
-    doc.fontSize(12).fillColor('white').text(headers[0], startX, startY, { width: columnWidths[0], align: 'center', backgroundColor: '#4CAF50' });
-    doc.text(headers[1], startX + columnWidths[0], startY, { width: columnWidths[1], align: 'center', backgroundColor: '#4CAF50' });
-    doc.text(headers[2], startX + columnWidths[0] + columnWidths[1], startY, { width: columnWidths[2], align: 'center', backgroundColor: '#4CAF50' });
-    doc.text(headers[3], startX + columnWidths[0] + columnWidths[1] + columnWidths[2], startY, { width: columnWidths[3], align: 'center', backgroundColor: '#4CAF50' });
-    doc.text(headers[4], startX + columnWidths[0] + columnWidths[1] + columnWidths[2] + columnWidths[3], startY, { width: columnWidths[4], align: 'center', backgroundColor: '#4CAF50' });
-    doc.text(headers[5], startX + columnWidths[0] + columnWidths[1] + columnWidths[2] + columnWidths[3] + columnWidths[4], startY, { width: columnWidths[5], align: 'center', backgroundColor: '#4CAF50' });
-    doc.text(headers[6], startX + columnWidths[0] + columnWidths[1] + columnWidths[2] + columnWidths[3] + columnWidths[4] + columnWidths[5], startY, { width: columnWidths[6], align: 'center', backgroundColor: '#4CAF50' });
-    
-    // Dibujar una línea debajo del encabezado
-    doc.moveTo(startX, startY + 20).lineTo(startX + columnWidths.reduce((a, b) => a + b, 0), startY + 20).stroke();
-    startY += 30; // Moverse para las filas
-}
-
-// Dibujar encabezado de la tabla
-drawTableHeader();
-
-// Función para agregar filas
-function addTableRow(permit, index) {
-    doc.fontSize(10).fillColor('black');
-    doc.text(permit.userId.nombre + " " + permit.userId.apellidoP + " " + permit.userId.apellidoM, startX, startY, { width: columnWidths[0], align: 'center' });
-    doc.text(permit.registro, startX + columnWidths[0], startY, { width: columnWidths[1], align: 'center' });
-    doc.text(permit.fechaInicio, startX + columnWidths[0] + columnWidths[1], startY, { width: columnWidths[2], align: 'center' });
-    doc.text(permit.fechaTermino, startX + columnWidths[0] + columnWidths[1] + columnWidths[2], startY, { width: columnWidths[3], align: 'center' });
-    doc.text(permit.docPaths && permit.docPaths.length > 0 ? permit.docPaths.map(doc => doc.originalname).join(', ') : 'No hay documentos', startX + columnWidths[0] + columnWidths[1] + columnWidths[2] + columnWidths[3], startY, { width: columnWidths[4], align: 'center' });
-    
-    let status = '';
-    if (permit.estatus === 'Aprobado') status = '✔ Aprobado';
-    else if (permit.estatus === 'Cancelado') status = '❌ Cancelado';
-    else status = permit.estatus;
-    
-    doc.text(status, startX + columnWidths[0] + columnWidths[1] + columnWidths[2] + columnWidths[3] + columnWidths[4], startY, { width: columnWidths[5], align: 'center' });
-    
-    let actions = permit.isVerified ? 'Cerrado' : 'Pendiente';
-    doc.text(actions, startX + columnWidths[0] + columnWidths[1] + columnWidths[2] + columnWidths[3] + columnWidths[4] + columnWidths[5], startY, { width: columnWidths[6], align: 'center' });
-    
-    // Dibujar una línea debajo de la fila
-    doc.moveTo(startX, startY + 10).lineTo(startX + columnWidths.reduce((a, b) => a + b, 0), startY + 10).stroke();
-    startY += 20; // Moverse hacia abajo para la siguiente fila
-}
-
-// Añadir las filas de la tabla
-permitsRows.forEach((permit, index) => {
-    addTableRow(permit, index);
-});
-
-// Finalizar el documento y esperar a que se cierre el stream
-doc.end();
-
-stream.on('finish', () => {
-    res.download(outputFilePath, filename, (err) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ success: false, message: 'Error sending file.' });
-        }
-
-        // Después de enviar el archivo, eliminarlo
-        fs.unlink(outputFilePath, (err) => {
-            if (err) {
-                console.error('Hubo un error al eliminar el archivo:', err);
-                return res.status(500).json({ message: 'Hubo un error al eliminar el archivo' });
-            }
-        });
-    });
-});
 
             if (permitsRows.length === 0) {
-                // TODO, download mesaje warning no hay información para pdf
                 return res.status(404).json({ success: false, message: 'No users found to export.' });
             }
 
-            return true;
-
-        // Permits module for "rHumanos"
+            // Permits module for "rHumanos"
         } else if (res.locals.userPrivilege === "rHumanos") {
-            // get all permits regardless of the user but must be sent
-            permitsRows = await permitsModel.find({ isSent: true })                            
-                            .populate('userId', 'nombre apellidoP apellidoM area')
-                            .populate('docPaths', '_id originalname filename path') 
-                            .select('-__v');
+            permitsRows = await permitsModel.find({ isSent: true })
+                .populate('userId', 'nombre apellidoP apellidoM area')
+                .populate('docPaths', '_id originalname filename path')
+                .select('-__v');
 
-            console.log("PDF rHumanos: " + permitsRows);
-            return true;
+            if (permitsRows.length === 0) {
+                return res.status(404).json({ success: false, message: 'No users found to export.' });
+            }
+        } else {
+            return res.redirect("/login");
         }
-        // catch non-authenticated user
-        return res.redirect("/login");
+
+        // Create PDF with better styling
+        const PDFDocument = require('pdfkit');
+        const doc = new PDFDocument({
+            margin: 30,
+            size: 'Letter',
+            layout: 'landscape'
+        });
+
+        // Set response headers
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=permisos.pdf');
+        doc.pipe(res);
+
+        // Add header with company logo placeholder and title
+        doc.fontSize(22)
+            .fillColor('#2C3E50')
+            .text('Reporte de Permisos', 50, 30, { align: 'center' });
+
+        doc.fontSize(12)
+            .fillColor('#7F8C8D')
+            .text('Generado el: ' + new Date().toLocaleDateString('es-MX'), 50, 60, { align: 'center' });
+
+
+
+        // Table configuration
+        const startY = 100;
+        const rowHeight = 54;
+        const columnWidths = [90, 90, 90, 90, 90, 90, 90, 90];
+        // Add horizontal line
+        const startX = 39; // Punto de inicio de la tabla
+        const tableWidth = columnWidths.reduce((sum, width) => sum + width, 0); // Suma de todas las columnas
+        
+        doc.strokeColor('#BDC3C7')
+            .lineWidth(1)
+            .moveTo(startX, startY - 20)  // Línea justo arriba de la tabla
+            .lineTo(startX + tableWidth, startY - 20) // Final de la línea según el ancho total de la tabla
+            .stroke();
+        
+        // 
+        const headers = ['Nombre del colaborador', 'Área del colaborador', 'Descripción del permiso', 'Fecha y hora de inicio', 'Fecha y hora de término', 'Documentos agregados', 'Estatus actual del permiso', 'Estado de verificación'];
+        let currentY = startY;
+
+        // Function to draw cell background
+        function drawCellBackground(x, y, width, height, color) {
+            doc.fillColor(color)
+                .rect(x, y, width, height)
+                .fill();
+        }
+
+        // Function to draw cell borders
+        function drawCellBorders(x, y, width, height) {
+            doc.strokeColor('#E0E0E0')
+                .lineWidth(1)
+                .rect(x, y, width, height)
+                .stroke();
+        }
+
+        // Dibujar encabezados de la tabla
+        let currentX = startX;
+        headers.forEach((header, i) => {
+            // Dibujar fondo del encabezado
+            drawCellBackground(currentX, currentY, columnWidths[i], rowHeight, '#34495E');
+
+            // Calcular la posición vertical centrada
+            const textHeight = doc.heightOfString(header, { width: columnWidths[i] - 10 });
+            const centeredY = currentY + (rowHeight - textHeight) / 2; // Centrar verticalmente
+
+            // Dibujar texto del encabezado
+            doc.fillColor('#FFFFFF')
+                .fontSize(11)
+                .font('Helvetica-Bold')
+                .text(
+                    header,
+                    currentX + 5, // Margen izquierdo
+                    centeredY, // Coordenada Y centrada
+                    {
+                        width: columnWidths[i] - 10,
+                        align: 'center'
+                    }
+                );
+
+            currentX += columnWidths[i]; // Avanzar a la siguiente columna
+        });
+
+        currentY += rowHeight;
+
+        // Draw table rows
+        permitsRows.forEach((permit, index) => {
+            currentX = startX;
+            const isEvenRow = index % 2 === 0;
+            const rowColor = isEvenRow ? '#F8F9F9' : '#FFFFFF';
+
+            // Draw row background
+            drawCellBackground(50, currentY, columnWidths.reduce((a, b) => a + b, 0), rowHeight, rowColor);
+
+            // Draw cell data
+            const rowData = [
+                `${permit.userId.nombre} ${permit.userId.apellidoP} ${permit.userId.apellidoM}`,
+                permit.userId.area,
+                `${permit.registro} para ${permit.filtro}`,
+                formatReadableDateTime(permit.fechaInicio),
+                formatReadableDateTime(permit.fechaTermino),
+                permit.docPaths?.length ? permit.docPaths.map(doc => doc.originalname).join(', ') : 'No hay documentos',
+                permit.estatus,
+                permit.isVerified ? 'Interacción cerrado' : 'Interacción abierto'
+            ];
+
+
+    
+
+            rowData.forEach((text, i) => {
+                // Draw cell borders
+                drawCellBorders(currentX, currentY, columnWidths[i], rowHeight);
+
+                // Draw cell text
+                doc.fillColor('#2C3E50')
+                    .fontSize(10)
+                    .font('Helvetica')
+                    .text(
+                        text,
+                        currentX + 5,
+                        currentY + rowHeight / 6,
+                        {
+                            width: columnWidths[i] - 12,
+                            align: 'center',
+                            lineBreak: false,
+                            ellipsis: true
+                        }
+                    );
+
+                currentX += columnWidths[i];
+            });
+
+            currentY += rowHeight;
+
+            // Add new page if needed
+            if (currentY > 500) {
+                doc.addPage();
+                currentY = 50;
+            }
+        });
+
+        // Add footer
+        const pageBottom = 550;
+        doc.strokeColor('#BDC3C7')
+            .lineWidth(1)
+            .moveTo(50, pageBottom)
+            .lineTo(750, pageBottom)
+            .stroke();
+
+        // Finalize PDF
+        doc.end();
 
     } catch (error) {
         console.error(error);
@@ -623,12 +670,9 @@ stream.on('finish', () => {
 
 
 
-       
-*/
-    return res.status(200).json({ success: true, message: "" });
-
 
 };
+
 /****************/
 /*********/
 /***/
