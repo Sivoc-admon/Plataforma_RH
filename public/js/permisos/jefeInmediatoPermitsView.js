@@ -3,7 +3,7 @@ async function viewPermitsRowFile(button) {
     window.open(DOMPurify.sanitize(`/permisos/viewPermitsRowFile/${button.getAttribute('permitId')}/${button.getAttribute('filename')}`));
 };
 
-// changeStatus : ---
+// changeStatus : Done
 async function changeStatus(button) {
     const permitId = button.getAttribute('permitId');
     const currentStatus = button.getAttribute('currentStatus');
@@ -69,7 +69,7 @@ async function changeStatus(button) {
     })
 };
 
-// verifyPermit : ---
+// verifyPermit : Done
 async function verifyPermit(button) {
     const permitId = button.getAttribute('permitId');
     const currentStatus = button.getAttribute('currentStatus');
@@ -137,7 +137,7 @@ async function downloadPDF() {
     }
 };
 
-// downloadExcel : ---
+// downloadExcel : Done
 async function downloadExcel() {
     try {
         window.location.href = '/permisos/downloadExcel';

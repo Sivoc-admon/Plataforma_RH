@@ -1,33 +1,13 @@
-<%- include('../navbar.ejs') %>
-    <!-- // TODO, cleanup after 80% backend framework --->
-     
+<%- include('../navbar.ejs') %>     
     <link rel="stylesheet" href="/css/usuarios.css">
 
-    <script>
-        const usersRows = <%- JSON.stringify(usersRows) %>; 
-    </script>
-
-    <script src="/js/usuarios.js" defer></script>
+    <script src="/js/usuarios/jefeInmediatoUsersView.js" defer></script>
 
     <div class="inside-content-css">
 
         <h1> Módulo Usuarios </h1>
 
         <div class="columns" style="margin-top: 1rem;">
-
-            <div class="column is-centered" style="text-align: center;">
-                <button class="default-button-css functionality-button-css" onclick="addUser()">
-                    <i class="fa-solid fa-user-plus default-icon-button-css"></i>
-                    <p>Añadir Usuarios</p>
-                </button>
-            </div>
-
-            <div class="column is-centered" style="text-align: center;">
-                <button class="default-button-css functionality-button-css" onclick="restoreUsersView()">
-                    <i class="fa-solid fa-boxes-packing default-icon-button-css"></i>
-                    <p>Restaurar Usuarios</p>
-                </button>
-            </div>
 
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="downloadPDF()">
@@ -53,9 +33,9 @@
         <table class="table is-fullwidth is-hoverable">
             <thead>
                 <tr style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue));">
-                    <th class="has-text-centered">Nombre</th>
-                    <th class="has-text-centered">Apellido Paterno</th>
-                    <th class="has-text-centered">Apellido Materno</th>
+                    <th class="has-text-centered">Nombre del colaborador</th>
+                    <th class="has-text-centered">Fecha de ingreso</th>
+                    <th class="has-text-centered">Fecha de baja</th>
                     <th class="has-text-centered">Área</th>
                     <th class="has-text-centered">Puesto</th>
                     <th class="has-text-centered">Privilegio</th>
@@ -66,14 +46,17 @@
                 <% usersRows.forEach(user=> { %>
                     <tr>
                         <td class="is-centered">
-                            <%= user.nombre %>
+                            <%= user.userId.nombre + " " + user.userId.apellidoP + " " + user.userId.apellidoM %>
                         </td>
+                        
                         <td class="is-centered">
-                            <%= user.apellidoP %>
+                            <%= user.fechaIngreso %>
                         </td>
+
                         <td class="is-centered">
-                            <%= user.apellidoM %>
+                            <%= user.fechaBaja %>
                         </td>
+
                         <td class="is-centered">
                             <%= user.area %>
                         </td>
@@ -89,10 +72,8 @@
                                 Jefe Inmediato
                             <% } else if (user.privilegio === "direccion") { %>
                                 Dirección
-                            <% } else if (user.privilegio === "superadmin") { %>
-                                Superadmin
                             <% } else { %>
-                                No autorizado
+                                Tomar captura y favor de informar a soporte técnico. (#099)
                             <% } %>
                         </td>
                         <td class="is-centered">

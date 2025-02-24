@@ -6,11 +6,6 @@ function toggleSidebar() {
     }
     content.classList.toggle('shifted');
 }
-function hideSidebar() {
-    if (!content.classList.contains('shifted')){
-        sidebar.classList.remove('active');
-    }
-}
 document.querySelectorAll('.menu-list a').forEach(item => {
     item.addEventListener('click', () => {
         document.querySelectorAll('.menu-list a').forEach(link => link.classList.remove('active'));

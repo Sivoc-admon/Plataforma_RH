@@ -2,16 +2,87 @@
 const usersModel = require("../models/usuarios.model");
 const filesModel = require("../models/files.model");
 const bcrypt = require("bcryptjs");
-const { Parser } = require('json2csv');
-const PDFDocument = require('pdfkit'); // Asegúrate de tener instalada esta biblioteca
-const fs = require('fs');
 
 
-// TODO, cleanup after 80% backend framework
+
+/* --- AUX --- */
+const formatReadableDateTime = (isoDate) => {
+    if (isoDate == false) return "(Por definir)";
+    const date = new Date(isoDate);
+    const readableDate = date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+    const readableTime = date.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+    return `${readableDate}, ${readableTime}`;
+};
+/****************/
+/*********/
+/***/
+
+
+
+/* --- VIEWS --- */
+exports.accessUsersModule = async (req, res) => {
+    try {
+        let usersRows = "";
+
+        if (res.locals.userPrivilege === "jefeInmediato") {
+
+        } else if (res.locals.userPrivilege === "rHumanos" || res.locals.userPrivilege === "direccion") {
+            usersRows = await usersModel.find({ estaActivo: true }).select('-password -__v');
+
+            usersRows = usersRows.map(user => ({
+                ...user.toObject(),
+                fechaIngreso: formatReadableDateTime(user.fechaIngreso),
+                fechaBaja: formatReadableDateTime(user.fechaBaja)
+            }));
+
+
+            return res.render('usuarios/rHumanosUsersView.ejs', { usersRows });
+        } else {
+            return res.redirect("/login");
+        }
+
+
+
+
+
+    } catch (error) {
+        return res.status(500).send("Tomar captura y favor de informar a soporte técnico. (#071)");
+    }
+};
+/****************/
+/*********/
+/***/
+
+
+
+
+
+
+
+/*
+const setupDatePicker = (elementId, options) => {
+    return flatpickr(`#${elementId}`, {
+        enableTime: options.enableTime,
+        dateFormat: "Y-m-d",
+        time_24hr: true,
+        locale: "es",
+        minDate: options.minDate,
+        defaultDate: options.defaultDate,
+        maxDate: options.maxDate || "",
+        onChange: options.onChange
+    });
+};
+*/
 
 
 /* --- MODEL LOGIC --- */
-
 exports.postEmailExists = async (req, res) => {
     try {
         const response = await usersModel.findOne({ email: req.body.email });
@@ -51,15 +122,15 @@ exports.postEditUser = async (req, res) => {
 
         // If for some reason user not found, send 404
         if (!response) {
-            return res.status(404).json({success: false, message: "" });
+            return res.status(404).json({ success: false, message: "" });
         }
 
         activeUsers.delete(userId); // log him out 
 
-        return res.status(200).json({success: true, message: req.body});
+        return res.status(200).json({ success: true, message: req.body });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({success: false, message: "" });
+        return res.status(500).json({ success: false, message: "" });
     }
 
 
@@ -68,10 +139,10 @@ exports.postEditUser = async (req, res) => {
 exports.postFileUpload = async (req, res) => {
     try {
         const response = await filesModel.create(req.file);
-        return res.status(200).json({success: true, message: response}); // response.path = file location
+        return res.status(200).json({ success: true, message: response }); // response.path = file location
     } catch (error) {
         console.error(error);
-        return res.status(500).json({success: false, message: "" });
+        return res.status(500).json({ success: false, message: "" });
     }
 };
 
@@ -81,21 +152,21 @@ exports.postUserDeactivation = async (req, res) => {
 
         // Execute findByIdAndUpdate
         const response = await usersModel.findByIdAndUpdate(
-            userId, 
+            userId,
             { $set: { estaActivo: false } }, // Change attribute
-            { new: true, runValidators: true } 
+            { new: true, runValidators: true }
         );
 
         // If for some reason user not found, send 404
         if (!response) {
-            return res.status(404).json({success: false, message: "" });
+            return res.status(404).json({ success: false, message: "" });
         }
 
         activeUsers.delete(userId); // log him out 
-        return res.status(200).json({success: true, message: ""});
+        return res.status(200).json({ success: true, message: "" });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({success: false, message: "" });
+        return res.status(500).json({ success: false, message: "" });
     }
 };
 
@@ -105,20 +176,20 @@ exports.postUserActivation = async (req, res) => {
 
         // Execute findByIdAndUpdate
         const response = await usersModel.findByIdAndUpdate(
-            userId, 
+            userId,
             { $set: { estaActivo: true } }, // Change attribute
-            { new: true, runValidators: true } 
+            { new: true, runValidators: true }
         );
 
         // If for some reason user not found, send 404
         if (!response) {
-            return res.status(404).json({success: false, message: "" });
+            return res.status(404).json({ success: false, message: "" });
         }
 
-        return res.status(200).json({success: true, message: ""});
+        return res.status(200).json({ success: true, message: "" });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({success: false, message: "" });
+        return res.status(500).json({ success: false, message: "" });
     }
 };
 
@@ -131,36 +202,27 @@ exports.postUserChangePrivilege = async (req, res) => {
 
         // Execute findByIdAndUpdate
         const response = await usersModel.findByIdAndUpdate(
-            userId, 
+            userId,
             { $set: { privilegio: newPrivilege } }, // Change attribute
-            { new: true , runValidators: true } 
+            { new: true, runValidators: true }
         );
 
         // if for some reason user not found, send 404
         if (!response) {
-            return res.status(404).json({success: false, message: "" });
+            return res.status(404).json({ success: false, message: "" });
         }
 
         // send correct execution
         activeUsers.delete(userId); // log him out 
-        return res.status(200).json({success: true, message: ""});
+        return res.status(200).json({ success: true, message: "" });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({success: false, message: "" });
+        return res.status(500).json({ success: false, message: "" });
     }
 };
 
 /* --- VIEWS LOGIC --- */
-exports.getUsersView = async (req, res) => {
-    try {
-        const usersRows = await usersModel.find({ estaActivo: true }).select('-password -__v');
-        return res.render('usuarios/usuarios.ejs', { usersRows });
-        
-    } catch (error) {
-        console.error(error);
-        return res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
-    }
-};
+
 
 exports.getRestoreUsersView = async (req, res) => {
     try {
@@ -175,11 +237,11 @@ exports.getRestoreUsersView = async (req, res) => {
 // Output CSV file path
 // TODO, remake
 exports.postDownloadExcelUsers = async (req, res) => {
-    const outputFilePath = './usuarios.xlsx'; 
+    const outputFilePath = './usuarios.xlsx';
 
     try {
         const usersRows = await usersModel.find().select('-__v -foto -password').lean();
-        
+
         if (usersRows.length === 0) {
             return res.status(404).json({ success: false, message: 'No users found to export.' });
         }

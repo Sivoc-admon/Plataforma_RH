@@ -94,6 +94,7 @@
     padding: 0.75rem;
     vertical-align: middle; 
     max-width: 180px;
+    min-width: 150px;
     word-wrap: break-word;
     overflow-wrap: break-word;
     white-space: normal;
@@ -104,30 +105,14 @@
     background-color: white;
 }
 
-
-/* Estilos de calendario */
-        /* Estilos de calendario */
-        input[type="date"] {
-
-            border-radius: 4px; /* Bordes redondeados */
-            box-sizing: border-box; /* Incluye el padding en el ancho total */
-            appearance: none; /* Elimina el estilo predeterminado del navegador */
-            cursor: pointer; /* Cambia el cursor al de mano */
-        }
-
-        /* Hover: cuando el mouse pasa sobre el input */
-        input[type="date"]:hover {
-            border-color: #666; /* Cambia el color del borde al pasar el mouse */
-        }
-
-        /* Focus: cuando el input está activo */
-        input[type="date"]:focus {
-            outline: none; /* Elimina el borde azul predeterminado */
-            border-color: #007BFF; /* Borde azul más vibrante */
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Resaltado */
-        }
-
-        /* Estilo del ícono del calendario (oculto pero funcional) */
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            display: none; /* Oculta el ícono del calendario visualmente */
-        }
+/* Flatpickr Styles */
+.flatpickr-day:hover , .flatpickr-day.selected{
+    background: var(--dark-green) !important; /* Naranja */
+    border-color:  var(--dark-green) !important;
+    color: white;
+}
+.flatpickr-calendar {
+    border: 2px solid var(--light-blue);
+    border-radius: 8px;
+    color: white;
+}

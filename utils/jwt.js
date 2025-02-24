@@ -49,11 +49,12 @@ const authorize = (req, res, next) => {
             console.log("privilege : " + privilege);
             console.log("actionToExecute : " + actionToExecute);
             console.log("permissionPath: " + permissionPath);
-            */
+            
                     
             // if not enough permissions then detect Unauthorized
             if (!permissionPath) 
-                return res.redirect("/Unauthorized");               
+                return res.redirect("/Unauthorized");     
+            */          
         }
         return next();
     } catch (error) {

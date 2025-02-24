@@ -4,6 +4,9 @@ async function logIn() {
         const password = document.getElementById("password").value.trim();
         const remember = document.getElementById("remember").checked;
 
+        //     <!-- TODO on enter -->
+        // añade un listener al enter en general, si hace enter entonces se acciona logIn(); 
+
         // nosql injection protection
         if (/[\{\}\:\$\=\'\*\[\]]/.test(email) || /[\{\}\:\$\=\'\*\[\]]/.test(password)) {
             Swal.fire({

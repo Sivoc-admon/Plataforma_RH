@@ -4,7 +4,6 @@ function returnMainTable() {
 
 // activateUser button
 async function activateUser(button) { // async function to perform fetch chain
-    hideSidebar(); // sidebar frontend
     Swal.fire({
         html: `
             <div style="padding: 0.5rem; margin: 1rem 0.5rem">

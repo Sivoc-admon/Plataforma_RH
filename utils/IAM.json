@@ -1,7 +1,7 @@
 {
     "direccion": {
         "usuarios": {
-
+            "accessUsersModule": true
         },
         "permisos": {
             "accessPermitsModule": true,
@@ -39,7 +39,7 @@
     },
     "rHumanos": {
         "usuarios": {
-           
+            "accessUsersModule": true
         },
         "permisos": {
             "accessPermitsModule": true,
@@ -57,9 +57,6 @@
         }
     },
     "colaborador": {
-        "usuarios": {
-
-        },
         "permisos": {
             "accessPermitsModule": true,
             "createPermitRequest": true,

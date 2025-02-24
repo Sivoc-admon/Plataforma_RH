@@ -827,7 +827,7 @@ exports.accessPermitsModule = async (req, res) => {
         return res.redirect("/login");
 
     } catch (error) {
-        res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
+        res.status(500).send("Tomar captura y favor de informar a soporte técnico. (#070)");
     }
 };
 /****************/
