@@ -19,13 +19,15 @@ const allowedFileTypes = [
     "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 ];
+const MAX_FILES = 3;
+
 
 // createPermitRequest : Colaborador : Done
-const upload = configureFileUpload("uploads/permisos", allowedFileTypes, allowedFileExtensions, MAX_SIZE_MB);
+const upload = configureFileUpload("uploads/permisos", allowedFileTypes, allowedFileExtensions, MAX_SIZE_MB, MAX_FILES);
 router.post("/createPermitRequest", 
     ensureFilesArray,
     (req, res, next) => { 
-        upload.array("files", 3)(req, res, (err) => {
+        upload.array("files", MAX_FILES)(req, res, (err) => {
             if (err) {
                 return res.status(400).json({ 
                     success: false, 

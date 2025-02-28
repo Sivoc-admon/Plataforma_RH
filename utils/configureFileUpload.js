@@ -3,9 +3,8 @@ const path = require("path");
 const fs = require("fs");
 
 // Constants for file validation
-const MAX_FILES = 3;
 
-const configureUpload = (uploadDir, allowedTypes, allowedExtensions, MAX_SIZE_MB) => {
+const configureUpload = (uploadDir, allowedTypes, allowedExtensions, MAX_SIZE_MB, MAX_FILES) => {
     // Create upload directory if it doesn't exist
     if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
@@ -25,6 +24,7 @@ const configureUpload = (uploadDir, allowedTypes, allowedExtensions, MAX_SIZE_MB
 
     // File filter with enhanced security validations
     const fileFilter = (req, file, cb) => {
+            console.log(req.files);
     
             // Check number of files
             if (req.files.length > MAX_FILES) {

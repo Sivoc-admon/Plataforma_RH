@@ -1,19 +1,19 @@
-// Auxiliary functions
-const formatReadableDateTime = (isoDate) => {
-    const date = new Date(isoDate);
-    const readableDate = date.toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    return `${readableDate}`;
-};
+// Configuration & Utils
 const areaToPuestos = {
     "Administración": ["Director General", "Coordinador de Finanzas", "Gestora de Tesorería", "Coordinador de Recursos Humanos", "Gestor de Recursos Humanos", "Analista de Recursos Humanos"],
     "Ventas": ["Coordinador Comercial", "Gestor de Ventas", "Analista de Ventas"],
     "Calidad": ["Coordinador de Calidad", "Gestor de Calidad", "Analista de Calidad"],
     "Operativo": ["Coordinador Operacional", "Gestor de Ingeniería", "Analista de Ingeniería", "Gestor de Compras", "Analista de Compras", "Gestor de Manufactura", "Analista de Manufactura", "Analista de Almacén"],
     "Pruebas": ["Gestor de Pruebas", "Ingeniero de Servicio A", "Ingeniero de Servicio B", "Ingeniero de Servicio C"]
+};
+// Utility Functions
+const formatReadableDateTime = (isoDate) => {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString('es-MX', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
 };
 const setupDatePicker = (elementId) => {
     return flatpickr(`#${elementId}`, {
@@ -24,12 +24,116 @@ const setupDatePicker = (elementId) => {
         defaultDate: new Date()
     });
 };
+const validateInput = (value, pattern) => {
+    if (!value || value.trim() === '') return false;
+    if (pattern && !pattern.test(value.trim())) return false;
+    return true;
+};
+// UI Handlers
+const setupAreaToPuestoRelationship = () => {
+    const areaSelect = document.getElementById("area");
+    const puestoSelect = document.getElementById("puesto");
+    
+    if (!areaSelect || !puestoSelect) return;
+    
+    areaSelect.addEventListener("change", () => {
+        const selectedArea = areaSelect.value;
+        const puestos = areaToPuestos[selectedArea] || [];
+        
+        // Clear and rebuild puesto options
+        puestoSelect.innerHTML = '<option value="" hidden>Selecciona un puesto</option>';
+        puestos.forEach(puesto => {
+            const option = document.createElement("option");
+            option.value = puesto;
+            option.textContent = puesto;
+            puestoSelect.appendChild(option);
+        });
+    });
+};
+const setupImagePreview = () => {
+    window.updateImagePreview = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
 
+        // Validate file type
+        const validExtensions = ['image/jpeg', 'image/png', 'image/jpg'];
+        if (!validExtensions.includes(file.type)) {
+            Swal.showValidationMessage('Selecciona un archivo de imagen válido (JPEG, PNG).');
+            event.target.value = '';
+            return;
+        }
 
-// addUser : ---
+        // Validate file size
+        const maxSize = 2 * 1024 * 1024; // 2 MB
+        if (file.size > maxSize) {
+            Swal.showValidationMessage('El tamaño máximo permitido es de 2 MB.');
+            event.target.value = '';
+            return;
+        }
+
+        // Preview the image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Skip DOMPurify for data URLs since they've already been validated
+            // by file type and size checks above
+            document.getElementById('profile-img').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+};
+const setupDateInputs = () => {
+    // Setup for date inputs with display
+    const setupDateInput = (inputId, displayId) => {
+        const input = document.getElementById(inputId);
+        const display = document.getElementById(displayId);
+        
+        if (!input || !display) return;
+        
+        // Initialize flatpickr
+        setupDatePicker(inputId);
+        
+        // Set initial value on display
+        if (input.value) {
+            display.value = formatReadableDateTime(input.value);
+        }
+        
+        // Handle display click to show picker
+        display.addEventListener("click", (event) => {
+            event.preventDefault();
+            input.click();
+        });
+        
+        // Update display when date changes
+        input.addEventListener("input", () => {
+            display.value = formatReadableDateTime(input.value);
+        });
+    };
+
+    setupDateInput('fechaIngreso', 'fechaIngresoDisplay');
+    
+    // For simple date inputs
+    const setupSimpleDateInput = (elementId) => {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        element.value = formattedDate;
+        
+        element.addEventListener("click", (event) => {
+            event.preventDefault();
+            element.showPicker();
+        });
+    };
+    
+    setupSimpleDateInput('fechaBaja');
+};
+
+// editPermit : --- (1 skip)
 async function addUser() {
+    // (skip: skipped sanitization)
     Swal.fire({
-        html: DOMPurify.sanitize(`
+        html: `
             <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
                 <i class="fa-solid fa-user-plus" style="margin-right:0.9rem;"></i>Añadir Usuario
             </h2>
@@ -60,7 +164,7 @@ async function addUser() {
                 </div>
                 <div class="column">
                     <label class="label">Fecha de ingreso</label>
-                    <input type="text" id="fechaIngreso" style="opacity: 0; position: absolute;" required readonly>
+                    <input type="text" id="fechaIngreso" style="opacity: 0; position: absolute;" required>
                     <input type="text" id="fechaIngresoDisplay" class="input" readonly>
                 </div>
             </div>
@@ -71,7 +175,7 @@ async function addUser() {
                     <select id="area" class="input">
                         <option value="" hidden>Selecciona un área</option>
                         ${Object.keys(areaToPuestos).map(area => 
-                            `<option value="${DOMPurify.sanitize(area)}">${DOMPurify.sanitize(area)}</option>`
+                            `<option value="${area}">${area}</option>`
                         ).join('')}
                     </select>
                 </div>
@@ -82,11 +186,39 @@ async function addUser() {
                     </select>
                 </div>
                 <div class="column">
-                    <label class="label">Foto (Opcional)</label>
-                    <input type="file" name="foto" class="input" id="foto" accept="image/*">
+                    <label class="label">Privilegio</label>
+                    <select id="privilegio" class="input">
+                        <option value="" hidden>Selecciona un privilegio</option>
+                        <option value="colaborador">Colaborador</option>
+                        <option value="rHumanos">Recursos Humanos</option>
+                        <option value="jefeInmediato">Jefe Inmediato</option>
+                        <option value="direccion">Dirección</option>
+                        <option value="unauthorized">No autorizado</option>
+                    </select>
                 </div>
             </div>
-        `),
+
+            <div class="columns is-vcentered">
+                                    
+                <div class="column">
+                    <label class="label">Foto de Perfil</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="file has-name is-boxed" style="flex: 1;">
+                            <label class="input" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-right:0.3rem;">
+                                <i class="fas fa-upload" style="margin: 0rem 0.3rem;font-size: 1.1rem;"></i>
+                                <span>Selecciona una imagen cuadrada</span>
+                                <input type="file" name="foto" class="file-input" id="foto" style="display: none;" onchange="updateImagePreview(event)">
+                            </label>
+                        </div>
+                        <div class="input" style="margin-top: 0; width: 48px; height: 48px; position: relative; overflow: hidden; border-radius: 50%; border: 2px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <img 
+                                id="profile-img" 
+                                style="position: absolute; top: 50%; left: 50%; width: auto; height: auto; transform: translate(-50%, -50%);">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `,
         confirmButtonText: 'Guardar',
         cancelButtonText: 'Cancelar',
         cancelButtonColor: '#f0466e',
@@ -98,29 +230,9 @@ async function addUser() {
             cancelButton: 'default-button-css',
         },
         didOpen: () => {
-            // Area to Puesto innerHTML
-            const areaSelect = document.getElementById("area");
-            const puestoSelect = document.getElementById("puesto");
-            areaSelect.addEventListener("change", () => {
-                const selectedArea = areaSelect.value;
-                const puestos = areaToPuestos[selectedArea] || [];
-                puestoSelect.innerHTML = DOMPurify.sanitize(
-                    '<option value="" hidden>Selecciona un puesto</option>' +
-                    puestos.map(puesto => `<option value="${puesto}">${puesto}</option>`).join('')
-                );
-            });
-
-            // Date picker
-            const fechaIngresoDisplay = document.getElementById("fechaIngresoDisplay");
-            const fechaIngreso = document.getElementById("fechaIngreso");
-            setupDatePicker('fechaIngreso');
-            fechaIngresoDisplay.addEventListener("click", (event) => {
-                event.preventDefault();
-                fechaIngreso.click();
-            });
-            fechaIngreso.addEventListener("input", () => {
-                fechaIngresoDisplay.value = formatReadableDateTime(fechaIngreso.value);
-            });
+            setupAreaToPuestoRelationship();
+            setupImagePreview();
+            setupDateInputs();
         },
         preConfirm: async () => {
             try {
@@ -132,47 +244,62 @@ async function addUser() {
                 const area = $('#area').val().trim();
                 const puesto = $('#puesto').val().trim();
                 const fechaIngreso = $('#fechaIngreso').val();
+                const privilegio = $('#privilegio').val().trim();
                 const fileInput = document.getElementById('foto');
+                
+                // Base validation
+                if (!nombre || !apellidoP || !apellidoM || !email || !password || 
+                    !area || !puesto || !fechaIngreso || !privilegio) {
+                    return Swal.showValidationMessage('Todos los campos son requeridos.');
+                }
+                
 
-    
-                if (/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(nombre) || 
-                    /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(apellidoP) || 
-                    /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(apellidoM) ||
-                    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) 
-                    return Swal.showValidationMessage('El nombre o el correo electrónico no son correctos.');
-            
-                if (!nombre || !apellidoP || !apellidoM || !email || !password || !area || !puesto || !fechaIngreso)
-                    return Swal.showValidationMessage('Existen campos faltantes.');
+                // Character validation 
+                const forbiddenCharsPattern = /[\{\}\:\$\=\'\*\[\]]/;
+                if (forbiddenCharsPattern.test(nombre) || 
+                    forbiddenCharsPattern.test(apellidoP) || 
+                    forbiddenCharsPattern.test(apellidoM) ||
+                    forbiddenCharsPattern.test(email)) {
+                    return Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
+                }
+                
+                // Email format validation
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(email)) {
+                    return Swal.showValidationMessage('El formato del correo electrónico no es válido.');
+                }
 
-
-                // Check email existence
-                const emailResponse = await fetch('/usuarios/addUser/doesEmailExists', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email })
-                });
-                const emailData = await emailResponse.json();
-                if (!emailData.success) return location.reload();
-                if (emailData.exists) return Swal.showValidationMessage('Email existente. Ese email ya está ocupado por un usuario.');
-                // Check email existence
-
-
-                // Execute payload
+                // Create a single form data for the entire operation
                 const formData = new FormData();
-                formData.append('file', fileInput.files[0]);
-                const response = await fetch('/usuarios/addUser/createUser', {
+                formData.append('nombre', nombre);
+                formData.append('apellidoP', apellidoP);
+                formData.append('apellidoM', apellidoM);
+                formData.append('email', email);
+                formData.append('password', password);
+                formData.append('area', area);
+                formData.append('puesto', puesto);
+                formData.append('fechaIngreso', fechaIngreso);
+                formData.append('privilegio', privilegio);
+                
+                // Append the file if it exists
+                if (fileInput.files[0]) {
+                    formData.append('files', fileInput.files[0]);
+                }
+                
+                // Single fetch call
+                const response = await fetch('/usuarios/addUser', {
                     method: 'POST',
-                    body: formData,
+                    body: formData
                 });
+                
                 const data = await response.json();
+
                 await Swal.fire({
                     title: data.success ? 'Usuario añadido' : data.messageTitle,
                     icon: data.success ? 'success' : 'error',
                     text: data.success ? 'Se añadió el usuario correctamente.' : data.messageText,
                     width: "500px"
                 });
-                // Execute payload
-                
 
                 location.reload();
 
@@ -182,591 +309,242 @@ async function addUser() {
         }
     });
 }
-// deactivateUser button
-async function deactivateUser(button) { // async function to perform fetch chain
+
+async function editUser(button) {
     
-    Swal.fire({
-        html: `
-            <div style="padding: 0.5rem; margin: 1rem 0.5rem">
-                <h2>¿Deseas desactivar este usuario?</h2>
-                <h2>Ya no podrá acceder a la plataforma.<h2>
-            </div>
-        `,
-        confirmButtonText: 'Desactivar usuario',
-        cancelButtonText: 'Cancelar',
-        cancelButtonColor: '#f0466e',
-        showCancelButton: true,
-        allowOutsideClick: false,
-        width: '1000px',
-        customClass: {
-            confirmButton: 'default-button-css',
-            cancelButton: 'default-button-css',
-        },
+    try {
 
-        preConfirm: async () => {
-            const userId = button.getAttribute('userId');
-            // Fetch #01 - Execute user deactivation
-            try {
-                const response = await fetch('/usuarios/deactivateUser', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        userId: userId,
-                    })
-                });
+        console.log("Hi!");
 
-                const data = await response.json();
-
-                console.log(data);
-
-                // Catch from Controller "/usuarios/deactivateUser"
-                if (!data.success) {
-                    Swal.fire({
-                        title: 'Algo salió mal :(',
-                        icon: 'error',
-                        width: "500px",
-                        text: 'Favor de contactar a Soporte Técnico. (Error #005)'
-                    });
-                    return; // disableUser() failed execution
-                } else {
-                    Swal.fire({
-                        title: 'Usuario desactivado',
-                        icon: 'success',
-                        width: "500px",
-                        text: 'Se ha desactivado el usuario correctamente.'
-                    }).then(() => {
-                        location.reload(); // reload after popup
-                    });
-                    return; // disableUser() successful execution
-                }
-
-            // Catch from Fetch #01
-            } catch (error) {
-                Swal.fire({
-                    title: 'Algo salió mal :(',
-                    icon: 'error',
-                    width: "500px",
-                    text: 'Favor de contactar a Soporte Técnico. (Error #006)'
-                }).then(() => {
-                    location.reload(); // reload after popup
-                });
-            }
+        // Prepare jefe inmediato options
+        let jefeInmediatoName = "Selecciona un Jefe";
+        if (jefeInmediatoObject) {
+            jefeInmediatoName = `${jefeInmediatoObject.nombre} ${jefeInmediatoObject.apellidoP} ${jefeInmediatoObject.apellidoM}`;
         }
-    })
-};
+        
+        // Show edit form
+        Swal.fire({
+            html: `
+            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">Datos del Colaborador</h2>
 
-// editUser button
-// , REQUIRES PFP VISIBILITY AND addUser FRONT END)
-// , do not add a new user, rather set again with moongose
-// , password decryption only when editing
-// , this variable not working properly, only loading the 1st one.
-// , change field type to PASSWORD when edtining password (easier)
-// , use userId instead
-// , add activeUsers.delete(userId); // log him out inside the controller function
+            <div class="columns is-multiline">
+                <!-- Name Fields -->
+                <div class="column is-one-third">
+                    <label class="label">Nombre</label>
+                    <input class="input" id="nombre" value="${user.nombre}" required>
+                </div>
+                <div class="column is-one-third">
+                    <label class="label">Apellido Paterno</label>
+                    <input class="input" id="apellidoP" value="${user.apellidoP}" required>
+                </div>
+                <div class="column is-one-third">
+                    <label class="label">Apellido Materno</label>
+                    <input class="input" id="apellidoM" value="${user.apellidoM}" required>
+                </div>
 
-//  añadir validación de imagen, tamaño y tipo de archivo only, y su frontend
-async function editUser(button) { // async function to perform fetch chain
-    
+                <!-- Email, Privilege and Date of Entry -->
+                <div class="column is-one-third">
+                    <label class="label">Email</label>
+                    <input class="input" id="email" value="${user.email}" required>
+                </div>
+                <div class="column is-one-third">
+                    <label class="label">Privilegio</label>
+                    <select id="privilegio" class="input">
+                        <option value="${user.privilegio}" hidden>${user.privilegio}</option>
+                        <option value="colaborador">Colaborador</option>
+                        <option value="rHumanos">Recursos Humanos</option>
+                        <option value="jefeInmediato">Jefe Inmediato</option>
+                        <option value="direccion">Dirección</option>
+                    </select>
+                </div>
+                <div class="column is-one-third">
+                    <label class="label">Fecha de Ingreso</label>
+                    <input type="date" class="input" id="fechaIngreso" value="${user.fechaIngreso}" required>
+                </div>
 
-    // return user object based on userID (frontend, thus only non-sensitive information)
-    const user = usersRows.find(user => user._id === button.getAttribute('userId'));
-    
-    const email = user.email;
-    const nombre = user.nombre;
-    const apellidoP = user.apellidoP;
-    const apellidoM = user.apellidoM;
-    const fechaBaja = user.fechaBaja;
-    const fechaIngreso = user.fechaIngreso;
-    const areaUser = user.area;
-    const puesto = user.puesto;
-    const jefeInmediatoId = user.jefeInmediato;
-    const foto = user.foto.replace("public", "");
-    const privilegio = user.privilegio;
-    
-    // dynamic html to show available "Jefe Inmediatos"
-    const jefeInmediatoObject = usersRows.find(user => user._id === jefeInmediatoId);
-    let jefeInmediatoName = "Selecciona un Jefe"
-    if (jefeInmediatoObject){
-        jefeInmediatoName = jefeInmediatoObject.nombre + " " + jefeInmediatoObject.apellidoP + " " + jefeInmediatoObject.apellidoM;
-    } 
-    
-    let optionsJefeInmediato = `<option value=${jefeInmediatoId} hidden>${jefeInmediatoName}</option>`;
-    for (let user of usersRows) {
-        if (user.privilegio === "jefeInmediato") {
-            optionsJefeInmediato += `<option value="${user._id}">${user.nombre} ${user.apellidoP} ${user.apellidoM}</option>`;
-        }
-    }
-    
-    Swal.fire({
-        html: `
-        <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">Datos del Colaborador</h2>
+                <!-- Area and Position -->
+                <div class="column is-one-third">
+                    <label class="label">Área</label>
+                    <select id="area" class="input">
+                        <option value="${user.area}" hidden>${user.area}</option>
+                        ${Object.keys(areaToPuestos).map(area => 
+                            `<option value="${area}">${area}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                <div class="column is-one-third">
+                    <label class="label">Puesto</label>
+                    <select id="puesto" class="input">
+                        <option value="${user.puesto}" hidden>${user.puesto}</option>
+                    </select>
+                </div>
+                <div class="column is-one-third">
+                    <label class="label">Jefe Inmediato</label>
+                    <select id="jefeInmediato" class="input" required>
+                        ${optionsJefeInmediato}
+                    </select>
+                </div>
 
-        <div class="columns is-multiline">
-
-            <!-- Name Fields -->
-            <div class="column is-one-third">
-                <label class="label">Nombre</label>
-                <input class="input" id="nombre" value="${nombre}" required>
-            </div>
-            <div class="column is-one-third">
-                <label class="label">Apellido Paterno</label>
-                <input class="input" id="apellidoP" value="${apellidoP}" required>
-            </div>
-            <div class="column is-one-third">
-                <label class="label">Apellido Materno</label>
-                <input class="input" id="apellidoM" value="${apellidoM}" required>
-            </div>
-
-
-            <!-- Email, Privilege and Date of Entry -->
-            <div class="column is-one-third">
-                <label class="label">Email</label>
-                <input class="input" id="email" value="${email}" required>
-            </div>
-
-            <div class="column is-one-third">
-                <label class="label">Privilegio</label>
-                <select id="privilegio" class="input">
-                    <option value="${privilegio}" hidden>${privilegio}</option>
-                    <option value="colaborador" >Colaborador</option>
-                    <option value="rHumanos" >Recursos Humanos</option>
-                    <option value="jefeInmediato" >Jefe Inmediato</option>
-                    <option value="direccion" >Dirección</option>
-                    <option value="unauthorized" >No autorizado</option>
-                </select>
-            </div>
-
-            <div class="column is-one-third">
-                <label class="label">Fecha de Ingreso</label>
-                <input type="date" class="input" id="fechaIngreso" value="${fechaIngreso}" required>
-            </div>
-
-
-            <!-- Area and Position -->
-            <div class="column is-one-third">
-                <label class="label">Área</label>
-                <select id="area" class="input">
-                    <option value="${areaUser}" hidden>${areaUser}</option>
-                    ${Object.keys(areaToPuestos).map(area => `<option value="${area}">${area}</option>`).join('')}
-                </select>
-            </div>
-            <div class="column is-one-third">
-                <label class="label">Puesto</label>
-                <select id="puesto" class="input">
-                    <option value="${puesto}" hidden>${puesto}</option>
-                </select>
-            </div>
-            <div class="column is-one-third">
-                <label class="label">Jefe Inmediato</label>
-                <select id="jefeInmediato" class="input" required>
-                    ${optionsJefeInmediato}
-                </select>
-            </div>
-
-
-            <!-- Photo and Date of Exit -->
-            <div class="column is-half">
-                <label class="label">Fecha de Baja</label>
-                <input type="date" class="input" id="fechaBaja" value="${fechaBaja}" required>
-            </div>
-            <div class="column is-half">
-                <label class="label">Foto de Perfil</label>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <!-- File Input Button -->
-                    <div class="file has-name is-boxed" style="flex: 1;">
-                        <label class="input" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-right:0.3rem;">
-                            <i class="fas fa-upload" style="margin: 0rem 0.3rem;font-size: 1.1rem;"></i>
-                            <span>Selecciona una imagen</span>
-                            <input type="file" name="foto" class="file-input" id="foto" value="${foto}" style="display: none;" onchange="updateImagePreview(event)">
-                        </label>
-                    </div>
-
-                    <!-- Image Preview -->
-                    <div class="input" style="margin-top: 0; width: 48px; height: 48px; position: relative; overflow: hidden; border-radius: 50%; border: 2px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <img 
-                            id="profile-img" 
-                            src="${foto}"
-                            style="position: absolute; top: 50%; left: 50%; width: auto; height: auto; transform: translate(-50%, -50%);"
-                            onerror="this.onerror=null; this.src='/img/SIVOC_PFP.png';">
+                <!-- Photo and Date of Exit -->
+                <div class="column is-half">
+                    <label class="label">Fecha de Baja</label>
+                    <input type="date" class="input" id="fechaBaja" value="${user.fechaBaja || ''}" required>
+                </div>
+                <div class="column is-half">
+                    <label class="label">Foto de Perfil</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="file has-name is-boxed" style="flex: 1;">
+                            <label class="input" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-right:0.3rem;">
+                                <i class="fas fa-upload" style="margin: 0rem 0.3rem;font-size: 1.1rem;"></i>
+                                <span>Selecciona una imagen</span>
+                                <input type="file" name="foto" class="file-input" id="foto" style="display: none;" onchange="updateImagePreview(event)">
+                            </label>
+                        </div>
+                        <div class="input" style="margin-top: 0; width: 48px; height: 48px; position: relative; overflow: hidden; border-radius: 50%; border: 2px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <img 
+                                id="profile-img" 
+                                src="${user.foto ? user.foto.replace("public", "") : ''}"
+                                style="position: absolute; top: 50%; left: 50%; width: auto; height: auto; transform: translate(-50%, -50%);"
+                                onerror="this.onerror=null; this.src='/SIVOC_PFP.png';">
+                        </div>
                     </div>
                 </div>
             </div>
-
-
-        </div>
-        `,
-        confirmButtonText: 'Guardar',
-        cancelButtonText: 'Cancelar',
-        cancelButtonColor: '#f0466e',
-        showCancelButton: true,
-        allowOutsideClick: false,
-        width: '777px',
-        customClass: {
-            confirmButton: 'default-button-css',
-            cancelButton: 'default-button-css',
-        },
-        didOpen: () => {
-
-            // Función para actualizar la vista previa de la imagen cuando se selecciona un archivo
-            window.updateImagePreview = function(event) {
-                const file = event.target.files[0];
-
-                if (file) {
-                    // Validar extensión del archivo
-                    const validExtensions = ['image/jpeg', 'image/png'];
-                    if (!validExtensions.includes(file.type)) {
-                        Swal.showValidationMessage('Selecciona un archivo de imagen válido (JPEG, PNG).');
-                        event.target.value = ''; // Limpia el input de archivo
-                        return;
+            `,
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            cancelButtonColor: '#f0466e',
+            showCancelButton: true,
+            allowOutsideClick: false,
+            width: '777px',
+            customClass: {
+                confirmButton: 'default-button-css',
+                cancelButton: 'default-button-css',
+            },
+            didOpen: () => {
+                setupAreaToPuestoRelationship();
+                setupImagePreview();
+                setupDateInputs();
+            },
+            preConfirm: async () => {
+                try {
+                    // Get all form values
+                    const nombre = $('#nombre').val().trim();
+                    const apellidoP = $('#apellidoP').val().trim();
+                    const apellidoM = $('#apellidoM').val().trim();
+                    const email = $('#email').val().trim();
+                    const area = $('#area').val().trim();
+                    const puesto = $('#puesto').val().trim();
+                    const fechaIngreso = $('#fechaIngreso').val();
+                    const fechaBaja = $('#fechaBaja').val();
+                    const jefeInmediato = $('#jefeInmediato').val().trim();
+                    const privilegio = $('#privilegio').val().trim();
+                    const fileInput = document.getElementById('foto');
+                    
+                    // Basic validation
+                    if (!nombre || !apellidoP || !apellidoM || !email || !area || 
+                        !fechaIngreso || !jefeInmediato || !puesto || !privilegio) {
+                        return Swal.showValidationMessage('Todos los campos son requeridos.');
                     }
-
-                    // Validar tamaño del archivo (límite: 2 MB)
-                    const maxSize = 2 * 1024 * 1024; // 2 MB
-                    if (file.size > maxSize) {
-                        Swal.showValidationMessage('El tamaño máximo permitido es de 2 MB.');
-                        event.target.value = ''; // Limpia el input de archivo
-                        return;
+                    
+                    // Character validation
+                    const forbiddenCharsPattern = /[\{\}\:\$\=\'\*\[\]]/;
+                    if (forbiddenCharsPattern.test(nombre) || 
+                        forbiddenCharsPattern.test(apellidoP) || 
+                        forbiddenCharsPattern.test(apellidoM) ||
+                        forbiddenCharsPattern.test(email) || 
+                        forbiddenCharsPattern.test(area) || 
+                        forbiddenCharsPattern.test(privilegio) ||
+                        forbiddenCharsPattern.test(jefeInmediato) || 
+                        forbiddenCharsPattern.test(puesto)) {
+                        return Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
                     }
-
-                    // Leer y mostrar la vista previa de la imagen si todo es válido
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        // Actualiza la fuente de la imagen en la vista previa
-                        document.getElementById('profile-img').src = e.target.result;
-                    };
-                    reader.readAsDataURL(file); // Lee el archivo como una URL de datos
-                }
-            };
-
-            const areaSelect = document.getElementById("area");
-            const puestoSelect = document.getElementById("puesto");
-            areaSelect.addEventListener("change", () => {
-                const selectedArea = areaSelect.value; 
-                const puestos = areaToPuestos[selectedArea] || []; 
-                puestoSelect.innerHTML = DOMPurify.sanitize('<option value="" hidden>Selecciona un puesto</option>');
-                puestos.forEach(puesto => {
-                    const option = document.createElement("option");
-                    option.value = puesto;
-                    option.textContent = puesto;
-                    puestoSelect.appendChild(option);
-                });
-            });
-
-            // format styles and user experience for calendars (fechaIngreso)
-            const todayIn = new Date();
-            const formattedISODateIn = todayIn.toISOString().split('T')[0];
-            const dateInputIn = document.getElementById("fechaIngreso");
-            dateInputIn.value = formattedISODateIn;
-            dateInputIn.addEventListener("click", (event) => {
-                event.preventDefault(); // Previene comportamiento predeterminado
-                dateInputIn.showPicker(); // Fuerza mostrar el calendario
-            });
-
-            // format styles and user experience for calendars (fechaIngreso)
-            const todayOut = new Date();
-            const formattedISODateOut = todayOut.toISOString().split('T')[0];
-            const dateInputOut = document.getElementById("fechaBaja");
-            dateInputOut.value = formattedISODateOut;
-            dateInputOut.addEventListener("click", (event) => {
-                event.preventDefault(); // Previene comportamiento predeterminado
-                dateInputOut.showPicker(); // Fuerza mostrar el calendario
-            });
-
-            
-        },
-        preConfirm: async () => { // allows to perform fetch chain
-            const nombre = $('#nombre').val().trim();
-            const apellidoP = $('#apellidoP').val().trim();
-            const apellidoM = $('#apellidoM').val().trim();
-            const email = $('#email').val().trim();
-            const area = $('#area').val().trim();
-            const fechaBaja = $('#fechaBaja').val();
-            const fechaIngreso = $('#fechaIngreso').val();
-            const jefeInmediato = $('#jefeInmediato').val().trim();
-            const puesto = $('#puesto').val().trim();
-            const fileInput = document.getElementById('foto');
-            const privilegio = $('#privilegio').val().trim();
-
-            /*
-            if (.test(nombre) || .test(apellidoP) || .test(apellidoM) ||
-                .test(email) || .test(area) || .test(privilegio) ||
-                .test(jefeInmediato) || .test(puesto)) {
-                Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
-                return;
-            }
-                */
-             if (!nombre || !apellidoP || !apellidoM || !email || !area || !fechaBaja || !fechaIngreso || !jefeInmediato
-                || !puesto || !privilegio) {
-                Swal.showValidationMessage('Todos los campos son requeridos.');
-                return;
-            }
-
-            // Preconfirm Fetch #01 - verify email collision
-            try {
-                const responseEmail = await fetch('/usuarios/doesEmailExists', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                    })
-                });
-                const dataEmail = await responseEmail.json();
-                if (dataEmail.success) {
-                    if (dataEmail.exists) {
-                        Swal.showValidationMessage('Email existente. Ese email ya está ocupado por un usuario.');
-                        return; // email collision detected
-                    } // else, continue execution
-                } else {
-                    Swal.fire({
-                        title: 'Algo salió mal :(',
-                        icon: 'error',
-                        width: "500px",
-                        text: 'Favor de contactar a Soporte Técnico. (Error #007)'
-                    });
-                    return; // addUser() failed execution
-                }
-
-            // Catch from Preconfirm Fetch #01
-            } catch (error) {
-                Swal.fire({
-                    title: 'Algo salió mal :(',
-                    icon: 'error',
-                    width: "500px",
-                    text: 'Favor de contactar a Soporte Técnico. (Error #008)'
-                });
-                console.error('Hubo un error:', error);
-                return; // addUser() failed execution 
-            }
-
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]); // Postman "Key" = "file"
-
-            try {
-                const responseUser = await fetch('/usuarios/editUser', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        nombre: nombre,
-                        apellidoP: apellidoP,
-                        apellidoM: apellidoM,
-                        email: email,
-                        area: area,
-                        fechaBaja: fechaBaja,
-                        fechaIngreso: fechaIngreso,
-                        // foto: dataFile.message.path,  TODO
-                        jefeInmediato: jefeInmediato,
-                        puesto: puesto,
-                        estaActivo: estaActivo,
-                        privilegio: privilegio, 
-                    })
-                });
-                const dataUser = await responseUser.json();
-                if (dataUser.success) {
-                    Swal.fire({
-                        title: 'Usuario EDITADO',
-                        icon: 'success',
-                        width: "500px",
-                        text: 'Se añadió el usuario correctamente.'
-                    }).then(() => {
-                        location.reload(); // reload after popup
-                    });
-                    return; // addUser() successful execution
-
-                    // Catch from Controller "/usuarios/addUser"
-                } else {
-                    Swal.fire({
-                        title: 'Algo salió mal :(',
-                        icon: 'error',
-                        width: "500px",
-                        text: 'Favor de contactar a Soporte Técnico. (Error #004)'
-                    });
-                    return; // addUser() failed execution
-                }
-
-                // Catch from Fetch #02
-            } catch (error) {
-                Swal.fire({
-                    title: 'Algo salió mal :(',
-                    icon: 'error',
-                    width: "500px",
-                    text: 'Favor de contactar a Soporte Técnico. (Error #003)'
-                });
-                console.error('Hubo un error:', error);
-                return; // addUser() failed execution
-            }
-        
-
-
-
-
-            //if (!fileInput.files[0])
-
-
-
-
-
-
-                // !fileInput.files[0]
-                //  help
-
-
-            
-            // Fetch #01 - File upload (profile picture)
-            /*
-            try {
-                const responseFile = await fetch('/usuarios/uploadFile', {
-                    method: 'POST',
-                    body: formData,
-                });
-                const dataFile = await responseFile.json();
-
-                // Catch from Controller "/usuarios/uploadFile"
-                if (!dataFile.success) {
-                    Swal.fire({
-                        title: 'Algo salió mal :(',
-                        icon: 'error',
-                        width: "500px",
-                        text: 'Favor de contactar a Soporte Técnico. (Error #001)'
-                    });
-                    return; // addUser() failed execution
-                } else {
-
-                    // (CHAINED) Fetch #02 - User information (json object)
-                    try {
-                        const responseUser = await fetch('/usuarios/editUser', {
+                    
+                    // Check if email changed and verify no collision
+                    if (email !== user.email) {
+                        const emailResponse = await fetch('/usuarios/doesEmailExists', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                nombre: nombre,
-                                apellidoP: apellidoP,
-                                apellidoM: apellidoM,
-                                email: email,
-                                area: area,
-                                fechaBaja: fechaBaja,
-                                fechaIngreso: fechaIngreso,
-                                foto: dataFile.message.path, 
-                                jefeInmediato: jefeInmediato,
-                                puesto: puesto,
-                                estaActivo: estaActivo,
-                                privilegio: privilegio, 
-                            })
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ email, userId: user._id })
                         });
-                        const dataUser = await responseUser.json();
-                        if (dataUser.success) {
-                            Swal.fire({
-                                title: 'Usuario EDITADO',
-                                icon: 'success',
-                                width: "500px",
-                                text: 'Se añadió el usuario correctamente.'
-                            }).then(() => {
-                                location.reload(); // reload after popup
-                            });
-                            return; // addUser() successful execution
-
-                            // Catch from Controller "/usuarios/addUser"
-                        } else {
-                            Swal.fire({
-                                title: 'Algo salió mal :(',
-                                icon: 'error',
-                                width: "500px",
-                                text: 'Favor de contactar a Soporte Técnico. (Error #004)'
-                            });
-                            return; // addUser() failed execution
+                        const emailData = await emailResponse.json();
+                        if (!emailData.success) throw new Error('Error checking email');
+                        if (emailData.exists) {
+                            return Swal.showValidationMessage('Email existente. Ese email ya está ocupado por otro usuario.');
                         }
-
-                        // Catch from Fetch #02
-                    } catch (error) {
-                        Swal.fire({
-                            title: 'Algo salió mal :(',
-                            icon: 'error',
-                            width: "500px",
-                            text: 'Favor de contactar a Soporte Técnico. (Error #003)'
-                        });
-                        console.error('Hubo un error:', error);
-                        return; // addUser() failed execution
                     }
+                    
+                    // Create form data
+                    const formData = new FormData();
+                    formData.append('userId', user._id);
+                    formData.append('nombre', nombre);
+                    formData.append('apellidoP', apellidoP);
+                    formData.append('apellidoM', apellidoM);
+                    formData.append('email', email);
+                    formData.append('area', area);
+                    formData.append('puesto', puesto);
+                    formData.append('fechaIngreso', fechaIngreso);
+                    formData.append('fechaBaja', fechaBaja);
+                    formData.append('jefeInmediato', jefeInmediato);
+                    formData.append('privilegio', privilegio);
+                    formData.append('estaActivo', user.estaActivo);
+                    
+                    // Append file if exists
+                    if (fileInput.files[0]) {
+                        formData.append('file', fileInput.files[0]);
+                    }
+                    
+                    // Single fetch for edit
+                    const response = await fetch('/usuarios/editUser', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Usuario actualizado',
+                            icon: 'success',
+                            width: "500px",
+                            text: 'El usuario se actualizó correctamente.'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        throw new Error(data.message || 'Error al actualizar el usuario');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showErrorAlert('002');
                 }
-
-                // Catch from Fetch #01
-            } catch (error) {
-                Swal.fire({
-                    title: 'Algo salió mal :(',
-                    icon: 'error',
-                    width: "500px",
-                    text: 'Favor de contactar a Soporte Técnico. (Error #002)'
-                });
-                console.error('Hubo un error:', error);
-                return; // addUser() failed execution
             }
-            */
-        }
-    })
-};
-
-// restoreUsersView button
-async function restoreUsersView() {
-    try {
-        const response = await fetch('/usuarios/restoreUsersView', {
-            method: 'GET',
         });
-
-        // Catch from Controller "/usuarios/restoreUsersView"
-        if (!response.ok) {
-            Swal.fire({
-                title: 'Algo salió mal :(',
-                icon: 'error',
-                width: "500px",
-                text: 'Favor de contactar a Soporte Técnico. (Error #012)'
-            });
-            return; // restoreUsersView() failed execution
-        } else {
-            window.location.href = '/usuarios/restoreUsersView';
-            return; // restoreUsersView() successful execution
-        }
-
-    // Catch from Fetch #01
     } catch (error) {
-        Swal.fire({
-            title: 'Algo salió mal :(',
-            icon: 'error',
-            width: "500px",
-            text: 'Favor de contactar a Soporte Técnico. (Error #011)'
-        });
-        console.error('Hubo un error:', error);
-        return; // restoreUsersView() failed execution
+        location.reload();
     }
-};
+}
 
-// changePrivilege button
-// TODO, si se cambia el privilegio fuera de Jefe Inmediato se debe borrar la relacion con
-        // sus trabajadores del equipo (no aparecer en editarUsuario como valor asignado también)
-async function changePrivilege(button) { // async function to perform fetch chain
+async function changePrivilege(button) {
+    hideSidebar();
     
     Swal.fire({
         html: `
             <div style="padding: 0.5rem; margin: 1rem 0.5rem">
                 <h2>Cambiar el privilegio del usuario</h2>
                 <br><br>
-                    <div class="field">
-                        <div class="control">
-                            <select id="newPrivilege" class="is-fullwidth input">
+                <div class="field">
+                    <div class="control">
+                        <select id="newPrivilege" class="is-fullwidth input">
                             <option value="" hidden>Selecciona un privilegio</option>
-                            <option value="colaborador" >Colaborador</option>
-                            <option value="rHumanos" >Recursos Humanos</option>
-                            <option value="jefeInmediato" >Jefe Inmediato</option>
-                            <option value="direccion" >Dirección</option>
-                            <option value="unauthorized" >No autorizado</option>
-                            </select> 
-                        </div>
+                            <option value="colaborador">Colaborador</option>
+                            <option value="rHumanos">Recursos Humanos</option>
+                            <option value="jefeInmediato">Jefe Inmediato</option>
+                            <option value="direccion">Dirección</option>
+                            <option value="unauthorized">No autorizado</option>
+                        </select> 
                     </div>
+                </div>
             </div>
         `,
         confirmButtonText: 'Confirmar',
@@ -774,140 +552,103 @@ async function changePrivilege(button) { // async function to perform fetch chai
         cancelButtonColor: '#f0466e',
         showCancelButton: true,
         allowOutsideClick: false,
-        width: '1000px',
+        width: '600px',
         customClass: {
             confirmButton: 'default-button-css',
             cancelButton: 'default-button-css',
         },
-
         preConfirm: async () => {
-            const userId = button.getAttribute('userId');
-            const newPrivilege = $('#newPrivilege').val();
-
-            if (!newPrivilege) {
-                Swal.showValidationMessage('Selecciona un privilegio para continuar.');
-                return;
-            }
-            
-            // Fetch #01 - Execute changePrivilege
             try {
+                const userId = button.getAttribute('userId');
+                const newPrivilege = $('#newPrivilege').val();
+                
+                if (!newPrivilege) {
+                    return Swal.showValidationMessage('Selecciona un privilegio para continuar.');
+                }
+                
                 const response = await fetch('/usuarios/changePrivilege', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        userId: userId,
-                        newPrivilege: newPrivilege,
-                    })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({userId, newPrivilege})
                 });
+                
                 const data = await response.json();
-
-                // Catch from Controller "/changePrivilege"
-                if (!data.success) {
-                    Swal.fire({
-                        title: 'Algo salió mal :(',
-                        icon: 'error',
-                        width: "500px",
-                        text: 'Favor de contactar a Soporte Técnico. (Error #015)'
-                    });
-                    return; // changePrivilege() failed execution
-                } else {
+                
+                if (data.success) {
                     Swal.fire({
                         title: 'Privilegio configurado',
                         icon: 'success',
                         width: "500px",
                         text: 'Se ha cambiado el privilegio del usuario correctamente.'
                     }).then(() => {
-                        location.reload(); // reload after popup
+                        location.reload();
                     });
-                    return; // changePrivilege() successful execution
+                } else {
+                    throw new Error(data.message || 'Error al cambiar el privilegio');
                 }
-
-                // Catch from Fetch #01
             } catch (error) {
-                Swal.fire({
-                    title: 'Algo salió mal :(',
-                    icon: 'error',
-                    width: "500px",
-                    text: 'Favor de contactar a Soporte Técnico. (Error #016)'
-                });
-                console.error('Hubo un error:', error);
-                return; // changePrivilege() failed execution
+                console.error('Error:', error);
+                showErrorAlert('015');
             }
         }
-    })
-};
+    });
+}
 
-
-// downloadExcel button
-// TODO, remake
-async function downloadExcel() {
-    try {
-        const response = await fetch('/usuarios/downloadExcelUsers', {
-            method: 'POST',
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+async function deactivateUser(button) {
+    Swal.fire({
+        html: `
+            <div style="padding: 0.5rem; margin: 1rem 0.5rem">
+                <h2>¿Deseas desactivar este usuario?</h2>
+                <h2>Ya no podrá acceder a la plataforma.</h2>
+            </div>
+        `,
+        confirmButtonText: 'Desactivar usuario',
+        cancelButtonText: 'Cancelar',
+        cancelButtonColor: '#f0466e',
+        showCancelButton: true,
+        allowOutsideClick: false,
+        width: '600px',
+        customClass: {
+            confirmButton: 'default-button-css',
+            cancelButton: 'default-button-css',
+        },
+        preConfirm: async () => {
+            try {
+                const userId = button.getAttribute('userId');
+                
+                const response = await fetch('/usuarios/deactivateUser', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({userId})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Usuario desactivado',
+                        icon: 'success',
+                        width: "500px",
+                        text: 'Se ha desactivado el usuario correctamente.'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    throw new Error(data.message || 'Error al desactivar el usuario');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorAlert('005');
+            }
         }
+    });
+}
 
-        // Create a link to download the file
-        const blob = await response.blob();
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = 'usuarios.xlsx';
-        link.click();
-
-        Swal.fire({
-            title: 'Excel descargado',
-            icon: 'success',
-            width: "500px",
-            text: 'El archivo se descargó correctamente.'
-        });
-
-    } catch (error) {
-        console.error('Error downloading file:', error);
-        Swal.fire({
-            title: 'Algo salió mal :(',
-            icon: 'error',
-            width: "500px",
-            text: 'Favor de contactar a Soporte Técnico. (Error #020)'
-        });
-    }
-};
-
-// downloadPDF button
-// TODO, remake
-async function downloadPDF() {
+async function restoreUsersView() {
     try {
-        const response = await fetch('/usuarios/downloadPDFUsers', {
-            method: 'POST',
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const blob = await response.blob();
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = 'usuarios.pdf';
-        link.click();
-
-        Swal.fire({
-            title: 'PDF descargado',
-            icon: 'success',
-            width: "500px",
-            text: 'El archivo se descargó correctamente.'
-        });
+        window.location.href = '/usuarios/restoreUsersView';
     } catch (error) {
-        console.error('Error downloading file:', error);
-        Swal.fire({
-            title: 'Algo salió mal :(',
-            icon: 'error',
-            width: "500px",
-            text: 'Favor de contactar a Soporte Técnico. (Error #019)'
-        });
+        console.error('Error:', error);
+        showErrorAlert('011');
     }
-};
+}

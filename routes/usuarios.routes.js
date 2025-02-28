@@ -1,12 +1,53 @@
 const express = require("express");
 const router = express.Router();
 const controller = require('../controllers/usuarios.controller');
+const configureFileUpload = require("../utils/configureFileUpload");
+
+// File upload validation & configuration
+const ensureFilesArray = (req, res, next) => {
+    if (!req.files)
+        req.files = [];
+    next();
+};
+const allowedFileExtensions = ['png', 'jpeg', 'jpg'];
+const MAX_SIZE_MB = 3 * 1024 * 1024; // 3MB in bytes
+const allowedFileTypes = [
+    "image/png",
+    "image/jpeg",
+    "image/jpg",
+];
+const MAX_FILES = 1;
+
+// createPermitRequest : Colaborador : Done
+const upload = configureFileUpload("uploads/usuarios", allowedFileTypes, allowedFileExtensions, MAX_SIZE_MB, MAX_FILES);
+router.post("/addUser", 
+    ensureFilesArray,
+    (req, res, next) => { 
+        upload.array("files", MAX_FILES)(req, res, (err) => {
+            if (err) {
+                return res.status(400).json({ 
+                    success: false, 
+                    messageTitle: "Multer invalidation", 
+                    messageText: err.message 
+                });
+            }
+            next(); // Si no hay error, continuar con el controlador
+        });
+    },
+controller.addUser);
+
+
+
+// addUser : rHumanos : ----
+router.post("/addUser", controller.addUser); 
+
+
+
 
 // accessUsersModule : jefeInmediato, rHumanos : ---
 router.get("/accessUsersModule", controller.accessUsersModule);
 
-
-// addUser : -- : ----
+//  : -- : ----
 exports.editPermit_getInfo = async (req, res) => {
     try {
         const { permitId } = req.body;
@@ -178,47 +219,10 @@ exports.editPermit_postInfo = async (req, res) => {
 
 
 
-
-const configureFileUpload = require("../utils/configureFileUpload");
-
-// File upload validation & configuration
-const ensureFilesArray = (req, res, next) => {
-    if (!req.files)
-        req.files = [];
-    next();
-};
-const allowedFileExtensions = ['png', 'jpeg', 'jpg', 'pdf', 'doc', 'docx'];
-const MAX_SIZE_MB = 3 * 1024 * 1024; // 3MB in bytes
-const allowedFileTypes = [
-    "image/png",
-    "image/jpeg",
-    "image/jpg",
-    "application/pdf",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-];
-
-// Storage directory (critical)
-const multer = require('multer');
-const path = require('path');
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/uploads/usuarios'); // Destination folder
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9); // Collision avoidance
-    const extension = path.extname(file.originalname);
-    const newName = file.fieldname + '-' + uniqueSuffix + extension;
-    cb(null, newName);
-  }
-});
-const upload = multer({ storage }); // Compacted into 'upload'
-
 router.post("/downloadExcelUsers", controller.postDownloadExcelUsers);
 router.post("/downloadPDFUsers", controller.postDownloadPDFUsers);
 router.get("/restoreUsersView", controller.getRestoreUsersView);
 
-router.post("/addUser", controller.postAddUser); 
 router.post("/uploadFile", upload.single('file'), controller.postFileUpload);
 router.post("/deactivateUser", controller.postUserDeactivation);
 router.post("/activateUser", controller.postUserActivation);

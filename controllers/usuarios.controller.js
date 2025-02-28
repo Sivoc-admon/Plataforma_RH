@@ -4,6 +4,36 @@ const filesModel = require("../models/files.model");
 const bcrypt = require("bcryptjs");
 
 
+// editPermit : rHumanos : -- 
+exports.addUser = async (req, res) => {
+
+    console.log("what");
+    console.log(req.body);
+    console.log(req.files);
+
+
+
+    try {
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        if (error instanceof mongoose.Error.ValidationError)
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#111)" });
+        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#110)" });
+    }
+
+    /*
+    try {
+        req.body.password = await bcrypt.hash(req.body.password, 10); // password encryption          
+        const response = await usersModel.create(req.body);
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: "" });
+    }
+        */
+
+};
+
+
 
 /* --- AUX --- */
 const formatReadableDateTime = (isoDate) => {
@@ -96,16 +126,6 @@ exports.postEmailExists = async (req, res) => {
     }
 };
 
-exports.postAddUser = async (req, res) => {
-    try {
-        req.body.password = await bcrypt.hash(req.body.password, 10); // password encryption          
-        const response = await usersModel.create(req.body);
-        return res.status(200).json({ success: true, message: response });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
-    }
-};
 
 exports.postEditUser = async (req, res) => {
     try {
