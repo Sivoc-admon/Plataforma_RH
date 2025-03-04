@@ -24,8 +24,7 @@ const configureUpload = (uploadDir, allowedTypes, allowedExtensions, MAX_SIZE_MB
 
     // File filter with enhanced security validations
     const fileFilter = (req, file, cb) => {
-            console.log(req.files);
-    
+           
             // Check number of files
             if (req.files.length > MAX_FILES) {
                 return cb(new Error("1Se ha detectado un intento de actividad maliciosa."));

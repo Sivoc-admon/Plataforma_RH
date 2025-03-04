@@ -14,8 +14,17 @@ const authorize = (req, res, next) => {
 
     const token = req.cookies.__psmxoflxpspgolxps_mid;
 
-    if (["/login", "/login/POSTAUTH","/Unauthorized", "/logout"].includes(req.url) || req.url.startsWith("/uploads/"))
-        return next();     
+    // if the user goes into any of these links and doesnt have a jwt then skip the jwt validation
+    if (!token && (["/login", "/login/POSTAUTH","/Unauthorized", "/logout"].includes(req.url)))
+        return next();
+
+    // if the user already has been logged in and accidentally goes into login page just redirect to homepage
+    if (token && (["/login", "/login/POSTAUTH"].includes(req.url)))
+        return res.redirect("/login/inicio");     
+
+    // if the user has jwt and wants to access uploads then just allow it (skipped, fix when 4th module)
+    if (token && req.url.startsWith("/uploads/"))
+        return next();
 
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);

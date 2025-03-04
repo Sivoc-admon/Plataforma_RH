@@ -1,38 +1,111 @@
-// Importar el modelo para utilizarlo
 const usersModel = require("../models/usuarios.model");
 const filesModel = require("../models/files.model");
 const bcrypt = require("bcryptjs");
 
+const fs = require('fs');
+const path = require('path');
 
-// editPermit : rHumanos : -- 
-exports.addUser = async (req, res) => {
-
-    console.log("what");
-    console.log(req.body);
-    console.log(req.files);
-
-
-
-    try {
-        return res.status(200).json({ success: true });
-    } catch (error) {
-        if (error instanceof mongoose.Error.ValidationError)
-            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#111)" });
-        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#110)" });
-    }
-
-    /*
-    try {
-        req.body.password = await bcrypt.hash(req.body.password, 10); // password encryption          
-        const response = await usersModel.create(req.body);
-        return res.status(200).json({ success: true });
-    } catch (error) {
-        return res.status(500).json({ success: false, message: "" });
-    }
-        */
-
+const areaToPuestos = {
+    "Administración": ["Director General", "Coordinador de Finanzas", "Gestora de Tesorería", "Coordinador de Recursos Humanos", "Gestor de Recursos Humanos", "Analista de Recursos Humanos"],
+    "Ventas": ["Coordinador Comercial", "Gestor de Ventas", "Analista de Ventas"],
+    "Calidad": ["Coordinador de Calidad", "Gestor de Calidad", "Analista de Calidad"],
+    "Operativo": ["Coordinador Operacional", "Gestor de Ingeniería", "Analista de Ingeniería", "Gestor de Compras", "Analista de Compras", "Gestor de Manufactura", "Analista de Manufactura", "Analista de Almacén"],
+    "Pruebas": ["Gestor de Pruebas", "Ingeniero de Servicio A", "Ingeniero de Servicio B", "Ingeniero de Servicio C"]
 };
 
+
+// addUser : rHumanos : -- 
+exports.addUser = async (req, res) => {
+    try {
+        console.log("req.body: ");
+        console.log(req.body);
+
+        // 0. VALIDATE USER PRIVILEGES
+        if (res.locals.userPrivilege !== "rHumanos") {
+            return res.status(403).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "Espera un poco y vuelvelo a intentar. (#112)" 
+            });
+        }
+
+        // A. MINIMAL PAYLOAD VALIDATION
+        // Some basic validations are kept here to provide better error messages
+        // More complex validations are now handled by the model
+        const { 
+            nombre, apellidoP, apellidoM, email, password, 
+            area, puesto, fechaIngreso, privilegio 
+        } = req.body;
+
+        // 1. Check if all required fields exist
+        if (!nombre || !apellidoP || !apellidoM || !email || !password || 
+            !area || !puesto || !fechaIngreso || !privilegio) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "Datos Incompletos", 
+                messageText: "Todos los campos son requeridos." 
+            });
+        }
+
+        if ( typeof nombre !== "string" ||  typeof apellidoP !== "string" ||  typeof apellidoM !== "string" ||  typeof email !== "string" ||  typeof password !== "string" || 
+            typeof area !== "string" ||  typeof puesto !== "string" ||  typeof fechaIngreso !== "string" ||  typeof privilegio !== "string") {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "Datos Incorrectos", 
+                messageText: "Todos los campos deben tener un formato correcto." 
+            });
+        }
+
+        // B. BUILD PAYLOAD
+        // 1. Hash password
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        let foto = "";
+        if (req.files?.length > 0) {  // Validación segura de req.files
+            const response = await filesModel.create(req.files[0]);
+            if (!response) throw new Error("Error al guardar el archivo"); // Manejo correcto del error
+            foto = response._id; // Asignación correcta del _id
+        }
+
+        // 2. Create user object
+        const newUser = {
+            nombre,
+            apellidoP,
+            apellidoM,
+            email,
+            password: hashedPassword,
+            area,
+            foto,
+            puesto,
+            fechaIngreso,
+            privilegio,
+            estaActivo: true
+        };
+
+        // 4. Save user to database - model validation happens here
+        await usersModel.create(newUser);
+        return res.status(200).json({ success: true });
+        
+    } catch (error) {
+        //console.log(error);
+
+        // Handle validation errors from Mongoose
+        if (error instanceof mongoose.Error.ValidationError) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "Espera un poco y vuelvelo a intentar. (#111)" 
+            });
+        }
+        
+        // Generic server error
+        return res.status(500).json({ 
+            success: false, 
+            messageTitle: "Error", 
+            messageText: "Tomar captura y favor de informar a soporte técnico. (#110)" 
+        });
+    }
+};
 
 
 /* --- AUX --- */
@@ -44,11 +117,7 @@ const formatReadableDateTime = (isoDate) => {
         month: 'long',
         day: 'numeric',
     });
-    const readableTime = date.toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-    return `${readableDate}, ${readableTime}`;
+    return `${readableDate}`;
 };
 /****************/
 /*********/
@@ -113,18 +182,44 @@ const setupDatePicker = (elementId, options) => {
 
 
 /* --- MODEL LOGIC --- */
-exports.postEmailExists = async (req, res) => {
+exports.doesEmailExists = async (req, res) => {
     try {
-        const response = await usersModel.findOne({ email: req.body.email });
-        if (!response) {
-            return res.status(200).json({ success: true, exists: false });
+        const { email } = req.body;
+
+        // Validación inicial: Comprueba que se envíe el email
+        if (!email) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "Email Inválido", 
+                messageText: "El email es obligatorio." 
+            });
         }
+
+        // Validar formato de email
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "Email Inválido", 
+                messageText: "El formato del correo electrónico no es válido." 
+            });
+        }
+
+        // Busca un usuario existente con el email
+        const user = await usersModel.findOne({ email });
+
+        // Si no hay usuario, responde con `exists: false`
+        if (!user) return res.status(200).json({ success: true, exists: false });
+
+        // Si el email ya existe, responde indicando que existe
         return res.status(200).json({ success: true, exists: true });
+
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, exists: false });
+        return res.status(500).json({ success: false });
     }
 };
+
+
 
 
 exports.postEditUser = async (req, res) => {

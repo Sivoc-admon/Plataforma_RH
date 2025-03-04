@@ -20,26 +20,23 @@ const MAX_FILES = 1;
 
 // createPermitRequest : Colaborador : Done
 const upload = configureFileUpload("uploads/usuarios", allowedFileTypes, allowedFileExtensions, MAX_SIZE_MB, MAX_FILES);
-router.post("/addUser", 
+router.post("/addUser",
     ensureFilesArray,
     (req, res, next) => { 
         upload.array("files", MAX_FILES)(req, res, (err) => {
             if (err) {
                 return res.status(400).json({ 
                     success: false, 
-                    messageTitle: "Multer invalidation", 
-                    messageText: err.message 
+                    messageTitle: "Error con el archivo", 
+                    messageText: "El archivo se encuentra en un formato inválido"
                 });
             }
             next(); // Si no hay error, continuar con el controlador
         });
     },
 controller.addUser);
+router.post("/doesEmailExists", controller.doesEmailExists)
 
-
-
-// addUser : rHumanos : ----
-router.post("/addUser", controller.addUser); 
 
 
 
@@ -226,7 +223,6 @@ router.get("/restoreUsersView", controller.getRestoreUsersView);
 router.post("/uploadFile", upload.single('file'), controller.postFileUpload);
 router.post("/deactivateUser", controller.postUserDeactivation);
 router.post("/activateUser", controller.postUserActivation);
-router.post("/doesEmailExists", controller.postEmailExists);
 router.post("/changePrivilege", controller.postUserChangePrivilege);
 
 router.post("/editUser", controller.postEditUser); 

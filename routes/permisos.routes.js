@@ -31,8 +31,8 @@ router.post("/createPermitRequest",
             if (err) {
                 return res.status(400).json({ 
                     success: false, 
-                    messageTitle: "Multer invalidation", 
-                    messageText: err.message 
+                    messageTitle: "Error con el archivo", 
+                    messageText: "El archivo se encuentra en un formato inválido"
                 });
             }
             next(); // Si no hay error, continuar con el controlador

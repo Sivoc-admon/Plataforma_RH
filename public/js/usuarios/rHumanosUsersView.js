@@ -18,7 +18,7 @@ const formatReadableDateTime = (isoDate) => {
 const setupDatePicker = (elementId) => {
     return flatpickr(`#${elementId}`, {
         enableTime: false,
-        dateFormat: "Y-m-d",
+        dateFormat: "Y-m-d\\TH:i",
         time_24hr: true,
         locale: "es",
         defaultDate: new Date()
@@ -51,7 +51,12 @@ const setupAreaToPuestoRelationship = () => {
     });
 };
 const setupImagePreview = () => {
-    window.updateImagePreview = function(event) {
+    // Get the file input element
+    const fileInput = document.getElementById('foto');
+    if (!fileInput) return;
+    
+    // Attach event listener
+    fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (!file) return;
 
@@ -74,12 +79,10 @@ const setupImagePreview = () => {
         // Preview the image
         const reader = new FileReader();
         reader.onload = function(e) {
-            // Skip DOMPurify for data URLs since they've already been validated
-            // by file type and size checks above
             document.getElementById('profile-img').src = e.target.result;
         };
         reader.readAsDataURL(file);
-    };
+    });
 };
 const setupDateInputs = () => {
     // Setup for date inputs with display
@@ -129,11 +132,10 @@ const setupDateInputs = () => {
     setupSimpleDateInput('fechaBaja');
 };
 
-// editPermit : --- (1 skip)
+// addUser : ---
 async function addUser() {
-    // (skip: skipped sanitization)
-    Swal.fire({
-        html: `
+    Swal.fire({ 
+        html: DOMPurify.sanitize(`
             <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
                 <i class="fa-solid fa-user-plus" style="margin-right:0.9rem;"></i>Añadir Usuario
             </h2>
@@ -173,7 +175,7 @@ async function addUser() {
                 <div class="column">
                     <label class="label">Área</label>
                     <select id="area" class="input">
-                        <option value="" hidden>Selecciona un área</option>
+                        <option value="" hidden> 🔔 Selecciona un área</option>
                         ${Object.keys(areaToPuestos).map(area => 
                             `<option value="${area}">${area}</option>`
                         ).join('')}
@@ -182,18 +184,17 @@ async function addUser() {
                 <div class="column">
                     <label class="label">Puesto</label>
                     <select id="puesto" class="input">
-                        <option value="" hidden>(Selecciona un área primero)</option>
+                        <option value="" hidden> 🔔 Selecciona un área primero</option>
                     </select>
                 </div>
                 <div class="column">
                     <label class="label">Privilegio</label>
                     <select id="privilegio" class="input">
-                        <option value="" hidden>Selecciona un privilegio</option>
+                        <option value="" hidden> 🔔 Selecciona un privilegio</option>
                         <option value="colaborador">Colaborador</option>
                         <option value="rHumanos">Recursos Humanos</option>
                         <option value="jefeInmediato">Jefe Inmediato</option>
                         <option value="direccion">Dirección</option>
-                        <option value="unauthorized">No autorizado</option>
                     </select>
                 </div>
             </div>
@@ -207,7 +208,7 @@ async function addUser() {
                             <label class="input" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-right:0.3rem;">
                                 <i class="fas fa-upload" style="margin: 0rem 0.3rem;font-size: 1.1rem;"></i>
                                 <span>Selecciona una imagen cuadrada</span>
-                                <input type="file" name="foto" class="file-input" id="foto" style="display: none;" onchange="updateImagePreview(event)">
+                                <input type="file" name="foto" class="file-input" id="foto" style="display: none;">
                             </label>
                         </div>
                         <div class="input" style="margin-top: 0; width: 48px; height: 48px; position: relative; overflow: hidden; border-radius: 50%; border: 2px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -218,7 +219,7 @@ async function addUser() {
                     </div>
                 </div>
             </div>
-        `,
+        `),
         confirmButtonText: 'Guardar',
         cancelButtonText: 'Cancelar',
         cancelButtonColor: '#f0466e',
@@ -231,7 +232,7 @@ async function addUser() {
         },
         didOpen: () => {
             setupAreaToPuestoRelationship();
-            setupImagePreview();
+            setupImagePreview(); // This will now attach the event listener properly
             setupDateInputs();
         },
         preConfirm: async () => {
@@ -250,9 +251,8 @@ async function addUser() {
                 // Base validation
                 if (!nombre || !apellidoP || !apellidoM || !email || !password || 
                     !area || !puesto || !fechaIngreso || !privilegio) {
-                    return Swal.showValidationMessage('Todos los campos son requeridos.');
+                    return Swal.showValidationMessage('Todos los campos a excepción de la foto son requeridos.');
                 }
-                
 
                 // Character validation 
                 const forbiddenCharsPattern = /[\{\}\:\$\=\'\*\[\]]/;
@@ -268,6 +268,22 @@ async function addUser() {
                 if (!emailPattern.test(email)) {
                     return Swal.showValidationMessage('El formato del correo electrónico no es válido.');
                 }
+
+                // Check if email exists
+                const emailResponse = await fetch('/usuarios/doesEmailExists', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                    })
+
+                });
+                const emailData = await emailResponse.json(); 
+                if (!emailData.success) return Swal.showValidationMessage('Tomar captura y reportar soporte técnico #130.');
+                if (emailData.exists) return Swal.showValidationMessage('El correo electrónico ya se encuentra ocupado.');
+
 
                 // Create a single form data for the entire operation
                 const formData = new FormData();
@@ -309,6 +325,7 @@ async function addUser() {
         }
     });
 }
+
 
 async function editUser(button) {
     
