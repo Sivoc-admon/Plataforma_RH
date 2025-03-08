@@ -17,10 +17,20 @@ const userSchema = new mongoose.Schema({
         required: [true, 'El email es obligatorio'],
         unique: true,
         trim: true,
+        validate: {
+            validator: (value) => validator.isEmail(value),  // Usa "validator" para validar el formato del email
+            message: 'El email no tiene un formato válido', // Mensaje de error si el email no es válido
+        }
     },
     password: {
         type: String,
-        required: [true, 'La contraseña es obligatoria']
+        required: [true, 'La contraseña es obligatoria'],
+        validate: {
+            validator: function(v) {
+                return !/[\{\}\:\$\=\'\*\[\]]/.test(v);
+            },
+            message: props => `El nombre contiene caracteres no permitidos`
+        }    
     },
     privilegio: {
         type: String,

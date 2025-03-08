@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const mongoose = require('mongoose'); global.mongoose = mongoose;
+const fs = require('fs');
 
 const { authorize } = require('./utils/jwt');
 const { sanitizeInputs } = require('./utils/sanitizeInputs');
@@ -48,7 +49,6 @@ app.use("/cursos", require("./routes/cursos.routes"));
 
 /* Global routes */
 app.get("/", (req, res) => {
-  res.clearCookie('__psmxoflxpspgolxps_mid');
   res.redirect("/login");
 });
 app.get("/logout", (req, res) => {
@@ -58,6 +58,17 @@ app.get("/logout", (req, res) => {
 app.get("/Unauthorized", (req, res) => {
   res.clearCookie('__psmxoflxpspgolxps_mid');
   res.status(404).render("404.ejs");  // Catch 404 before middlewares
+});
+// 🔹 Ruta para servir imágenes sin hacerlas públicas
+app.get('/getPfp', (req, res) => {
+  const filePath = path.join(__dirname, 'uploads', 'usuarios', res.locals.userPhoto);
+
+  // Verificar si el archivo existe antes de enviarlo
+  if (fs.existsSync(filePath)) {
+      return res.sendFile(filePath);
+  } else {
+      return res.status(404).send('Archivo no encontrado');
+  }
 });
 /*-------------*/
 

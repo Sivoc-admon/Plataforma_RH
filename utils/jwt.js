@@ -26,9 +26,11 @@ const authorize = (req, res, next) => {
     if (token && req.url.startsWith("/uploads/"))
         return next();
 
+    //console.log("req.url: ", req.url);
+
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-        
+                
         // if an admin made a change while user still logged in, throw error to enforce logIn again
         if (!activeUsers.has(decoded.userId)) {
             throw new Error("User information was edited by an admin.");
@@ -41,7 +43,7 @@ const authorize = (req, res, next) => {
         res.locals.userId = decoded.userId;
 
         // if you arrive to the lobby you dont need any privileges, but do need a jwt
-        if (req.url === "/login/inicio") {
+        if (req.url === "/login/inicio" || req.url === "/getPfp") {
             return next();
 
         // if you do want to execute ANYTHING it must past the IAM test

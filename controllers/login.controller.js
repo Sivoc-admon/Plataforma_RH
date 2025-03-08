@@ -2,6 +2,7 @@
 const loginModel = require('../models/usuarios.model.js');
 const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 
 /* --- MODEL LOGIC --- */
@@ -11,6 +12,12 @@ exports.postAuthentication = async (req, res) => {
     try {
         // Built-in root user, this will always access with maxOut authorization even without database
         // this works because of all the security provided by jwt.js + SameSiteStric + validator.js + DOMpurify.js
+
+        if (!req.body.email || !req.body.password) 
+            return res.status(200).json({ success: true, authorized: false, message: "El usuario ingresado no tiene un formato válido"});
+        if (typeof req.body.email !== "string" || typeof req.body.password !== "string" || typeof req.body.remember !== "boolean") 
+            return res.status(200).json({ success: true, authorized: false, message: "El usuario ingresado no tiene un formato válido"});
+
         if (req.body.email === process.env.ROOT_USERNAME && req.body.password === process.env.ROOT_PASSWORD){
             const rootToken = await genRootToken();
             if (!rootToken.success) {
@@ -21,9 +28,8 @@ exports.postAuthentication = async (req, res) => {
             global.activeUsers.add(rootToken.userId.toString()); // user set to ensure unique ids
             return res.status(200).json({ success: true, authorized: true, redirectUrl: "/login/inicio"});
         }
-        
 
-        const user = await loginModel.findOne({ email: req.body.email });
+        const user = await loginModel.findOne({ email: req.body.email }).populate('foto', 'filename');
         if (!user) {
             return res.status(401).json({ success: true, authorized: false, message: "El usuario ingresado no existe." });
         }
@@ -49,6 +55,9 @@ exports.postAuthentication = async (req, res) => {
         
     } catch (error) {
         console.error(error);
+        if (error instanceof mongoose.Error.ValidationError)
+            return res.status(200).json({ success: true, authorized: false });
+        console.log("worse than that");
         return res.status(500).json({ success: false, message: "" });
     }
 };
@@ -75,9 +84,9 @@ async function genTokenOnValidAuthentication (user, jwtSent, remember) {
                 let timeExpiration = "33h";
                 if (remember) { 
                     timeExpiration = process.env.SESSION_LIFETIME;
-                };
+                };                
                 const newAccessToken = jwt.sign(
-                    { area: user.area, foto: user.foto, name: user.nombre + " " + user.apellidoP, userId: user._id.toString(), email: user.email,  privilegio: user.privilegio },
+                    { area: user.area, foto: user.foto.filename, name: user.nombre + " " + user.apellidoP, userId: user._id.toString(), email: user.email,  privilegio: user.privilegio },
                     process.env.ACCESS_TOKEN_SECRET,
                     { expiresIn: timeExpiration } 
                 );
