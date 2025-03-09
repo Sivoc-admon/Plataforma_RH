@@ -4,8 +4,9 @@
     <script src="/js/usuarios/rHumanosUsersView.js" defer></script>
 
     <div class="inside-content-css">
-
         <h1> Módulo Usuarios </h1>
+
+        <% if (usersRows.length !==0) { %>
 
         <div class="columns" style="margin-top: 1rem;">
 
@@ -132,6 +133,8 @@
             <button class="default-button-css" onclick="prevPage()">Anterior</button>
             <button class="default-button-css" onclick="nextPage()">Siguiente</button>
         </div>
-
+        <% } else { %>
+            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">El sistema no cuenta con usuarios. ✅</h2>
+            <% }; %>
 
     </div>

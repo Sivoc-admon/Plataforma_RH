@@ -41,7 +41,7 @@ const setupAreaToPuestoRelationship = () => {
         const puestos = areaToPuestos[selectedArea] || [];
         
         // Clear and rebuild puesto options
-        puestoSelect.innerHTML = '<option value="" hidden>Selecciona un puesto</option>';
+        puestoSelect.innerHTML = '<option value="" hidden>🔔 Selecciona un puesto</option>';
         puestos.forEach(puesto => {
             const option = document.createElement("option");
             option.value = puesto;
@@ -132,7 +132,7 @@ const setupDateInputs = () => {
     setupSimpleDateInput('fechaBaja');
 };
 
-// addUser : ---
+// addUser : Done
 async function addUser() {
     Swal.fire({ 
         html: DOMPurify.sanitize(`
@@ -232,7 +232,7 @@ async function addUser() {
         },
         didOpen: () => {
             setupAreaToPuestoRelationship();
-            setupImagePreview(); // This will now attach the event listener properly
+            setupImagePreview();
             setupDateInputs();
         },
         preConfirm: async () => {
@@ -325,6 +325,16 @@ async function addUser() {
         }
     });
 }
+
+// restoreUsersView : Done
+async function restoreUsersView() {
+    try {
+        window.location.href = '/usuarios/restoreUsersView';
+    } catch (error) {
+        location.reload();
+    }
+}
+
 
 
 async function editUser(button) {
@@ -661,11 +671,3 @@ async function deactivateUser(button) {
     });
 }
 
-async function restoreUsersView() {
-    try {
-        window.location.href = '/usuarios/restoreUsersView';
-    } catch (error) {
-        console.error('Error:', error);
-        showErrorAlert('011');
-    }
-}

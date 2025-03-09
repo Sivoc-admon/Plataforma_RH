@@ -1,10 +1,9 @@
 <%- include('../navbar.ejs') %>
     <link rel="stylesheet" href="/css/usuarios.css">
-    <script src="/js/restaurar-usuarios.js" defer></script>
+    <script src="/js/usuarios/restoreUsersView.js" defer></script>
 
     <div class="inside-content-css">
         <h1> Módulo Usuarios </h1>
-
         <div class="columns" style="margin-top: 1rem;">
             <div class="column is-centered" style="text-align: center;">
                 <button class="default-button-css functionality-button-css" onclick="returnMainTable()">
@@ -13,6 +12,11 @@
                 </button>
             </div>
         </div>
+
+
+        <% if (usersRows.length !==0) { %>
+
+
 
         <div class="field">
             <div class="control">
@@ -23,9 +27,9 @@
         <table class="table is-fullwidth is-hoverable">
             <thead>
                 <tr style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue));">
-                    <th class="has-text-centered">Nombre</th>
-                    <th class="has-text-centered">Apellido Paterno</th>
-                    <th class="has-text-centered">Apellido Materno</th>
+                    <th class="has-text-centered">Nombre completo</th>
+                    <th class="has-text-centered">Fecha de ingreso</th>
+                    <th class="has-text-centered">Fecha de baja</th>
                     <th class="has-text-centered">Área</th>
                     <th class="has-text-centered">Puesto</th>
                     <th class="has-text-centered">Privilegio</th>
@@ -36,14 +40,17 @@
                 <% usersRows.forEach(user=> { %>
                     <tr>
                         <td class="is-centered">
-                            <%= user.nombre %>
+                            <%= user.nombre + " " + user.apellidoP + " " + user.apellidoM %>
                         </td>
+
                         <td class="is-centered">
-                            <%= user.apellidoP %>
+                            <%= user.fechaIngreso %>
                         </td>
+
                         <td class="is-centered">
-                            <%= user.apellidoM %>
+                            <%= user.fechaBaja %>
                         </td>
+
                         <td class="is-centered">
                             <%= user.area %>
                         </td>
@@ -51,26 +58,24 @@
                             <%= user.puesto %>
                         </td>
                         <td class="is-centered">
-                            <% if (user.privilegio === "colaborador") { %>
+                            <% if (user.privilegio==="colaborador" ) { %>
                                 Colaborador
-                            <% } else if (user.privilegio === "rHumanos") { %>
-                                Recursos Humanos
-                            <% } else if (user.privilegio === "jefeInmediato") { %>
-                                Jefe Inmediato
-                            <% } else if (user.privilegio === "direccion") { %>
-                                Dirección
-                            <% } else if (user.privilegio === "superadmin") { %>
-                                Superadmin
-                            <% } else { %>
-                                No autorizado
-                            <% } %>
+                                <% } else if (user.privilegio==="rHumanos" ) { %>
+                                    Recursos Humanos
+                                    <% } else if (user.privilegio==="jefeInmediato" ) { %>
+                                        Jefe Inmediato
+                                        <% } else if (user.privilegio==="direccion" ) { %>
+                                            Dirección
+                                            <% } else { %>
+                                                Tomar captura y favor de informar a soporte técnico. (#099)
+                                                <% } %>
                         </td>
                         <td class="is-centered">
                             <div class="columns is-centered">
 
-                                <!-- activateUser button : activateUser --->
-                                <div class="column">
-                                    <button id="activateUser" class="default-button-css table-button-css" userId="<%= user._id %>" onclick="activateUser(this)">
+                                <div class="">
+                                    <button class="default-button-css table-button-css" userId="<%= user._id %>" 
+                                        onclick="activateUser(this)">
                                         <i class="fa-solid fa-user-check"></i>
                                     </button>
                                 </div>
@@ -81,10 +86,14 @@
                     <% }); %>
             </tbody>
         </table>
+        
         <div class="pagination" >
             <button class="default-button-css" onclick="prevPage()">Anterior</button>
             <button class="default-button-css" onclick="nextPage()">Siguiente</button>
         </div>
+        <% } else { %>
+            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">El sistema no cuenta con usuarios desactivados. ✅</h2>
+            <% }; %>
 
 
     </div>

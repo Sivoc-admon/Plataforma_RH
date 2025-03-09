@@ -18,7 +18,10 @@ const allowedFileTypes = [
 ];
 const MAX_FILES = 1;
 
-// createPermitRequest : Colaborador : Done
+// accessUsersModule : jefeInmediato, rHumanos : ---
+router.get("/accessUsersModule", controller.accessUsersModule);
+
+// addUser : rHumanos : Done
 const upload = configureFileUpload("uploads/usuarios", allowedFileTypes, allowedFileExtensions, MAX_SIZE_MB, MAX_FILES);
 router.post("/addUser",
     ensureFilesArray,
@@ -37,12 +40,13 @@ router.post("/addUser",
 controller.addUser);
 router.post("/doesEmailExists", controller.doesEmailExists)
 
+// restoreUsersView : rHumanos : Done
+router.get("/restoreUsersView", controller.restoreUsersView);
+
+// activateUser : rHumanos : Done
+router.post("/activateUser", controller.activateUser);
 
 
-
-
-// accessUsersModule : jefeInmediato, rHumanos : ---
-router.get("/accessUsersModule", controller.accessUsersModule);
 
 //  : -- : ----
 exports.editPermit_getInfo = async (req, res) => {
@@ -218,11 +222,9 @@ exports.editPermit_postInfo = async (req, res) => {
 
 router.post("/downloadExcelUsers", controller.postDownloadExcelUsers);
 router.post("/downloadPDFUsers", controller.postDownloadPDFUsers);
-router.get("/restoreUsersView", controller.getRestoreUsersView);
 
 router.post("/uploadFile", upload.single('file'), controller.postFileUpload);
 router.post("/deactivateUser", controller.postUserDeactivation);
-router.post("/activateUser", controller.postUserActivation);
 router.post("/changePrivilege", controller.postUserChangePrivilege);
 
 router.post("/editUser", controller.postEditUser); 

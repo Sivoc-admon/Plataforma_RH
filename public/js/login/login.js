@@ -1,4 +1,4 @@
-// addUser button
+// logIn button : Done
 async function logIn() {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();

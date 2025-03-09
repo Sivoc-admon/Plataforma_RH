@@ -14,11 +14,9 @@ const areaToPuestos = {
 };
 
 
-// addUser : rHumanos : -- 
+// addUser : rHumanos : Done 
 exports.addUser = async (req, res) => {
     try {
-        console.log("req.body: ");
-        console.log(req.body);
 
         // 0. VALIDATE USER PRIVILEGES
         if (res.locals.userPrivilege !== "rHumanos") {
@@ -30,8 +28,6 @@ exports.addUser = async (req, res) => {
         }
 
         // A. MINIMAL PAYLOAD VALIDATION
-        // Some basic validations are kept here to provide better error messages
-        // More complex validations are now handled by the model
         const { 
             nombre, apellidoP, apellidoM, email, password, 
             area, puesto, fechaIngreso, privilegio 
@@ -106,7 +102,29 @@ exports.addUser = async (req, res) => {
         });
     }
 };
+// activateUser : rHumanos : -- 
+exports.activateUser = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+        if (!mongoose.Types.ObjectId.isValid(userId)) 
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "ID de usuario inválido." });
 
+        // Execute findByIdAndUpdate
+        const response = await usersModel.findByIdAndUpdate(
+            userId,
+            { $set: { estaActivo: true } }, // Change attribute
+            { new: true, runValidators: true }
+        );
+
+        // If for some reason user not found, send 404
+        if (!response) 
+            return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#173)" });
+        
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#174)" });
+    }
+};
 
 /* --- AUX --- */
 const formatReadableDateTime = (isoDate) => {
@@ -122,8 +140,6 @@ const formatReadableDateTime = (isoDate) => {
 /****************/
 /*********/
 /***/
-
-
 
 /* --- VIEWS --- */
 exports.accessUsersModule = async (req, res) => {
@@ -147,39 +163,37 @@ exports.accessUsersModule = async (req, res) => {
             return res.redirect("/login");
         }
 
-
-
-
-
     } catch (error) {
         return res.status(500).send("Tomar captura y favor de informar a soporte técnico. (#071)");
+    }
+};
+exports.restoreUsersView = async (req, res) => {
+    try {
+        let usersRows = "";
+
+        if (res.locals.userPrivilege === "jefeInmediato") {
+
+        } else if (res.locals.userPrivilege === "rHumanos" || res.locals.userPrivilege === "direccion") {
+            usersRows = await usersModel.find({ estaActivo: false }).select('-email -foto -password -__v');
+
+            usersRows = usersRows.map(user => ({
+                ...user.toObject(),
+                fechaIngreso: formatReadableDateTime(user.fechaIngreso),
+                fechaBaja: formatReadableDateTime(user.fechaBaja)
+            }));
+
+            return res.render('usuarios/restoreUsersView.ejs', { usersRows });
+        } else {
+            return res.redirect("/login");
+        }
+
+    } catch (error) {
+        return res.status(500).send("Tomar captura y favor de informar a soporte técnico. (#171)");
     }
 };
 /****************/
 /*********/
 /***/
-
-
-
-
-
-
-
-/*
-const setupDatePicker = (elementId, options) => {
-    return flatpickr(`#${elementId}`, {
-        enableTime: options.enableTime,
-        dateFormat: "Y-m-d",
-        time_24hr: true,
-        locale: "es",
-        minDate: options.minDate,
-        defaultDate: options.defaultDate,
-        maxDate: options.maxDate || "",
-        onChange: options.onChange
-    });
-};
-*/
-
 
 /* --- MODEL LOGIC --- */
 exports.doesEmailExists = async (req, res) => {
@@ -285,28 +299,7 @@ exports.postUserDeactivation = async (req, res) => {
     }
 };
 
-exports.postUserActivation = async (req, res) => {
-    try {
-        const userId = req.body.userId;
 
-        // Execute findByIdAndUpdate
-        const response = await usersModel.findByIdAndUpdate(
-            userId,
-            { $set: { estaActivo: true } }, // Change attribute
-            { new: true, runValidators: true }
-        );
-
-        // If for some reason user not found, send 404
-        if (!response) {
-            return res.status(404).json({ success: false, message: "" });
-        }
-
-        return res.status(200).json({ success: true, message: "" });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
-    }
-};
 
 
 // TODO, add a new button that says change password, use the skeleton down below.
@@ -336,18 +329,6 @@ exports.postUserChangePrivilege = async (req, res) => {
     }
 };
 
-/* --- VIEWS LOGIC --- */
-
-
-exports.getRestoreUsersView = async (req, res) => {
-    try {
-        const usersRows = await usersModel.find({ estaActivo: false }).select('-email -foto -password -__v');
-        return res.render('usuarios/restoreUsersView.ejs', { usersRows });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
-    }
-};
 
 // Output CSV file path
 // TODO, remake
