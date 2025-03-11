@@ -346,6 +346,39 @@ async function configureTeamView() {
 }
 
 
+// downloadPDF : ---
+async function downloadPDF() {
+    try {
+        window.location.href = '/usuarios/downloadPDF';
+        Swal.fire({
+            title: 'PDF descargado',
+            icon: 'success',
+            width: "500px",
+            text: 'El archivo se descargó correctamente.'
+        });
+    } catch (error) {
+        location.reload();
+    }
+};
+
+// downloadExcel : ---
+async function downloadExcel() {
+    try {
+        window.location.href = '/usuarios/downloadExcel';
+        Swal.fire({
+            title: 'Excel descargado',
+            icon: 'success',
+            width: "500px",
+            text: 'El archivo se descargó correctamente.'
+        });
+    } catch (error) {
+        location.reload();
+    }
+};
+
+
+
+
 async function editUser(button) {
     
     try {
@@ -679,4 +712,3 @@ async function deactivateUser(button) {
         }
     });
 }
-

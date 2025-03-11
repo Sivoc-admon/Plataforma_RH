@@ -247,9 +247,6 @@ exports.doesEmailExists = async (req, res) => {
     }
 };
 
-
-
-
 exports.postEditUser = async (req, res) => {
     try {
         const userId = req.body.userId;
@@ -276,7 +273,6 @@ exports.postEditUser = async (req, res) => {
         return res.status(500).json({ success: false, message: "" });
     }
 
-
 };
 
 exports.postFileUpload = async (req, res) => {
@@ -301,9 +297,7 @@ exports.postUserDeactivation = async (req, res) => {
         );
 
         // If for some reason user not found, send 404
-        if (!response) {
-            return res.status(404).json({ success: false, message: "" });
-        }
+        if (!response) return res.status(404).json({ success: false, message: "" });
 
         activeUsers.delete(userId); // log him out 
         return res.status(200).json({ success: true, message: "" });
@@ -344,95 +338,327 @@ exports.postUserChangePrivilege = async (req, res) => {
 };
 
 
-// Output CSV file path
-// TODO, remake
-exports.postDownloadExcelUsers = async (req, res) => {
-    const outputFilePath = './usuarios.xlsx';
-
+// changeStatus : rHumanos : ---
+exports.changeStatus = async (req, res) => {
     try {
-        const usersRows = await usersModel.find().select('-__v -foto -password').lean();
+        const { permitId, estatus } = req.body;
 
-        if (usersRows.length === 0) {
-            return res.status(404).json({ success: false, message: 'No users found to export.' });
+        // 1. Verify request quality
+        if (!permitId || typeof permitId !== "string" || !estatus || typeof estatus !== "string") {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#035)"
+            });
         }
 
-        // Generate CSV from data
-        const json2csvParser = new Parser();
-        const csv = json2csvParser.parse(usersRows);
+        // 2. Get current permit data and validate if the new estatus
+        const permitData = await permitsModel.findOne({ _id: permitId });
 
-        // Write the file to disk
-        fs.writeFileSync(outputFilePath, csv);
+        if (!permitData) return res.status(400).json({
+            success: false,
+            messageTitle: "¡Repámpanos!",
+            messageText: "Espera un poco y vuelvelo a intentar. (#058)"
+        });
 
-        // Send the file to the client
-        return res.download(outputFilePath, 'usuarios.xlsx', (err) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ success: false, message: 'Error sending file.' });
+        if (!permitData.isSent || permitData.isVerified) {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#055)"
+            });
+        }
+
+        // 3. Execute mongoose action 
+        const updatedPermit = await permitsModel.findByIdAndUpdate(
+            permitId,
+            {
+                $set: {
+                    estatus: estatus,
+                }
+            },
+            { new: true, runValidators: true }
+        );
+        if (!updatedPermit) {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#059)"
+            });
+        }
+
+        return res.status(200).json({ success: true, message: "" });
+
+    } catch (error) {
+        if (error instanceof mongoose.Error.ValidationError) {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#057)"
+            });
+        }
+        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#060)" });
+    }
+};
+
+// downloadPDF : rHumanos : --- 
+// ALMOST, CORREGIR MARGENES Y LISTO
+exports.downloadPDF = async (req, res) => {
+    try {
+        let usersRows = [];
+
+        if (res.locals.userPrivilege === "rHumanos") {
+            usersRows = await usersModel.find({}).select('-__v');
+
+            if (usersRows.length === 0) return res.status(404).json({ success: false, message: 'No users found to export.' });
+        } else {
+            return res.redirect("/login");
+        }
+
+        // Create PDF with better styling - changed to portrait layout
+        const PDFDocument = require('pdfkit');
+        const doc = new PDFDocument({
+            margin: 30,
+            size: 'Letter',
+            layout: 'portrait' // Changed to portrait/vertical orientation
+        });
+
+        // Set response headers
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=usuarios.pdf');
+        doc.pipe(res);
+
+        // Add header with company logo placeholder and title
+        doc.fontSize(22)
+            .fillColor('#2C3E50')
+            .text('Reporte de Usuarios', 50, 30, { align: 'center' });
+
+        doc.fontSize(12)
+            .fillColor('#7F8C8D')
+            .text('Generado el: ' + new Date().toLocaleDateString('es-MX'), 50, 60, { align: 'center' });
+
+        // Table configuration - adjusted for portrait mode
+        const startY = 100;
+        const rowHeight = 30; // Reduced height for better fit in portrait
+        // Adjusted column widths for portrait layout
+        const columnWidths = [120, 130, 100, 100, 70];
+        
+        // Add horizontal line
+        const startX = 30; // Starting point of the table
+        const tableWidth = columnWidths.reduce((sum, width) => sum + width, 0); // Sum of all columns
+
+        doc.strokeColor('#BDC3C7')
+            .lineWidth(1)
+            .moveTo(startX, startY - 20)  
+            .lineTo(startX + tableWidth, startY - 20) 
+            .stroke();
+
+        // Updated headers to match the actual data structure from comments
+        const headers = ['Nombre completo', 'Correo', 'Área', 'Puesto', 'Activo'];
+        let currentY = startY;
+
+        // Function to draw cell background
+        function drawCellBackground(x, y, width, height, color) {
+            doc.fillColor(color)
+                .rect(x, y, width, height)
+                .fill();
+        }
+
+        // Function to draw cell borders
+        function drawCellBorders(x, y, width, height) {
+            doc.strokeColor('#E0E0E0')
+                .lineWidth(1)
+                .rect(x, y, width, height)
+                .stroke();
+        }
+
+        // Draw table headers
+        let currentX = startX;
+        headers.forEach((header, i) => {
+            // Draw header background
+            drawCellBackground(currentX, currentY, columnWidths[i], rowHeight, '#34495E');
+
+            // Calculate centered vertical position
+            const textHeight = doc.heightOfString(header, { width: columnWidths[i] - 10 });
+            const centeredY = currentY + (rowHeight - textHeight) / 2; // Center vertically
+
+            // Draw header text
+            doc.fillColor('#FFFFFF')
+                .fontSize(11)
+                .font('Helvetica-Bold')
+                .text(
+                    header,
+                    currentX + 5, // Left margin
+                    centeredY, // Centered Y coordinate
+                    {
+                        width: columnWidths[i] - 10,
+                        align: 'center'
+                    }
+                );
+
+            currentX += columnWidths[i]; // Move to next column
+        });
+
+        currentY += rowHeight;
+
+        // Draw table rows for users based on the data structure in comments
+        usersRows.forEach((user, index) => {
+            currentX = startX;
+            const isEvenRow = index % 2 === 0;
+            const rowColor = isEvenRow ? '#F8F9F9' : '#FFFFFF';
+
+            // Draw row background
+            drawCellBackground(startX, currentY, tableWidth, rowHeight, rowColor);
+            
+            // Use the actual structure from the sample data in comments
+            const rowData = [
+                `${user.nombre || ''} ${user.apellidoP || ''} ${user.apellidoM || ''}`,
+                user.email || 'N/A',
+                user.area || 'N/A',
+                user.puesto || 'N/A',
+                user.estaActivo ? 'Sí' : 'No'
+            ];
+
+            rowData.forEach((text, i) => {
+                // Draw cell borders
+                drawCellBorders(currentX, currentY, columnWidths[i], rowHeight);
+
+                // Draw cell text
+                doc.fillColor('#2C3E50')
+                    .fontSize(10)
+                    .font('Helvetica')
+                    .text(
+                        text,
+                        currentX + 5,
+                        currentY + 5, // Adjusted positioning for smaller row height
+                        {
+                            width: columnWidths[i] - 10,
+                            align: 'center',
+                            lineBreak: false,
+                            ellipsis: true
+                        }
+                    );
+
+                currentX += columnWidths[i];
+            });
+
+            currentY += rowHeight;
+
+            // Add new page if needed - adjusted page break point for portrait
+            if (currentY > 700) {
+                doc.addPage();
+                currentY = 50;
+                
+                // Redraw headers on new page
+                currentX = startX;
+                headers.forEach((header, i) => {
+                    drawCellBackground(currentX, currentY, columnWidths[i], rowHeight, '#34495E');
+                    const textHeight = doc.heightOfString(header, { width: columnWidths[i] - 10 });
+                    const centeredY = currentY + (rowHeight - textHeight) / 2;
+                    
+                    doc.fillColor('#FFFFFF')
+                        .fontSize(11)
+                        .font('Helvetica-Bold')
+                        .text(
+                            header,
+                            currentX + 5,
+                            centeredY,
+                            {
+                                width: columnWidths[i] - 10,
+                                align: 'center'
+                            }
+                        );
+                    currentX += columnWidths[i];
+                });
+                
+                currentY += rowHeight;
             }
         });
 
+        // Add footer - adjusted for portrait layout
+        const pageBottom = 740;
+        doc.strokeColor('#BDC3C7')
+            .lineWidth(1)
+            .moveTo(50, pageBottom)
+            .lineTo(550, pageBottom)
+            .stroke();
+
+        // Finalize PDF
+        doc.end();
+
     } catch (error) {
-        console.error('Error exporting users to CSV:', error);
-        return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        console.error('Error generating PDF:', error);
+        res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
 };
 
 
-// Output CSV file path
-// TODO, remake
-exports.postDownloadPDFUsers = async (req, res) => {
+// downloadExcel : rHumanos : --- 
+exports.downloadExcel = async (req, res) => {
+    const ExcelJS = require('exceljs');
     try {
-        const usersRows = await usersModel.find().select('-__v -foto -password').lean();
+        let usersRows = [];
+
+        if (res.locals.userPrivilege === "rHumanos") {
+            usersRows = await usersModel.find({})
+            // if teamId return jefeInmediatoId
+                // if jefeInmediatoId === userId, print "Usuario es J.I."
+                // else, print jefeInmediatoId.name+apellidoP
+            // else, return "N/A"
+                .populate('userId', 'nombre apellidoP apellidoM area')
+                .select('-__v');
+        } else {
+            return res.redirect("/login");
+        }
 
         if (usersRows.length === 0) {
             return res.status(404).json({ success: false, message: 'No users found to export.' });
         }
 
-        // Crear un nuevo documento PDF
-        const doc = new PDFDocument();
-        const outputFilePath = './usuarios.pdf';
+        // 📌 Crear un nuevo archivo Excel
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Permisos');
 
-        // Escribir el archivo PDF en el sistema de archivos
-        const stream = fs.createWriteStream(outputFilePath);
-        doc.pipe(stream);
+        // 📌 Definir encabezados
+        worksheet.columns = [
+            { header: 'Nombre del colaborador', key: 'nombre', width: 25 },
+            { header: 'Área', key: 'area', width: 20 },
+            { header: 'Descripción del permiso', key: 'descripcion', width: 30 },
+            { header: 'Fecha y hora de inicio', key: 'fechaInicio', width: 25 },
+            { header: 'Fecha y hora de término', key: 'fechaTermino', width: 25 },
+            { header: 'Documentos agregados', key: 'documentos', width: 30 },
+            { header: 'Estatus', key: 'estatus', width: 20 },
+            { header: 'Estado de verificación', key: 'verificacion', width: 20 }
+        ];
 
-        // Añadir título
-        doc.fontSize(20).text('Lista de Usuarios', { align: 'center' });
-        doc.moveDown();
-
-        // Añadir encabezados de la tabla
-        const headers = ['Nombre', 'Apellido Paterno', 'Apellido Materno', 'Fecha de Ingreso', 'Área', 'Puesto', 'Activo'];
-        doc.fontSize(12).text(headers.join(' | '), { align: 'left' });
-        doc.moveDown();
-
-        // Añadir filas de usuarios
-        usersRows.forEach(user => {
-            const row = [
-                user.nombre,
-                user.apellidoP,
-                user.apellidoM,
-                new Date(user.fechaIngreso).toLocaleDateString(),
-                user.area,
-                user.puesto,
-                user.estaActivo ? 'Sí' : 'No'
-            ];
-            doc.text(row.join(' | '), { align: 'left' });
-        });
-
-        // Finalizar el documento y esperar a que se cierre el stream
-        doc.end();
-
-        stream.on('finish', () => {
-            return res.download(outputFilePath, 'usuarios.pdf', err => {
-                if (err) {
-                    console.error(err);
-                    return res.status(500).json({ success: false, message: 'Error sending file.' });
-                }
+        // 📌 Llenar las filas con los datos
+        permitsRows.forEach(permit => {
+            worksheet.addRow({
+                nombre: `${permit.userId.nombre} ${permit.userId.apellidoP} ${permit.userId.apellidoM}`,
+                area: permit.userId.area,
+                descripcion: `${permit.registro} para ${permit.filtro}`,
+                fechaInicio: formatReadableDateTime(permit.fechaInicio),
+                fechaTermino: formatReadableDateTime(permit.fechaTermino),
+                documentos: permit.docPaths?.length ? permit.docPaths.map(doc => doc.originalname).join(', ') : 'No hay documentos',
+                estatus: permit.estatus,
+                verificacion: permit.isVerified ? 'Interacción cerrada' : 'Interacción abierta'
             });
         });
 
+        // 📌 Aplicar estilos al encabezado
+        worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        worksheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF34495E' } };
+        worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
+
+        // 📌 Configurar las respuestas HTTP
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=permisos.xlsx');
+
+        // 📌 Enviar el archivo
+        await workbook.xlsx.write(res);
+        res.end();
+
     } catch (error) {
-        console.error('Error generating PDF:', error);
-        return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
 };

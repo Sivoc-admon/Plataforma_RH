@@ -900,37 +900,3 @@ async function downloadExcel() {
     }
 };
 
-// downloadPDF button
-// TODO, remake
-async function downloadPDF() {
-    try {
-        const response = await fetch('/usuarios/downloadPDFUsers', {
-            method: 'POST',
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const blob = await response.blob();
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = 'usuarios.pdf';
-        link.click();
-
-        Swal.fire({
-            title: 'PDF descargado',
-            icon: 'success',
-            width: "500px",
-            text: 'El archivo se descargó correctamente.'
-        });
-    } catch (error) {
-        console.error('Error downloading file:', error);
-        Swal.fire({
-            title: 'Algo salió mal :(',
-            icon: 'error',
-            width: "500px",
-            text: 'Favor de contactar a Soporte Técnico. (Error #019)'
-        });
-    }
-};

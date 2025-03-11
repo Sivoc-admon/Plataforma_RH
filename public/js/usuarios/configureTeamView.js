@@ -3,11 +3,9 @@ function returnMainTable() {
     window.location.href = '/usuarios/accessUsersModule';
 }
 
-
 // configure TeamView button
 
-
-// activateUser button----------
+// activateUser button
 async function activateUser(button) { // async function to perform fetch chain
     Swal.fire({
         html: `
