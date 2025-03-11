@@ -116,3 +116,31 @@
     border-radius: 8px;
     color: white;
 }
+
+/* configureTeamView */
+.team-card {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    list-style: none;
+}
+
+.team-card h3 {
+    margin-top: 0;
+    color: var(--dark-green);
+}
+
+.team-card ul {
+    padding-left: 20px;
+}
+
+.team-card li {
+    margin-bottom: 5px;
+}
+
+.secondary-division {
+    padding: 0;
+}

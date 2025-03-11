@@ -1,0 +1,111 @@
+<%- include('../navbar.ejs') %>
+    <link rel="stylesheet" href="/css/usuarios.css">
+    <script src="/js/usuarios/configureTeamView.js" defer></script>
+
+    <div class="inside-content-css">
+        <h1> Módulo Usuarios </h1>
+
+        <div class="columns" style="margin-top: 1rem;">
+            <div class="column is-centered" style="text-align: center;">
+                <button class="default-button-css functionality-button-css" onclick="returnMainTable()">
+                    <i class="fa-solid fa-circle-left default-icon-button-css"></i>
+                    <p>Regresar al tablero</p>
+                </button>
+            </div>
+        </div>
+
+        <% if (teamsRows.length !==0) { %>
+
+            <div class="field">
+                <div class="control">
+                    <input class="input" type="text" id="searchInput" placeholder="Buscar por nombre, apellido o área"
+                        onkeyup="filterTable()">
+                </div>
+            </div>
+            <div class="container">
+                <h2
+                    style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue)); padding: 10px; color: white;">
+                    Distribución de equipos
+                </h2>
+
+                <ul id="userList" class="secondary-division">
+                    <% teamsRows.forEach(team=> { %>
+                        <li class="team-card">
+                            <h3>Jefe Inmediato:</h3>
+                            <% if (team.jefeInmediatoId) { %>
+                                <p><strong>Nombre:</strong>
+                                    <%= team.jefeInmediatoId.nombre %>
+                                        <%= team.jefeInmediatoId.apellidoP %>
+                                            <%= team.jefeInmediatoId.apellidoM %>
+                                </p>
+                                <p><strong>Área:</strong>
+                                    <%= team.jefeInmediatoId.area %>
+                                </p>
+                                <p><strong>Puesto:</strong>
+                                    <%= team.jefeInmediatoId.puesto %>
+                                </p>
+                                <% } else { %>
+                                    <p>No asignado</p>
+                                    <% } %>
+
+                                        <h3>Colaboradores:</h3>
+                                        <% if (team.colaboradoresIds && team.colaboradoresIds.length> 0) { %>
+                                            <ul>
+                                                <% team.colaboradoresIds.forEach(colaborador=> { %>
+                                                    <li>
+                                                        <%= colaborador.nombre %>
+                                                            <%= colaborador.apellidoP %>
+                                                                <%= colaborador.apellidoM %> - <%= colaborador.area %> (<%= colaborador.puesto %>)
+                                                    </li>
+                                                    <% }); %>
+                                            </ul>
+                                            <% } else { %>
+                                                <p>No hay colaboradores asignados.</p>
+                                                <% } %>
+                        </li>
+                        <% }); %>
+                </ul>
+            </div>
+
+
+            <style>
+                .team-card {
+                    border: 1px solid #ccc;
+                    border-radius: 12px;
+                    padding: 15px;
+                    margin-bottom: 20px;
+                    background: #f9f9f9;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    list-style: none;
+                }
+
+                .team-card h3 {
+                    margin-top: 0;
+                    color: var(--dark-green);
+                }
+
+                .team-card ul {
+                    padding-left: 20px;
+                }
+
+                .team-card li {
+                    margin-bottom: 5px;
+                }
+
+                .secondary-division {
+                    padding: 0;
+                }
+            </style>
+
+
+            <div class="pagination">
+                <button class="default-button-css" onclick="prevPage()">Anterior</button>
+                <button class="default-button-css" onclick="nextPage()">Siguiente</button>
+            </div>
+            <% } else { %>
+                <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">El sistema no
+                    cuenta con usuarios desactivados. ✅</h2>
+                <% }; %>
+
+
+    </div>

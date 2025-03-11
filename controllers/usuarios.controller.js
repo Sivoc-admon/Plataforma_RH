@@ -1,6 +1,7 @@
 const usersModel = require("../models/usuarios.model");
 const filesModel = require("../models/files.model");
 const bcrypt = require("bcryptjs");
+const teamsModel = require("../models/equipos.model");
 
 const fs = require('fs');
 const path = require('path');
@@ -102,7 +103,7 @@ exports.addUser = async (req, res) => {
         });
     }
 };
-// activateUser : rHumanos : -- 
+// activateUser : rHumanos : Done
 exports.activateUser = async (req, res) => {
     try {
         const userId = req.body.userId;
@@ -146,9 +147,7 @@ exports.accessUsersModule = async (req, res) => {
     try {
         let usersRows = "";
 
-        if (res.locals.userPrivilege === "jefeInmediato") {
-
-        } else if (res.locals.userPrivilege === "rHumanos" || res.locals.userPrivilege === "direccion") {
+        if (res.locals.userPrivilege === "rHumanos" || res.locals.userPrivilege === "direccion") {
             usersRows = await usersModel.find({ estaActivo: true }).select('-password -__v');
 
             usersRows = usersRows.map(user => ({
@@ -156,7 +155,6 @@ exports.accessUsersModule = async (req, res) => {
                 fechaIngreso: formatReadableDateTime(user.fechaIngreso),
                 fechaBaja: formatReadableDateTime(user.fechaBaja)
             }));
-
 
             return res.render('usuarios/rHumanosUsersView.ejs', { usersRows });
         } else {
@@ -189,6 +187,22 @@ exports.restoreUsersView = async (req, res) => {
 
     } catch (error) {
         return res.status(500).send("Tomar captura y favor de informar a soporte técnico. (#171)");
+    }
+};
+
+exports.configureTeamView = async (req, res) => {
+    try {
+        let teamsRows = "";
+        
+        if (res.locals.userPrivilege === "rHumanos" || res.locals.userPrivilege === "direccion") {
+            teamsRows = await teamsModel.find({}).populate('jefeInmediatoId colaboradoresIds', 'nombre apellidoP apellidoM area puesto').select('-password -fechaBaja -fechaIngreso -email -foto -__v');
+            return res.render('usuarios/configureTeamView.ejs', { teamsRows });
+        } else {
+            return res.redirect("/login");
+        }
+
+    } catch (error) {
+        return res.status(500).send("Tomar captura y favor de informar a soporte técnico. (#185)");
     }
 };
 /****************/

@@ -18,7 +18,7 @@ const allowedFileTypes = [
 ];
 const MAX_FILES = 1;
 
-// accessUsersModule : jefeInmediato, rHumanos : ---
+// accessUsersModule : rHumanos : Done
 router.get("/accessUsersModule", controller.accessUsersModule);
 
 // addUser : rHumanos : Done
@@ -45,6 +45,13 @@ router.get("/restoreUsersView", controller.restoreUsersView);
 
 // activateUser : rHumanos : Done
 router.post("/activateUser", controller.activateUser);
+
+// restoreUsersView : rHumanos : ---
+router.get("/configureTeamView", controller.configureTeamView);
+
+// configureTeam : rHumanos : ---
+//router.post("/configureTeam", controller.configureTeam);
+
 
 
 

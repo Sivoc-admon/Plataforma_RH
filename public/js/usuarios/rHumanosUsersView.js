@@ -336,6 +336,15 @@ async function restoreUsersView() {
 }
 
 
+// configureTeamView : ---
+async function configureTeamView() {
+    try {
+        window.location.href = '/usuarios/configureTeamView';
+    } catch (error) {
+        location.reload();
+    }
+}
+
 
 async function editUser(button) {
     

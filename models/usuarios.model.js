@@ -118,9 +118,9 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    jefeInmediato: {
+    teamId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',  // El modelo de usuario al que se hace referencia
+        ref: 'equipos',  // El modelo de usuario al que se hace referencia
         default: null,  // Permitir null al crear
         validate: {
             validator: function(value) {
@@ -129,7 +129,7 @@ const userSchema = new mongoose.Schema({
                 // Validar que el valor sea un ObjectId
                 return mongoose.Types.ObjectId.isValid(value);
             },
-            message: 'jefeInmediato debe ser un ObjectId válido'
+            message: 'teamId debe ser un ObjectId válido'
         }
     },
 });
