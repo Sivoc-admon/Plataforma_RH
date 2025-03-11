@@ -10,7 +10,11 @@ const path = require('path');
 // POST Endpoint para '/POSTAUTH'
 exports.postAuthentication = async (req, res) => {
     try {
-        // Built-in root user, this will always access with maxOut authorization even without database
+
+        // critical skip . you can stress the login very easily
+
+        // Built-in root user, this will always access with maxOut aut
+        // horization even without database
         // this works because of all the security provided by jwt.js + SameSiteStric + validator.js + DOMpurify.js
 
         if (!req.body.email || !req.body.password) 

@@ -21,35 +21,35 @@ exports.addUser = async (req, res) => {
 
         // 0. VALIDATE USER PRIVILEGES
         if (res.locals.userPrivilege !== "rHumanos") {
-            return res.status(403).json({ 
-                success: false, 
-                messageTitle: "¡Repámpanos!", 
-                messageText: "Espera un poco y vuelvelo a intentar. (#112)" 
+            return res.status(403).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#112)"
             });
         }
 
         // A. MINIMAL PAYLOAD VALIDATION
-        const { 
-            nombre, apellidoP, apellidoM, email, password, 
-            area, puesto, fechaIngreso, privilegio 
+        const {
+            nombre, apellidoP, apellidoM, email, password,
+            area, puesto, fechaIngreso, privilegio
         } = req.body;
 
         // 1. Check if all required fields exist
-        if (!nombre || !apellidoP || !apellidoM || !email || !password || 
+        if (!nombre || !apellidoP || !apellidoM || !email || !password ||
             !area || !puesto || !fechaIngreso || !privilegio) {
-            return res.status(400).json({ 
-                success: false, 
-                messageTitle: "Datos Incompletos", 
-                messageText: "Todos los campos son requeridos." 
+            return res.status(400).json({
+                success: false,
+                messageTitle: "Datos Incompletos",
+                messageText: "Todos los campos son requeridos."
             });
         }
 
-        if ( typeof nombre !== "string" ||  typeof apellidoP !== "string" ||  typeof apellidoM !== "string" ||  typeof email !== "string" ||  typeof password !== "string" || 
-            typeof area !== "string" ||  typeof puesto !== "string" ||  typeof fechaIngreso !== "string" ||  typeof privilegio !== "string") {
-            return res.status(400).json({ 
-                success: false, 
-                messageTitle: "Datos Incorrectos", 
-                messageText: "Todos los campos deben tener un formato correcto." 
+        if (typeof nombre !== "string" || typeof apellidoP !== "string" || typeof apellidoM !== "string" || typeof email !== "string" || typeof password !== "string" ||
+            typeof area !== "string" || typeof puesto !== "string" || typeof fechaIngreso !== "string" || typeof privilegio !== "string") {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "Datos Incorrectos",
+                messageText: "Todos los campos deben tener un formato correcto."
             });
         }
 
@@ -82,24 +82,24 @@ exports.addUser = async (req, res) => {
         // 4. Save user to database - model validation happens here
         await usersModel.create(newUser);
         return res.status(200).json({ success: true });
-        
+
     } catch (error) {
         //console.log(error);
 
         // Handle validation errors from Mongoose
         if (error instanceof mongoose.Error.ValidationError) {
-            return res.status(400).json({ 
-                success: false, 
-                messageTitle: "¡Repámpanos!", 
-                messageText: "Espera un poco y vuelvelo a intentar. (#111)" 
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "Espera un poco y vuelvelo a intentar. (#111)"
             });
         }
-        
+
         // Generic server error
-        return res.status(500).json({ 
-            success: false, 
-            messageTitle: "Error", 
-            messageText: "Tomar captura y favor de informar a soporte técnico. (#110)" 
+        return res.status(500).json({
+            success: false,
+            messageTitle: "Error",
+            messageText: "Tomar captura y favor de informar a soporte técnico. (#110)"
         });
     }
 };
@@ -107,7 +107,7 @@ exports.addUser = async (req, res) => {
 exports.activateUser = async (req, res) => {
     try {
         const userId = req.body.userId;
-        if (!mongoose.Types.ObjectId.isValid(userId)) 
+        if (!mongoose.Types.ObjectId.isValid(userId))
             return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "ID de usuario inválido." });
 
         // Execute findByIdAndUpdate
@@ -118,9 +118,9 @@ exports.activateUser = async (req, res) => {
         );
 
         // If for some reason user not found, send 404
-        if (!response) 
+        if (!response)
             return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelvelo a intentar. (#173)" });
-        
+
         return res.status(200).json({ success: true });
     } catch (error) {
         return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#174)" });
@@ -193,7 +193,7 @@ exports.restoreUsersView = async (req, res) => {
 exports.configureTeamView = async (req, res) => {
     try {
         let teamsRows = "";
-        
+
         if (res.locals.userPrivilege === "rHumanos" || res.locals.userPrivilege === "direccion") {
             teamsRows = await teamsModel.find({}).populate('jefeInmediatoId colaboradoresIds', 'nombre apellidoP apellidoM area puesto').select('-password -fechaBaja -fechaIngreso -email -foto -__v');
             return res.render('usuarios/configureTeamView.ejs', { teamsRows });
@@ -216,20 +216,20 @@ exports.doesEmailExists = async (req, res) => {
 
         // Validación inicial: Comprueba que se envíe el email
         if (!email) {
-            return res.status(400).json({ 
-                success: false, 
-                messageTitle: "Email Inválido", 
-                messageText: "El email es obligatorio." 
+            return res.status(400).json({
+                success: false,
+                messageTitle: "Email Inválido",
+                messageText: "El email es obligatorio."
             });
         }
 
         // Validar formato de email
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailPattern.test(email)) {
-            return res.status(400).json({ 
-                success: false, 
-                messageTitle: "Email Inválido", 
-                messageText: "El formato del correo electrónico no es válido." 
+            return res.status(400).json({
+                success: false,
+                messageTitle: "Email Inválido",
+                messageText: "El formato del correo electrónico no es válido."
             });
         }
 
@@ -423,6 +423,17 @@ exports.downloadPDF = async (req, res) => {
             layout: 'portrait' // Changed to portrait/vertical orientation
         });
 
+
+        // Table configuration - adjusted for portrait mode
+        const startY = 100;
+        const rowHeight = 30; // Reduced height for better fit in portrait
+        // Adjusted column widths for portrait layout
+        const columnWidths = [125, 135, 105, 105, 75];
+
+        // Add horizontal line
+        const startX = 33; // Starting point of the table
+        const tableWidth = columnWidths.reduce((sum, width) => sum + width, 0); // Sum of all columns
+
         // Set response headers
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'attachment; filename=usuarios.pdf');
@@ -431,26 +442,17 @@ exports.downloadPDF = async (req, res) => {
         // Add header with company logo placeholder and title
         doc.fontSize(22)
             .fillColor('#2C3E50')
-            .text('Reporte de Usuarios', 50, 30, { align: 'center' });
+            .text('Reporte de Usuarios', 45, 30, { align: 'center' });
 
         doc.fontSize(12)
             .fillColor('#7F8C8D')
-            .text('Generado el: ' + new Date().toLocaleDateString('es-MX'), 50, 60, { align: 'center' });
+            .text('Generado el: ' + new Date().toLocaleDateString('es-MX'), 45, 60, { align: 'center' });
 
-        // Table configuration - adjusted for portrait mode
-        const startY = 100;
-        const rowHeight = 30; // Reduced height for better fit in portrait
-        // Adjusted column widths for portrait layout
-        const columnWidths = [120, 130, 100, 100, 70];
-        
-        // Add horizontal line
-        const startX = 30; // Starting point of the table
-        const tableWidth = columnWidths.reduce((sum, width) => sum + width, 0); // Sum of all columns
 
         doc.strokeColor('#BDC3C7')
             .lineWidth(1)
-            .moveTo(startX, startY - 20)  
-            .lineTo(startX + tableWidth, startY - 20) 
+            .moveTo(startX, startY - 20)
+            .lineTo(startX + tableWidth, startY - 20)
             .stroke();
 
         // Updated headers to match the actual data structure from comments
@@ -509,7 +511,7 @@ exports.downloadPDF = async (req, res) => {
 
             // Draw row background
             drawCellBackground(startX, currentY, tableWidth, rowHeight, rowColor);
-            
+
             // Use the actual structure from the sample data in comments
             const rowData = [
                 `${user.nombre || ''} ${user.apellidoP || ''} ${user.apellidoM || ''}`,
@@ -548,14 +550,14 @@ exports.downloadPDF = async (req, res) => {
             if (currentY > 700) {
                 doc.addPage();
                 currentY = 50;
-                
+
                 // Redraw headers on new page
                 currentX = startX;
                 headers.forEach((header, i) => {
                     drawCellBackground(currentX, currentY, columnWidths[i], rowHeight, '#34495E');
                     const textHeight = doc.heightOfString(header, { width: columnWidths[i] - 10 });
                     const centeredY = currentY + (rowHeight - textHeight) / 2;
-                    
+
                     doc.fillColor('#FFFFFF')
                         .fontSize(11)
                         .font('Helvetica-Bold')
@@ -570,7 +572,7 @@ exports.downloadPDF = async (req, res) => {
                         );
                     currentX += columnWidths[i];
                 });
-                
+
                 currentY += rowHeight;
             }
         });
@@ -601,10 +603,10 @@ exports.downloadExcel = async (req, res) => {
 
         if (res.locals.userPrivilege === "rHumanos") {
             usersRows = await usersModel.find({})
-            // if teamId return jefeInmediatoId
+                // if teamId return jefeInmediatoId
                 // if jefeInmediatoId === userId, print "Usuario es J.I."
                 // else, print jefeInmediatoId.name+apellidoP
-            // else, return "N/A"
+                // else, return "N/A"
                 .populate('userId', 'nombre apellidoP apellidoM area')
                 .select('-__v');
         } else {
