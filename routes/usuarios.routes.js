@@ -46,24 +46,21 @@ router.get("/restoreUsersView", controller.restoreUsersView);
 // activateUser : rHumanos : Done
 router.post("/activateUser", controller.activateUser);
 
-// restoreUsersView : rHumanos : ---
+// restoreUsersView : rHumanos : Done
 router.get("/configureTeamView", controller.configureTeamView);
 
-
-// restoreUsersView : rHumanos : ---
-router.get("/downloadExcel", controller.downloadExcel);
-
-// restoreUsersView : rHumanos : ---
+// downloadPDF : rHumanos : Done
 router.get("/downloadPDF", controller.downloadPDF);
 
+// downloadExcel : rHumanos : ---
+router.get("/downloadExcel", controller.downloadExcel);
 
 
 
 
-router.post("/uploadFile", upload.single('file'), controller.postFileUpload);
+
 router.post("/deactivateUser", controller.postUserDeactivation);
 router.post("/changePrivilege", controller.postUserChangePrivilege);
-
 router.post("/editUser", controller.postEditUser); 
 
 module.exports = router;

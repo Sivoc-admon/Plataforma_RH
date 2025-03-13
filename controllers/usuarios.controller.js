@@ -5,7 +5,6 @@ const teamsModel = require("../models/equipos.model");
 
 const fs = require('fs');
 const path = require('path');
-
 const areaToPuestos = {
     "Administración": ["Director General", "Coordinador de Finanzas", "Gestora de Tesorería", "Coordinador de Recursos Humanos", "Gestor de Recursos Humanos", "Analista de Recursos Humanos"],
     "Ventas": ["Coordinador Comercial", "Gestor de Ventas", "Analista de Ventas"],
@@ -14,6 +13,7 @@ const areaToPuestos = {
     "Pruebas": ["Gestor de Pruebas", "Ingeniero de Servicio A", "Ingeniero de Servicio B", "Ingeniero de Servicio C"]
 };
 
+// critical . on every user configuration . activeUsers.delete(userId); // log him out 
 
 // addUser : rHumanos : Done 
 exports.addUser = async (req, res) => {
@@ -103,6 +103,7 @@ exports.addUser = async (req, res) => {
         });
     }
 };
+
 // activateUser : rHumanos : Done
 exports.activateUser = async (req, res) => {
     try {
@@ -169,9 +170,7 @@ exports.restoreUsersView = async (req, res) => {
     try {
         let usersRows = "";
 
-        if (res.locals.userPrivilege === "jefeInmediato") {
-
-        } else if (res.locals.userPrivilege === "rHumanos" || res.locals.userPrivilege === "direccion") {
+        if (res.locals.userPrivilege === "rHumanos" || res.locals.userPrivilege === "direccion") {
             usersRows = await usersModel.find({ estaActivo: false }).select('-email -foto -password -__v');
 
             usersRows = usersRows.map(user => ({
@@ -247,8 +246,11 @@ exports.doesEmailExists = async (req, res) => {
     }
 };
 
+// 3333
 exports.postEditUser = async (req, res) => {
     try {
+        // critical . on every user configuration . activeUsers.delete(userId); // log him out 
+
         const userId = req.body.userId;
 
         // Execute findByIdAndUpdate TODO
@@ -275,18 +277,11 @@ exports.postEditUser = async (req, res) => {
 
 };
 
-exports.postFileUpload = async (req, res) => {
-    try {
-        const response = await filesModel.create(req.file);
-        return res.status(200).json({ success: true, message: response }); // response.path = file location
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
-    }
-};
-
+// 2222
 exports.postUserDeactivation = async (req, res) => {
     try {
+        // critical . on every user configuration . activeUsers.delete(userId); // log him out 
+
         const userId = req.body.userId;
 
         // Execute findByIdAndUpdate
@@ -307,10 +302,7 @@ exports.postUserDeactivation = async (req, res) => {
     }
 };
 
-
-
-
-// TODO, add a new button that says change password, use the skeleton down below.
+// 1111
 exports.postUserChangePrivilege = async (req, res) => {
     try {
         const userId = req.body.userId;
@@ -337,72 +329,7 @@ exports.postUserChangePrivilege = async (req, res) => {
     }
 };
 
-
-// changeStatus : rHumanos : ---
-exports.changeStatus = async (req, res) => {
-    try {
-        const { permitId, estatus } = req.body;
-
-        // 1. Verify request quality
-        if (!permitId || typeof permitId !== "string" || !estatus || typeof estatus !== "string") {
-            return res.status(400).json({
-                success: false,
-                messageTitle: "¡Repámpanos!",
-                messageText: "Espera un poco y vuelvelo a intentar. (#035)"
-            });
-        }
-
-        // 2. Get current permit data and validate if the new estatus
-        const permitData = await permitsModel.findOne({ _id: permitId });
-
-        if (!permitData) return res.status(400).json({
-            success: false,
-            messageTitle: "¡Repámpanos!",
-            messageText: "Espera un poco y vuelvelo a intentar. (#058)"
-        });
-
-        if (!permitData.isSent || permitData.isVerified) {
-            return res.status(400).json({
-                success: false,
-                messageTitle: "¡Repámpanos!",
-                messageText: "Espera un poco y vuelvelo a intentar. (#055)"
-            });
-        }
-
-        // 3. Execute mongoose action 
-        const updatedPermit = await permitsModel.findByIdAndUpdate(
-            permitId,
-            {
-                $set: {
-                    estatus: estatus,
-                }
-            },
-            { new: true, runValidators: true }
-        );
-        if (!updatedPermit) {
-            return res.status(400).json({
-                success: false,
-                messageTitle: "¡Repámpanos!",
-                messageText: "Espera un poco y vuelvelo a intentar. (#059)"
-            });
-        }
-
-        return res.status(200).json({ success: true, message: "" });
-
-    } catch (error) {
-        if (error instanceof mongoose.Error.ValidationError) {
-            return res.status(400).json({
-                success: false,
-                messageTitle: "¡Repámpanos!",
-                messageText: "Espera un poco y vuelvelo a intentar. (#057)"
-            });
-        }
-        return res.status(500).json({ success: false, messageTitle: "Error", messageText: "Tomar captura y favor de informar a soporte técnico. (#060)" });
-    }
-};
-
-// downloadPDF : rHumanos : --- 
-// ALMOST, CORREGIR MARGENES Y LISTO
+// downloadPDF : rHumanos : Done 
 exports.downloadPDF = async (req, res) => {
     try {
         let usersRows = [];
@@ -594,73 +521,126 @@ exports.downloadPDF = async (req, res) => {
     }
 };
 
-
-// downloadExcel : rHumanos : --- 
+// downloadExcel : rHumanos : Done 
 exports.downloadExcel = async (req, res) => {
-    const ExcelJS = require('exceljs');
     try {
         let usersRows = [];
 
         if (res.locals.userPrivilege === "rHumanos") {
-            usersRows = await usersModel.find({})
-                // if teamId return jefeInmediatoId
-                // if jefeInmediatoId === userId, print "Usuario es J.I."
-                // else, print jefeInmediatoId.name+apellidoP
-                // else, return "N/A"
-                .populate('userId', 'nombre apellidoP apellidoM area')
-                .select('-__v');
+            usersRows = await usersModel.find({}).select('-__v');
+
+            if (usersRows.length === 0) return res.status(404).json({ success: false, message: 'No users found to export.' });
         } else {
             return res.redirect("/login");
         }
 
-        if (usersRows.length === 0) {
-            return res.status(404).json({ success: false, message: 'No users found to export.' });
-        }
+        const Excel = require('exceljs');
+        const workbook = new Excel.Workbook();
+        const worksheet = workbook.addWorksheet('Usuarios');
 
-        // 📌 Crear un nuevo archivo Excel
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Permisos');
+        // Add title
+        const titleCell = worksheet.getCell('A1');
+        titleCell.value = 'Reporte de Usuarios';
+        titleCell.font = {
+            size: 18,
+            bold: true,
+            color: { argb: 'FF2C3E50' }
+        };
+        titleCell.alignment = { horizontal: 'center' };
 
-        // 📌 Definir encabezados
+        worksheet.mergeCells('A1:E1');
+
+        // Add date
+        worksheet.mergeCells('A2:E2');
+        const dateCell = worksheet.getCell('A2');
+        dateCell.value = 'Generado el: ' + new Date().toLocaleDateString('es-MX');
+        dateCell.font = {
+            size: 12,
+            italic: true,
+            color: { argb: 'FF7F8C8D' }
+        };
+        dateCell.alignment = { horizontal: 'center' };
+
+        worksheet.addRow([]);  // Empty row (row 3)
+
+        // Define columns with width but without headers yet
         worksheet.columns = [
-            { header: 'Nombre del colaborador', key: 'nombre', width: 25 },
-            { header: 'Área', key: 'area', width: 20 },
-            { header: 'Descripción del permiso', key: 'descripcion', width: 30 },
-            { header: 'Fecha y hora de inicio', key: 'fechaInicio', width: 25 },
-            { header: 'Fecha y hora de término', key: 'fechaTermino', width: 25 },
-            { header: 'Documentos agregados', key: 'documentos', width: 30 },
-            { header: 'Estatus', key: 'estatus', width: 20 },
-            { header: 'Estado de verificación', key: 'verificacion', width: 20 }
+            { key: 'fullName', width: 30 },
+            { key: 'email', width: 35 },
+            { key: 'area', width: 25 },
+            { key: 'puesto', width: 30 },
+            { key: 'active', width: 15 }
         ];
 
-        // 📌 Llenar las filas con los datos
-        permitsRows.forEach(permit => {
-            worksheet.addRow({
-                nombre: `${permit.userId.nombre} ${permit.userId.apellidoP} ${permit.userId.apellidoM}`,
-                area: permit.userId.area,
-                descripcion: `${permit.registro} para ${permit.filtro}`,
-                fechaInicio: formatReadableDateTime(permit.fechaInicio),
-                fechaTermino: formatReadableDateTime(permit.fechaTermino),
-                documentos: permit.docPaths?.length ? permit.docPaths.map(doc => doc.originalname).join(', ') : 'No hay documentos',
-                estatus: permit.estatus,
-                verificacion: permit.isVerified ? 'Interacción cerrada' : 'Interacción abierta'
+        // Add header row separately (row 4)
+        const headerRow = worksheet.getRow(4);
+        headerRow.values = ['Nombre Completo', 'Correo Electrónico', 'Área', 'Puesto', 'Activo'];
+        headerRow.eachCell((cell) => {
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF34495E' }
+            };
+            cell.font = {
+                bold: true,
+                color: { argb: 'FFFFFFFF' },
+                size: 12
+            };
+            cell.alignment = {
+                horizontal: 'center',
+                vertical: 'middle'
+            };
+            cell.border = {
+                top: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+                left: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+                bottom: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+                right: { style: 'thin', color: { argb: 'FFE0E0E0' } }
+            };
+        });
+
+        usersRows.forEach((user, index) => {
+            const rowData = {
+                fullName: `${user.nombre || ''} ${user.apellidoP || ''} ${user.apellidoM || ''}`.trim(),
+                email: user.email || 'N/A',
+                area: user.area || 'N/A',
+                puesto: user.puesto || 'N/A',
+                active: user.estaActivo ? 'Sí' : 'No'
+            };
+
+            const row = worksheet.addRow(rowData);
+            const rowColor = index % 2 === 0 ? 'FFF8F9F9' : 'FFFFFFFF';
+
+            row.eachCell((cell) => {
+                cell.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: rowColor }
+                };
+                cell.font = {
+                    size: 11,
+                    color: { argb: 'FF2C3E50' }
+                };
+                cell.alignment = {
+                    horizontal: 'center',
+                    vertical: 'middle'
+                };
+                cell.border = {
+                    top: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+                    left: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+                    bottom: { style: 'thin', color: { argb: 'FFE0E0E0' } },
+                    right: { style: 'thin', color: { argb: 'FFE0E0E0' } }
+                };
             });
         });
 
-        // 📌 Aplicar estilos al encabezado
-        worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
-        worksheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF34495E' } };
-        worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
-
-        // 📌 Configurar las respuestas HTTP
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', 'attachment; filename=permisos.xlsx');
+        res.setHeader('Content-Disposition', 'attachment; filename=usuarios.xlsx');
 
-        // 📌 Enviar el archivo
         await workbook.xlsx.write(res);
         res.end();
 
     } catch (error) {
+        console.error('Error generating Excel:', error);
         res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
 };
