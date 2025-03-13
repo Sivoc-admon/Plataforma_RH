@@ -426,22 +426,24 @@ async function deactivateUser(button) {
 }
 
 // changePassword : ---
-async function deactivateUser(button) {
+async function changePassword(button) {
     const userId = DOMPurify.sanitize(button.getAttribute('userId'));
     const userName = DOMPurify.sanitize(button.getAttribute('userName'));
 
     Swal.fire({
         html: DOMPurify.sanitize(`
             <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
-                <i class="fa-solid fa-user-xmark" style="margin-right:0.9rem;"></i>Desactivar Usuario
+                <i class="fa-solid fa-key" style="margin-right:0.9rem;"></i>Reiniciar contraseña
             </h2>
 
             <div style="padding: 0.5rem; margin: 1rem 0.5rem">
-                ¿Deseas desactivar a "${userName}"?<br><br>
-                Este usuario ya no podrá acceder a la plataforma.
+                Escribe la nueva contraseña para "${userName}".<br><br>
+                <input class="input" type="password" id="password" placeholder="Contraseña" maxlength="54" required>
+                <p id="password-error" style="color: #f0466e; margin-top: 0.5rem; display: none;"></p>
             </div>
+
         `),
-        confirmButtonText: 'Desactivar',
+        confirmButtonText: 'Cambiar',
         cancelButtonText: 'Cancelar',
         cancelButtonColor: '#f0466e',
         showCancelButton: true,
@@ -452,19 +454,32 @@ async function deactivateUser(button) {
             cancelButton: 'default-button-css',
         },
         preConfirm: async () => {
-            try {                
+            const password = $('#password').val().trim();
+            const passwordError = $('#password-error');
+            
+            // Reset error message
+            passwordError.hide();
+            
+            // Validate password
+            if (!password) return Swal.showValidationMessage('La contraseña es obligatoria.');
+            
+            // Validate against special characters as per the model
+            const invalidCharsRegex = /[\{\}\:\$\=\'\*\[\]]/;
+            if (invalidCharsRegex.test(password)) return Swal.showValidationMessage('La contraseña contiene caracteres no permitidos ({ } : $ = \' * [ ])');
+
+            try {        
                 const response = await fetch('/usuarios/changePassword', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({userId})
+                    body: JSON.stringify({userId: userId, password: password})
                 });
                 
                 const data = await response.json();
 
                 await Swal.fire({
-                    title: data.success ? 'Usuario desactivado' : data.messageTitle,
+                    title: data.success ? 'Contraseña reiniciada' : data.messageTitle,
                     icon: data.success ? 'success' : 'error',
-                    text: data.success ? 'El usuario se ha desactivado correctamente.' : data.messageText,
+                    text: data.success ? 'La contraseña se ha reiniciado correctamente.' : data.messageText,
                     width: "500px"
                 });
 

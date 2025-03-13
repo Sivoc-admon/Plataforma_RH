@@ -329,38 +329,76 @@ exports.deactivateUser = async (req, res) => {
     }
 };
 
-// 2222
+// changePassword : rHumanos : Done 
 exports.changePassword = async (req, res) => {
-    try {
-        // critical . on every user configuration . activeUsers.delete(userId); // log him out 
-
+    try {   
+        const password = req.body.password;
         const userId = req.body.userId;
 
-        // Execute findByIdAndUpdate TODO
-        /*
-        const response = await usersModel.findByIdAndUpdate(
-            userId, 
-            { $set: { estaActivo: false } }, // Change attribute
-            { new: true } , runValidators: true
-        );
-        */
-
-        // If for some reason user not found, send 404
-        if (!response) {
-            return res.status(404).json({ success: false, message: "" });
+        // Input validation
+        if (!userId || !password || typeof userId !== "string" || typeof password !== "string") {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "Se necesita el ID de usuario y la contraseña." 
+            });
         }
 
+        // Validate if it's a valid MongoDB ObjectId
+        const invalidCharsRegex = /[\{\}\:\$\=\'\*\[\]]/;
+        if (!mongoose.Types.ObjectId.isValid(userId) || invalidCharsRegex.test(password)) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "El formato del ID de usuario o de la contraseña es inválido." 
+            });
+        }
+
+        // Execute password salt and update it
+        const hashedPassword = await bcrypt.hash(password, 12);
+        const response = await usersModel.findByIdAndUpdate(
+            userId, 
+            { $set: { password: hashedPassword } }, // Change attribute
+            { new: true, runValidators: true}
+        );
+
+        // If for some reason user not found, send 404
+        if (!response) return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "Espera un poco y vuelve a intentar." });
+
         activeUsers.delete(userId); // log him out 
+        return res.status(200).json({ success: true });
 
-        return res.status(200).json({ success: true, message: req.body });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
-    }
+        // Handle MongoDB validation errors
+        if (error instanceof mongoose.Error.ValidationError) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "Error de validación en los datos." 
+            });
+        }
+        
+        // Handle MongoDB cast errors (wrong type)
+        if (error instanceof mongoose.Error.CastError) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "Tipo de dato incorrecto." 
+            });
+        }
 
+        console.error("Error deactivating user:", error);
+        
+        return res.status(500).json({ 
+            success: false, 
+            messageTitle: "Error", 
+            messageText: "Tomar captura y favor de informar a soporte técnico. (#225)" 
+        });
+    }
 };
 
 // 1111
+// changePrivilege : rHumanos : --- 
 exports.changePrivilege = async (req, res) => {
     try {
         const userId = req.body.userId;

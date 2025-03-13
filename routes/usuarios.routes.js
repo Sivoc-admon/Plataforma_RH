@@ -58,7 +58,7 @@ router.get("/downloadExcel", controller.downloadExcel);
 // deactivateUser : rHumanos : Done
 router.post("/deactivateUser", controller.deactivateUser);
 
-// changePassword : rHumanos : ---
+// changePassword : rHumanos : Done
 router.post("/changePassword", controller.changePassword);
 
 // changePrivilege : rHumanos : ---

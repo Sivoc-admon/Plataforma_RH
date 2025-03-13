@@ -24,13 +24,7 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'La contraseña es obligatoria'],
-        validate: {
-            validator: function(v) {
-                return !/[\{\}\:\$\=\'\*\[\]]/.test(v);
-            },
-            message: props => `El nombre contiene caracteres no permitidos`
-        }    
+        required: [true, 'La contraseña es obligatoria'], 
     },
     privilegio: {
         type: String,
