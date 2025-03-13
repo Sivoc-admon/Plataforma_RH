@@ -1,35 +1,38 @@
-// returnMainTable button : Done
+// returnMainTable : Done
 function returnMainTable() {
     window.location.href = '/usuarios/accessUsersModule';
 }
 
-// activateUser button : Done
+// activateUser : Done
 async function activateUser(button) { // async function to perform fetch chain
-    Swal.fire({
-        html: `
-        <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
-            <i class="fa-solid fa-user-check" style="margin-right:0.9rem;"></i>Activar usuario
-        </h2>
-        <br>
+    const userId = DOMPurify.sanitize(button.getAttribute('userId'));
+    const userName = DOMPurify.sanitize(button.getAttribute('userName'));
 
-        <div style="padding: 0.5rem; margin: 1rem 0.5rem">
-            ¿Deseas activar este usuario? Esto implica que podrá acceder a la plataforma.
-        </div>
+    Swal.fire({
+        html: DOMPurify.sanitize(`
+
+            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
+                <i class="fa-solid fa-user-check" style="margin-right:0.9rem;"></i>Activar Usuario
+            </h2>
+
+            <div style="padding: 0.5rem; margin: 1rem 0.5rem">
+                ¿Deseas activar a "${userName}"?<br><br>
+                Este usuario podrá acceder a la plataforma.
+            </div>
         
-        `,
+        `),
         confirmButtonText: 'Activar usuario',
         cancelButtonText: 'Cancelar',
         cancelButtonColor: '#f0466e',
         showCancelButton: true,
         allowOutsideClick: false,
-        width: '1000px',
+        width: '800px',
         customClass: {
             confirmButton: 'default-button-css',
             cancelButton: 'default-button-css',
         },
 
         preConfirm: async () => {
-            const userId = button.getAttribute('userId');
             // Fetch #01 - Execute user activation
             try {
                 const response = await fetch('/usuarios/activateUser', {

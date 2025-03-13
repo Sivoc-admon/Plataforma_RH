@@ -52,15 +52,23 @@ router.get("/configureTeamView", controller.configureTeamView);
 // downloadPDF : rHumanos : Done
 router.get("/downloadPDF", controller.downloadPDF);
 
-// downloadExcel : rHumanos : ---
+// downloadExcel : rHumanos : Done
 router.get("/downloadExcel", controller.downloadExcel);
 
+// deactivateUser : rHumanos : Done
+router.post("/deactivateUser", controller.deactivateUser);
+
+// changePassword : rHumanos : ---
+router.post("/changePassword", controller.changePassword);
+
+// changePrivilege : rHumanos : ---
+router.post("/changePrivilege", controller.changePrivilege);
 
 
 
-
-router.post("/deactivateUser", controller.postUserDeactivation);
-router.post("/changePrivilege", controller.postUserChangePrivilege);
+// (requires client validation) editUser : rHumanos : ---
 router.post("/editUser", controller.postEditUser); 
+
+// 
 
 module.exports = router;

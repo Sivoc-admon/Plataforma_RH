@@ -110,10 +110,18 @@
                                     </button>
                                 </div>
                                 -->
+                                            
+                                <div class="column">
+                                    <button class="default-button-css table-button-css" userId="<%= user._id %>"
+                                        userName="<%= user.nombre %> <%= user.apellidoP %> <%= user.apellidoM %>"
+                                        onclick="deactivateUser(this)">
+                                        <i class="fa-solid fa-user-xmark"></i>
+                                    </button>
+                                </div>
 
                                 <div class="column">
                                     <button class="default-button-css table-button-css" userId="<%= user._id %>"
-                                        onclick="deactivateUser(this)">
+                                        onclick="changePassword(this)">
                                         <i class="fa-solid fa-user-xmark"></i>
                                     </button>
                                 </div>

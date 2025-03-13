@@ -335,8 +335,7 @@ async function restoreUsersView() {
     }
 }
 
-
-// configureTeamView : ---
+// configureTeamView : Done
 async function configureTeamView() {
     try {
         window.location.href = '/usuarios/configureTeamView';
@@ -345,8 +344,7 @@ async function configureTeamView() {
     }
 }
 
-
-// downloadPDF : ---
+// downloadPDF : Done
 async function downloadPDF() {
     try {
         window.location.href = '/usuarios/downloadPDF';
@@ -361,7 +359,7 @@ async function downloadPDF() {
     }
 };
 
-// downloadExcel : ---
+// downloadExcel : Done
 async function downloadExcel() {
     try {
         window.location.href = '/usuarios/downloadExcel';
@@ -376,9 +374,179 @@ async function downloadExcel() {
     }
 };
 
+// deactivateUser : Done
+async function deactivateUser(button) {
+    const userId = DOMPurify.sanitize(button.getAttribute('userId'));
+    const userName = DOMPurify.sanitize(button.getAttribute('userName'));
 
+    Swal.fire({
+        html: DOMPurify.sanitize(`
+            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
+                <i class="fa-solid fa-user-xmark" style="margin-right:0.9rem;"></i>Desactivar Usuario
+            </h2>
 
+            <div style="padding: 0.5rem; margin: 1rem 0.5rem">
+                ¿Deseas desactivar a "${userName}"?<br><br>
+                Este usuario ya no podrá acceder a la plataforma.
+            </div>
+        `),
+        confirmButtonText: 'Desactivar',
+        cancelButtonText: 'Cancelar',
+        cancelButtonColor: '#f0466e',
+        showCancelButton: true,
+        allowOutsideClick: false,
+        width: '800px',
+        customClass: {
+            confirmButton: 'default-button-css',
+            cancelButton: 'default-button-css',
+        },
+        preConfirm: async () => {
+            try {                
+                const response = await fetch('/usuarios/deactivateUser', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({userId})
+                });
+                
+                const data = await response.json();
 
+                await Swal.fire({
+                    title: data.success ? 'Usuario desactivado' : data.messageTitle,
+                    icon: data.success ? 'success' : 'error',
+                    text: data.success ? 'El usuario se ha desactivado correctamente.' : data.messageText,
+                    width: "500px"
+                });
+
+                location.reload();
+            } catch (error) {
+                location.reload();
+            }
+        }
+    });
+}
+
+// changePassword : ---
+async function deactivateUser(button) {
+    const userId = DOMPurify.sanitize(button.getAttribute('userId'));
+    const userName = DOMPurify.sanitize(button.getAttribute('userName'));
+
+    Swal.fire({
+        html: DOMPurify.sanitize(`
+            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
+                <i class="fa-solid fa-user-xmark" style="margin-right:0.9rem;"></i>Desactivar Usuario
+            </h2>
+
+            <div style="padding: 0.5rem; margin: 1rem 0.5rem">
+                ¿Deseas desactivar a "${userName}"?<br><br>
+                Este usuario ya no podrá acceder a la plataforma.
+            </div>
+        `),
+        confirmButtonText: 'Desactivar',
+        cancelButtonText: 'Cancelar',
+        cancelButtonColor: '#f0466e',
+        showCancelButton: true,
+        allowOutsideClick: false,
+        width: '800px',
+        customClass: {
+            confirmButton: 'default-button-css',
+            cancelButton: 'default-button-css',
+        },
+        preConfirm: async () => {
+            try {                
+                const response = await fetch('/usuarios/changePassword', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({userId})
+                });
+                
+                const data = await response.json();
+
+                await Swal.fire({
+                    title: data.success ? 'Usuario desactivado' : data.messageTitle,
+                    icon: data.success ? 'success' : 'error',
+                    text: data.success ? 'El usuario se ha desactivado correctamente.' : data.messageText,
+                    width: "500px"
+                });
+
+                location.reload();
+            } catch (error) {
+                location.reload();
+            }
+        }
+    });
+}
+
+// changePrivilege : ---
+async function changePrivilege(button) {
+    hideSidebar();
+    
+    Swal.fire({
+        html: `
+            <div style="padding: 0.5rem; margin: 1rem 0.5rem">
+                <h2>Cambiar el privilegio del usuario</h2>
+                <br><br>
+                <div class="field">
+                    <div class="control">
+                        <select id="newPrivilege" class="is-fullwidth input">
+                            <option value="" hidden>Selecciona un privilegio</option>
+                            <option value="colaborador">Colaborador</option>
+                            <option value="rHumanos">Recursos Humanos</option>
+                            <option value="jefeInmediato">Jefe Inmediato</option>
+                            <option value="direccion">Dirección</option>
+                            <option value="unauthorized">No autorizado</option>
+                        </select> 
+                    </div>
+                </div>
+            </div>
+        `,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
+        cancelButtonColor: '#f0466e',
+        showCancelButton: true,
+        allowOutsideClick: false,
+        width: '600px',
+        customClass: {
+            confirmButton: 'default-button-css',
+            cancelButton: 'default-button-css',
+        },
+        preConfirm: async () => {
+            try {
+                const userId = button.getAttribute('userId');
+                const newPrivilege = $('#newPrivilege').val();
+                
+                if (!newPrivilege) {
+                    return Swal.showValidationMessage('Selecciona un privilegio para continuar.');
+                }
+                
+                const response = await fetch('/usuarios/changePrivilege', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({userId, newPrivilege})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Privilegio configurado',
+                        icon: 'success',
+                        width: "500px",
+                        text: 'Se ha cambiado el privilegio del usuario correctamente.'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    throw new Error(data.message || 'Error al cambiar el privilegio');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorAlert('015');
+            }
+        }
+    });
+}
+
+// requires cliente validation of the teams, editUser : ----
 async function editUser(button) {
     
     try {
@@ -592,123 +760,4 @@ async function editUser(button) {
     } catch (error) {
         location.reload();
     }
-}
-
-async function changePrivilege(button) {
-    hideSidebar();
-    
-    Swal.fire({
-        html: `
-            <div style="padding: 0.5rem; margin: 1rem 0.5rem">
-                <h2>Cambiar el privilegio del usuario</h2>
-                <br><br>
-                <div class="field">
-                    <div class="control">
-                        <select id="newPrivilege" class="is-fullwidth input">
-                            <option value="" hidden>Selecciona un privilegio</option>
-                            <option value="colaborador">Colaborador</option>
-                            <option value="rHumanos">Recursos Humanos</option>
-                            <option value="jefeInmediato">Jefe Inmediato</option>
-                            <option value="direccion">Dirección</option>
-                            <option value="unauthorized">No autorizado</option>
-                        </select> 
-                    </div>
-                </div>
-            </div>
-        `,
-        confirmButtonText: 'Confirmar',
-        cancelButtonText: 'Cancelar',
-        cancelButtonColor: '#f0466e',
-        showCancelButton: true,
-        allowOutsideClick: false,
-        width: '600px',
-        customClass: {
-            confirmButton: 'default-button-css',
-            cancelButton: 'default-button-css',
-        },
-        preConfirm: async () => {
-            try {
-                const userId = button.getAttribute('userId');
-                const newPrivilege = $('#newPrivilege').val();
-                
-                if (!newPrivilege) {
-                    return Swal.showValidationMessage('Selecciona un privilegio para continuar.');
-                }
-                
-                const response = await fetch('/usuarios/changePrivilege', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({userId, newPrivilege})
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    Swal.fire({
-                        title: 'Privilegio configurado',
-                        icon: 'success',
-                        width: "500px",
-                        text: 'Se ha cambiado el privilegio del usuario correctamente.'
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    throw new Error(data.message || 'Error al cambiar el privilegio');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showErrorAlert('015');
-            }
-        }
-    });
-}
-
-async function deactivateUser(button) {
-    Swal.fire({
-        html: `
-            <div style="padding: 0.5rem; margin: 1rem 0.5rem">
-                <h2>¿Deseas desactivar este usuario?</h2>
-                <h2>Ya no podrá acceder a la plataforma.</h2>
-            </div>
-        `,
-        confirmButtonText: 'Desactivar usuario',
-        cancelButtonText: 'Cancelar',
-        cancelButtonColor: '#f0466e',
-        showCancelButton: true,
-        allowOutsideClick: false,
-        width: '600px',
-        customClass: {
-            confirmButton: 'default-button-css',
-            cancelButton: 'default-button-css',
-        },
-        preConfirm: async () => {
-            try {
-                const userId = button.getAttribute('userId');
-                
-                const response = await fetch('/usuarios/deactivateUser', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({userId})
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    Swal.fire({
-                        title: 'Usuario desactivado',
-                        icon: 'success',
-                        width: "500px",
-                        text: 'Se ha desactivado el usuario correctamente.'
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    throw new Error(data.message || 'Error al desactivar el usuario');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showErrorAlert('005');
-            }
-        }
-    });
 }

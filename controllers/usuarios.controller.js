@@ -107,7 +107,17 @@ exports.addUser = async (req, res) => {
 // activateUser : rHumanos : Done
 exports.activateUser = async (req, res) => {
     try {
+        
         const userId = req.body.userId;
+                // Input validation
+                if (!userId) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        messageTitle: "¡Repámpanos!", 
+                        messageText: "El ID de usuario es requerido." 
+                    });
+                }
+
         if (!mongoose.Types.ObjectId.isValid(userId))
             return res.status(400).json({ success: false, messageTitle: "¡Repámpanos!", messageText: "ID de usuario inválido." });
 
@@ -246,8 +256,81 @@ exports.doesEmailExists = async (req, res) => {
     }
 };
 
-// 3333
-exports.postEditUser = async (req, res) => {
+
+// deactivateUser : rHumanos : Done 
+exports.deactivateUser = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+
+        // Input validation
+        if (!userId) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "El ID de usuario es requerido." 
+            });
+        }
+
+        // Validate if it's a valid MongoDB ObjectId
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "El formato del ID de usuario es inválido." 
+            });
+        }
+
+        // Execute findByIdAndUpdate
+        const response = await usersModel.findByIdAndUpdate(
+            userId,
+            { $set: { estaActivo: false } },
+            { new: true, runValidators: true }
+        );
+
+        // Check if user exists
+        if (!response) {
+            return res.status(404).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "Usuario no encontrado." 
+            });
+        }
+
+        // Log user out by removing from activeUsers
+        activeUsers.delete(userId);
+
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        // Handle MongoDB validation errors
+        if (error instanceof mongoose.Error.ValidationError) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "Error de validación en los datos." 
+            });
+        }
+        
+        // Handle MongoDB cast errors (wrong type)
+        if (error instanceof mongoose.Error.CastError) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "Tipo de dato incorrecto." 
+            });
+        }
+
+        console.error("Error deactivating user:", error);
+        
+        return res.status(500).json({ 
+            success: false, 
+            messageTitle: "Error", 
+            messageText: "Tomar captura y favor de informar a soporte técnico. (#210)" 
+        });
+    }
+};
+
+// 2222
+exports.changePassword = async (req, res) => {
     try {
         // critical . on every user configuration . activeUsers.delete(userId); // log him out 
 
@@ -277,33 +360,8 @@ exports.postEditUser = async (req, res) => {
 
 };
 
-// 2222
-exports.postUserDeactivation = async (req, res) => {
-    try {
-        // critical . on every user configuration . activeUsers.delete(userId); // log him out 
-
-        const userId = req.body.userId;
-
-        // Execute findByIdAndUpdate
-        const response = await usersModel.findByIdAndUpdate(
-            userId,
-            { $set: { estaActivo: false } }, // Change attribute
-            { new: true, runValidators: true }
-        );
-
-        // If for some reason user not found, send 404
-        if (!response) return res.status(404).json({ success: false, message: "" });
-
-        activeUsers.delete(userId); // log him out 
-        return res.status(200).json({ success: true, message: "" });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
-    }
-};
-
 // 1111
-exports.postUserChangePrivilege = async (req, res) => {
+exports.changePrivilege = async (req, res) => {
     try {
         const userId = req.body.userId;
         const newPrivilege = req.body.newPrivilege
@@ -328,6 +386,13 @@ exports.postUserChangePrivilege = async (req, res) => {
         return res.status(500).json({ success: false, message: "" });
     }
 };
+
+
+
+
+
+
+
 
 // downloadPDF : rHumanos : Done 
 exports.downloadPDF = async (req, res) => {
@@ -643,4 +708,36 @@ exports.downloadExcel = async (req, res) => {
         console.error('Error generating Excel:', error);
         res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
+};
+
+
+// requieres client validation for teams
+exports.postEditUser = async (req, res) => {
+    try {
+        // critical . on every user configuration . activeUsers.delete(userId); // log him out 
+
+        const userId = req.body.userId;
+
+        // Execute findByIdAndUpdate TODO
+        /*
+        const response = await usersModel.findByIdAndUpdate(
+            userId, 
+            { $set: { estaActivo: false } }, // Change attribute
+            { new: true } , runValidators: true
+        );
+        */
+
+        // If for some reason user not found, send 404
+        if (!response) {
+            return res.status(404).json({ success: false, message: "" });
+        }
+
+        activeUsers.delete(userId); // log him out 
+
+        return res.status(200).json({ success: true, message: req.body });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "" });
+    }
+
 };
