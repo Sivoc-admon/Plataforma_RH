@@ -425,7 +425,7 @@ async function deactivateUser(button) {
     });
 }
 
-// changePassword : ---
+// changePassword : Done
 async function changePassword(button) {
     const userId = DOMPurify.sanitize(button.getAttribute('userId'));
     const userName = DOMPurify.sanitize(button.getAttribute('userName'));
@@ -439,7 +439,6 @@ async function changePassword(button) {
             <div style="padding: 0.5rem; margin: 1rem 0.5rem">
                 Escribe la nueva contraseña para "${userName}".<br><br>
                 <input class="input" type="password" id="password" placeholder="Contraseña" maxlength="54" required>
-                <p id="password-error" style="color: #f0466e; margin-top: 0.5rem; display: none;"></p>
             </div>
 
         `),
@@ -456,10 +455,7 @@ async function changePassword(button) {
         preConfirm: async () => {
             const password = $('#password').val().trim();
             const passwordError = $('#password-error');
-            
-            // Reset error message
-            passwordError.hide();
-            
+        
             // Validate password
             if (!password) return Swal.showValidationMessage('La contraseña es obligatoria.');
             
@@ -491,184 +487,102 @@ async function changePassword(button) {
     });
 }
 
-// changePrivilege : ---
-async function changePrivilege(button) {
-    hideSidebar();
-    
-    Swal.fire({
-        html: `
-            <div style="padding: 0.5rem; margin: 1rem 0.5rem">
-                <h2>Cambiar el privilegio del usuario</h2>
-                <br><br>
-                <div class="field">
-                    <div class="control">
-                        <select id="newPrivilege" class="is-fullwidth input">
-                            <option value="" hidden>Selecciona un privilegio</option>
-                            <option value="colaborador">Colaborador</option>
-                            <option value="rHumanos">Recursos Humanos</option>
-                            <option value="jefeInmediato">Jefe Inmediato</option>
-                            <option value="direccion">Dirección</option>
-                            <option value="unauthorized">No autorizado</option>
-                        </select> 
-                    </div>
-                </div>
-            </div>
-        `,
-        confirmButtonText: 'Confirmar',
-        cancelButtonText: 'Cancelar',
-        cancelButtonColor: '#f0466e',
-        showCancelButton: true,
-        allowOutsideClick: false,
-        width: '600px',
-        customClass: {
-            confirmButton: 'default-button-css',
-            cancelButton: 'default-button-css',
-        },
-        preConfirm: async () => {
-            try {
-                const userId = button.getAttribute('userId');
-                const newPrivilege = $('#newPrivilege').val();
-                
-                if (!newPrivilege) {
-                    return Swal.showValidationMessage('Selecciona un privilegio para continuar.');
-                }
-                
-                const response = await fetch('/usuarios/changePrivilege', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({userId, newPrivilege})
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    Swal.fire({
-                        title: 'Privilegio configurado',
-                        icon: 'success',
-                        width: "500px",
-                        text: 'Se ha cambiado el privilegio del usuario correctamente.'
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    throw new Error(data.message || 'Error al cambiar el privilegio');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showErrorAlert('015');
-            }
-        }
-    });
-}
-
 // requires cliente validation of the teams, editUser : ----
 async function editUser(button) {
     
     try {
-
-        console.log("Hi!");
-
-        // Prepare jefe inmediato options
-        let jefeInmediatoName = "Selecciona un Jefe";
-        if (jefeInmediatoObject) {
-            jefeInmediatoName = `${jefeInmediatoObject.nombre} ${jefeInmediatoObject.apellidoP} ${jefeInmediatoObject.apellidoM}`;
-        }
-        
-        // Show edit form
         Swal.fire({
-            html: `
-            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">Datos del Colaborador</h2>
-
-            <div class="columns is-multiline">
-                <!-- Name Fields -->
-                <div class="column is-one-third">
+            html: DOMPurify.sanitize(`
+            <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
+                <i class="fa-solid fa-pencil" style="margin-right:0.9rem;"></i>Editar Usuario
+            </h2>
+    
+            <div class="columns is-vcentered">
+                <div class="column">
                     <label class="label">Nombre</label>
-                    <input class="input" id="nombre" value="${user.nombre}" required>
+                    <input class="input" id="nombre" required>
                 </div>
-                <div class="column is-one-third">
+                <div class="column">
                     <label class="label">Apellido Paterno</label>
-                    <input class="input" id="apellidoP" value="${user.apellidoP}" required>
+                    <input class="input" id="apellidoP" required>
                 </div>
-                <div class="column is-one-third">
+                <div class="column">
                     <label class="label">Apellido Materno</label>
-                    <input class="input" id="apellidoM" value="${user.apellidoM}" required>
+                    <input class="input" id="apellidoM" required>
                 </div>
+            </div>
 
-                <!-- Email, Privilege and Date of Entry -->
-                <div class="column is-one-third">
+            <div class="columns is-vcentered">
+                <div class="column">
                     <label class="label">Email</label>
-                    <input class="input" id="email" value="${user.email}" required>
+                    <input class="input" id="email" type="email" required>
                 </div>
-                <div class="column is-one-third">
+                <div class="column">
+                    <label class="label">Contraseña</label>
+                    <input class="input" id="password" type="password" required>
+                </div>
+                <div class="column">
+                    <label class="label">Fecha de ingreso</label>
+                    <input type="text" id="fechaIngreso" style="opacity: 0; position: absolute;" required>
+                    <input type="text" id="fechaIngresoDisplay" class="input" readonly>
+                </div>
+            </div>
+
+            <div class="columns is-vcentered">
+                <div class="column">
+                    <label class="label">Área</label>
+                    <select id="area" class="input">
+                        <option value="" hidden> 🔔 Selecciona un área</option>
+                        ${Object.keys(areaToPuestos).map(area => 
+                            `<option value="${area}">${area}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                <div class="column">
+                    <label class="label">Puesto</label>
+                    <select id="puesto" class="input">
+                        <option value="" hidden> 🔔 Selecciona un área primero</option>
+                    </select>
+                </div>
+                <div class="column">
                     <label class="label">Privilegio</label>
                     <select id="privilegio" class="input">
-                        <option value="${user.privilegio}" hidden>${user.privilegio}</option>
+                        <option value="" hidden> 🔔 Selecciona un privilegio</option>
                         <option value="colaborador">Colaborador</option>
                         <option value="rHumanos">Recursos Humanos</option>
                         <option value="jefeInmediato">Jefe Inmediato</option>
                         <option value="direccion">Dirección</option>
                     </select>
                 </div>
-                <div class="column is-one-third">
-                    <label class="label">Fecha de Ingreso</label>
-                    <input type="date" class="input" id="fechaIngreso" value="${user.fechaIngreso}" required>
-                </div>
+            </div>
 
-                <!-- Area and Position -->
-                <div class="column is-one-third">
-                    <label class="label">Área</label>
-                    <select id="area" class="input">
-                        <option value="${user.area}" hidden>${user.area}</option>
-                        ${Object.keys(areaToPuestos).map(area => 
-                            `<option value="${area}">${area}</option>`
-                        ).join('')}
-                    </select>
-                </div>
-                <div class="column is-one-third">
-                    <label class="label">Puesto</label>
-                    <select id="puesto" class="input">
-                        <option value="${user.puesto}" hidden>${user.puesto}</option>
-                    </select>
-                </div>
-                <div class="column is-one-third">
-                    <label class="label">Jefe Inmediato</label>
-                    <select id="jefeInmediato" class="input" required>
-                        ${optionsJefeInmediato}
-                    </select>
-                </div>
-
-                <!-- Photo and Date of Exit -->
-                <div class="column is-half">
-                    <label class="label">Fecha de Baja</label>
-                    <input type="date" class="input" id="fechaBaja" value="${user.fechaBaja || ''}" required>
-                </div>
-                <div class="column is-half">
+            <div class="columns is-vcentered">
+                                    
+                <div class="column">
                     <label class="label">Foto de Perfil</label>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="file has-name is-boxed" style="flex: 1;">
                             <label class="input" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-right:0.3rem;">
                                 <i class="fas fa-upload" style="margin: 0rem 0.3rem;font-size: 1.1rem;"></i>
-                                <span>Selecciona una imagen</span>
-                                <input type="file" name="foto" class="file-input" id="foto" style="display: none;" onchange="updateImagePreview(event)">
+                                <span>Selecciona una imagen cuadrada</span>
+                                <input type="file" name="foto" class="file-input" id="foto" style="display: none;">
                             </label>
                         </div>
                         <div class="input" style="margin-top: 0; width: 48px; height: 48px; position: relative; overflow: hidden; border-radius: 50%; border: 2px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                             <img 
                                 id="profile-img" 
-                                src="${user.foto ? user.foto.replace("public", "") : ''}"
-                                style="position: absolute; top: 50%; left: 50%; width: auto; height: auto; transform: translate(-50%, -50%);"
-                                onerror="this.onerror=null; this.src='/SIVOC_PFP.png';">
+                                style="position: absolute; top: 50%; left: 50%; width: auto; height: auto; transform: translate(-50%, -50%);">
                         </div>
                     </div>
                 </div>
             </div>
-            `,
-            confirmButtonText: 'Guardar',
+            `),
+            confirmButtonText: '(En Construcción)',
             cancelButtonText: 'Cancelar',
             cancelButtonColor: '#f0466e',
             showCancelButton: true,
             allowOutsideClick: false,
-            width: '777px',
+            width: '1011px',
             customClass: {
                 confirmButton: 'default-button-css',
                 cancelButton: 'default-button-css',
@@ -679,7 +593,9 @@ async function editUser(button) {
                 setupDateInputs();
             },
             preConfirm: async () => {
+                /*
                 try {
+                    
                     // Get all form values
                     const nombre = $('#nombre').val().trim();
                     const apellidoP = $('#apellidoP').val().trim();
@@ -770,6 +686,7 @@ async function editUser(button) {
                     console.error('Error:', error);
                     showErrorAlert('002');
                 }
+                */
             }
         });
     } catch (error) {
