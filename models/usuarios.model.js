@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 const fechaRegex = /^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d)$/;
 
@@ -18,8 +19,8 @@ const userSchema = new mongoose.Schema({
         unique: true,
         trim: true,
         validate: {
-            validator: (value) => validator.isEmail(value),  // Usa "validator" para validar el formato del email
-            message: 'El email no tiene un formato válido', // Mensaje de error si el email no es válido
+            validator: (value) => validator.isEmail(value),
+            message: 'El email no tiene un formato válido',
         }
     },
     password: {
@@ -95,18 +96,7 @@ const userSchema = new mongoose.Schema({
     puesto: {
         type: String,
         required: [true, 'El puesto es obligatorio'],
-        trim: true,
-        validate: {
-            validator: function(v) {
-                // Access area from this.area if it exists, otherwise try to use the area from the document being validated
-                const area = this.area || this._area;
-                if (!area || !areaToPuestos[area]) {
-                    return false;
-                }
-                return areaToPuestos[area].includes(v);
-            },
-            message: props => `${props.value} no es un puesto válido para el área seleccionada`
-        }
+        trim: true
     },
     estaActivo: {
         type: Boolean,
@@ -114,13 +104,11 @@ const userSchema = new mongoose.Schema({
     },
     teamId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'equipos',  // El modelo de usuario al que se hace referencia
-        default: null,  // Permitir null al crear
+        ref: 'equipos',
+        default: null,
         validate: {
             validator: function(value) {
-                // Si el valor es null, es válido
                 if (value === null) return true;
-                // Validar que el valor sea un ObjectId
                 return mongoose.Types.ObjectId.isValid(value);
             },
             message: 'teamId debe ser un ObjectId válido'
@@ -128,13 +116,37 @@ const userSchema = new mongoose.Schema({
     },
 });
 
-// Pre-validate middleware to store area for puesto validation
-userSchema.pre('validate', function(next) {
-    // Store area temporarily for the puesto validator
-    if (this.area) {
-        this._area = this.area;
-    }
-    next();
+// Custom validation for puesto-area relationship
+userSchema.path('puesto').validate({
+    validator: async function(puesto) {
+        // For new documents, use the area from this document
+        let area = this.area;
+        
+        // For updates, if area is not provided, get it from the database
+        if (!area && this._update) {
+            // If updating and area is provided in the update
+            if (this._update.$set && this._update.$set.area) {
+                area = this._update.$set.area;
+            } else {
+                // If no area in update, get the current area from database
+                try {
+                    const doc = await mongoose.model('usuarios').findOne(this.getQuery());
+                    if (doc) {
+                        area = doc.area;
+                    }
+                } catch (err) {
+                    return false;
+                }
+            }
+        }
+        
+        // Validate puesto against area
+        if (!area || !areaToPuestos[area]) {
+            return false;
+        }
+        return areaToPuestos[area].includes(puesto);
+    },
+    message: props => `${props.value} no es un puesto válido para el área seleccionada`
 });
 
 module.exports = mongoose.model('usuarios', userSchema);

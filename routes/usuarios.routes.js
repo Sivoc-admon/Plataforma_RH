@@ -61,14 +61,8 @@ router.post("/deactivateUser", controller.deactivateUser);
 // changePassword : rHumanos : Done
 router.post("/changePassword", controller.changePassword);
 
-// changePrivilege : rHumanos : ---
-router.post("/changePrivilege", controller.changePrivilege);
+// editUser : rHumanos : Done
+router.post("/editUser", controller.editUser); 
 
-
-
-// (requires client validation) editUser : rHumanos : ---
-router.post("/editUser", controller.postEditUser); 
-
-// 
 
 module.exports = router;

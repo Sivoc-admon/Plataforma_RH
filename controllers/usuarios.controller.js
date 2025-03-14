@@ -3,24 +3,15 @@ const filesModel = require("../models/files.model");
 const bcrypt = require("bcryptjs");
 const teamsModel = require("../models/equipos.model");
 
-const fs = require('fs');
-const path = require('path');
-const areaToPuestos = {
-    "Administración": ["Director General", "Coordinador de Finanzas", "Gestora de Tesorería", "Coordinador de Recursos Humanos", "Gestor de Recursos Humanos", "Analista de Recursos Humanos"],
-    "Ventas": ["Coordinador Comercial", "Gestor de Ventas", "Analista de Ventas"],
-    "Calidad": ["Coordinador de Calidad", "Gestor de Calidad", "Analista de Calidad"],
-    "Operativo": ["Coordinador Operacional", "Gestor de Ingeniería", "Analista de Ingeniería", "Gestor de Compras", "Analista de Compras", "Gestor de Manufactura", "Analista de Manufactura", "Analista de Almacén"],
-    "Pruebas": ["Gestor de Pruebas", "Ingeniero de Servicio A", "Ingeniero de Servicio B", "Ingeniero de Servicio C"]
-};
-
-// critical . on every user configuration . activeUsers.delete(userId); // log him out 
-
-// addUser : rHumanos : Done 
+// addUser : rHumanos : Done (1 skip)
 exports.addUser = async (req, res) => {
     try {
 
+        // skip . if a validation triggers after the multer, the file must be deleted to avoid multiple file injections without user creation
+
         // 0. VALIDATE USER PRIVILEGES
-        if (res.locals.userPrivilege !== "rHumanos") {
+
+        if (res.locals.userPrivilege !== "rHumanos" && res.locals.userPrivilege !== "direccion" ) {
             return res.status(403).json({
                 success: false,
                 messageTitle: "¡Repámpanos!",
@@ -84,7 +75,7 @@ exports.addUser = async (req, res) => {
         return res.status(200).json({ success: true });
 
     } catch (error) {
-        //console.log(error);
+        console.log(error);
 
         // Handle validation errors from Mongoose
         if (error instanceof mongoose.Error.ValidationError) {
@@ -157,6 +148,8 @@ const formatReadableDateTime = (isoDate) => {
 exports.accessUsersModule = async (req, res) => {
     try {
         let usersRows = "";
+        let theRoot = false;
+
 
         if (res.locals.userPrivilege === "rHumanos" || res.locals.userPrivilege === "direccion") {
             usersRows = await usersModel.find({ estaActivo: true }).select('-password -__v');
@@ -167,7 +160,9 @@ exports.accessUsersModule = async (req, res) => {
                 fechaBaja: formatReadableDateTime(user.fechaBaja)
             }));
 
-            return res.render('usuarios/rHumanosUsersView.ejs', { usersRows });
+            if (res.locals.userId === "000") theRoot = true;
+
+            return res.render('usuarios/rHumanosUsersView.ejs', { usersRows, theRoot });
         } else {
             return res.redirect("/login");
         }
@@ -198,7 +193,6 @@ exports.restoreUsersView = async (req, res) => {
         return res.status(500).send("Tomar captura y favor de informar a soporte técnico. (#171)");
     }
 };
-
 exports.configureTeamView = async (req, res) => {
     try {
         let teamsRows = "";
@@ -255,7 +249,6 @@ exports.doesEmailExists = async (req, res) => {
         return res.status(500).json({ success: false });
     }
 };
-
 
 // deactivateUser : rHumanos : Done 
 exports.deactivateUser = async (req, res) => {
@@ -397,40 +390,131 @@ exports.changePassword = async (req, res) => {
     }
 };
 
-// 1111
-// changePrivilege : rHumanos : --- 
-exports.changePrivilege = async (req, res) => {
+// editUser : rHumanos : Done
+exports.editUser = async (req, res) => {
     try {
-        const userId = req.body.userId;
-        const newPrivilege = req.body.newPrivilege
+        // 0. VALIDATE USER PRIVILEGES
+        if (res.locals.userPrivilege !== "rHumanos" && res.locals.userPrivilege !== "direccion") {
+            return res.status(403).json({
+                success: false,
+                messageTitle: "¡Repámpanos!",
+                messageText: "No tienes permisos para realizar esta acción. (#226)"
+            });
+        }
 
-        // Execute findByIdAndUpdate
+        // A. GET USER ID AND VALIDATE
+        const userId = req.body.userId;
+
+        // Input validation
+        if (!userId) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "El ID de usuario es requerido." 
+            });
+        }
+
+        // Validate if it's a valid MongoDB ObjectId
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "El formato del ID de usuario es inválido." 
+            });
+        }
+
+        // B. VALIDATE EDITABLE FIELDS
+        const {
+            nombre, apellidoP, apellidoM, email,
+            area, puesto, fechaIngreso, privilegio
+        } = req.body;
+
+        // Check if all required fields exist
+        if (!nombre || !apellidoP || !apellidoM || !email ||
+            !area || !puesto || !fechaIngreso || !privilegio) {
+            return res.status(400).json({
+                success: false,
+                messageTitle: "Datos Incompletos",
+                messageText: "Todos los campos son requeridos."
+            });
+        }
+
+        // C. BUILD UPDATE PAYLOAD
+        const updateData = {
+            nombre,
+            apellidoP,
+            apellidoM,
+            email,
+            area,
+            puesto,
+            fechaIngreso,
+            privilegio
+        };
+
+        // Add optional fechaTermino field if provided
+        if (req.body.fechaTermino) {
+            updateData.fechaBaja = req.body.fechaTermino;
+        }
+
+        // Handle optional photo update
+        if (req.files?.length > 0) {
+            const response = await filesModel.create(req.files[0]);
+            if (!response) throw new Error("Error al guardar el archivo");
+            updateData.foto = response._id;
+        }
+
+        // D. UPDATE USER IN DATABASE
         const response = await usersModel.findByIdAndUpdate(
             userId,
-            { $set: { privilegio: newPrivilege } }, // Change attribute
+            { $set: updateData },
             { new: true, runValidators: true }
         );
 
-        // if for some reason user not found, send 404
+        // If user not found, send 404
         if (!response) {
-            return res.status(404).json({ success: false, message: "" });
+            return res.status(404).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "Usuario no encontrado." 
+            });
         }
 
-        // send correct execution
-        activeUsers.delete(userId); // log him out 
-        return res.status(200).json({ success: true, message: "" });
+        // Log user out to apply changes
+        if (typeof activeUsers !== 'undefined' && activeUsers.has(userId)) {
+            activeUsers.delete(userId);
+        }
+
+        return res.status(200).json({ success: true });
+
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
+        console.log(error);
+        // Handle MongoDB validation errors
+        if (error instanceof mongoose.Error.ValidationError) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "Error de validación en los datos." 
+            });
+        }
+        
+        // Handle MongoDB cast errors (wrong type)
+        if (error instanceof mongoose.Error.CastError) {
+            return res.status(400).json({ 
+                success: false, 
+                messageTitle: "¡Repámpanos!", 
+                messageText: "Tipo de dato incorrecto." 
+            });
+        }
+
+        console.error("Error updating user:", error);
+        
+        return res.status(500).json({ 
+            success: false, 
+            messageTitle: "Error", 
+            messageText: "Tomar captura y favor de informar a soporte técnico. (#227)" 
+        });
     }
 };
-
-
-
-
-
-
-
 
 // downloadPDF : rHumanos : Done 
 exports.downloadPDF = async (req, res) => {
@@ -746,36 +830,4 @@ exports.downloadExcel = async (req, res) => {
         console.error('Error generating Excel:', error);
         res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
-};
-
-
-// requieres client validation for teams
-exports.postEditUser = async (req, res) => {
-    try {
-        // critical . on every user configuration . activeUsers.delete(userId); // log him out 
-
-        const userId = req.body.userId;
-
-        // Execute findByIdAndUpdate TODO
-        /*
-        const response = await usersModel.findByIdAndUpdate(
-            userId, 
-            { $set: { estaActivo: false } }, // Change attribute
-            { new: true } , runValidators: true
-        );
-        */
-
-        // If for some reason user not found, send 404
-        if (!response) {
-            return res.status(404).json({ success: false, message: "" });
-        }
-
-        activeUsers.delete(userId); // log him out 
-
-        return res.status(200).json({ success: true, message: req.body });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "" });
-    }
-
 };

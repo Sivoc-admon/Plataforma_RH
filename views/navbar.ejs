@@ -60,7 +60,7 @@
                 <a href="/login/inicio" class="has-text-white is-size-5 mt-2">
                     <i class="fa-solid fa-house icon-css"></i> Inicio
                 </a>
-
+                
                 <% if ( userPrivilege !== "colaborador") { %>
                 <!-- Botón Usuarios -->
                 <a href="/usuarios/accessUsersModule" class="has-text-white is-size-5 mt-2">
@@ -68,6 +68,7 @@
                 </a>
                 <% }; %>
 
+                <% if ( userId !== "000") { %>
                 <!-- Botón Permisos -->
                 <a href="/permisos/accessPermitsModule" class="has-text-white is-size-5 mt-2">
                     <i class="fa-solid fa-clipboard-user icon-css"></i> Permisos
@@ -80,6 +81,7 @@
                 <a href="/cursos" class="has-text-white is-size-5 mt-2">
                     <i class="fa-solid fa-person-chalkboard icon-css"></i> Cursos
                 </a>
+                <% }; %>
 
                 <a href="/logout" class="has-text-white is-size-5 mt-2" class="has-text-white is-size-4 mt-2">
                     <i class="fa-solid fa-right-from-bracket icon-css"></i> Cerrar Sesión

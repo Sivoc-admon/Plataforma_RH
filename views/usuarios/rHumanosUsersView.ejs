@@ -6,7 +6,7 @@
     <div class="inside-content-css">
         <h1> Módulo Usuarios </h1>
 
-        <% if (usersRows.length !==0) { %>
+        <% if (usersRows.length !==0 || theRoot) { %>
 
         <div class="columns" style="margin-top: 1rem;">
 
@@ -58,7 +58,6 @@
                 <tr style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue));">
                     <th class="has-text-centered">Nombre completo</th>
                     <th class="has-text-centered">Fecha de ingreso</th>
-                    <th class="has-text-centered">Fecha de baja</th>
                     <th class="has-text-centered">Área</th>
                     <th class="has-text-centered">Puesto</th>
                     <th class="has-text-centered">Privilegio</th>
@@ -74,10 +73,6 @@
 
                         <td class="is-centered">
                             <%= user.fechaIngreso %>
-                        </td>
-
-                        <td class="is-centered">
-                            <%= user.fechaBaja %>
                         </td>
 
                         <td class="is-centered">
@@ -104,7 +99,10 @@
 
                                 <div class="column">
                                     <button class="default-button-css table-button-css" userId="<%= user._id %>"
-                                        onclick="editUser(this)">
+                                            userId="<%= user._id %>" nombre="<%= user.nombre %>" apellidoP="<%= user.apellidoP %>"
+                                            apellidoM="<%= user.apellidoM %>" email="<%= user.email %>" fechaIngreso="<%= user.fechaIngreso %>"
+                                            fechaTermino="<%= user.fechaBaja %>" area="<%= user.area %>" puesto="<%= user.puesto %>"
+                                            privilegio="<%= user.privilegio %>" onclick="editUser(this)">
                                         <i class="fa-solid fa-pencil"></i>
                                     </button>
                                 </div>
@@ -131,12 +129,16 @@
                     <% }); %>
             </tbody>
         </table>
+
+        <% if (theRoot && usersRows.length ===0 ) { %>
+            <h2 class="empty-message">Usuario raíz detectado, ¡Bienvenido! Empieza creando un nuevo usuario. ✅</h2>
+        <% }; %>
         <div class="pagination">
             <button class="default-button-css" onclick="prevPage()">Anterior</button>
             <button class="default-button-css" onclick="nextPage()">Siguiente</button>
         </div>
         <% } else { %>
             <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">El sistema no cuenta con usuarios. ✅</h2>
-            <% }; %>
+        <% }; %>
 
     </div>

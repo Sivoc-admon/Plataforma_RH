@@ -33,13 +33,13 @@ const validateInput = (value, pattern) => {
 const setupAreaToPuestoRelationship = () => {
     const areaSelect = document.getElementById("area");
     const puestoSelect = document.getElementById("puesto");
-    
+
     if (!areaSelect || !puestoSelect) return;
-    
+
     areaSelect.addEventListener("change", () => {
         const selectedArea = areaSelect.value;
         const puestos = areaToPuestos[selectedArea] || [];
-        
+
         // Clear and rebuild puesto options
         puestoSelect.innerHTML = '<option value="" hidden>🔔 Selecciona un puesto</option>';
         puestos.forEach(puesto => {
@@ -54,7 +54,7 @@ const setupImagePreview = () => {
     // Get the file input element
     const fileInput = document.getElementById('foto');
     if (!fileInput) return;
-    
+
     // Attach event listener
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
@@ -78,7 +78,7 @@ const setupImagePreview = () => {
 
         // Preview the image
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             document.getElementById('profile-img').src = e.target.result;
         };
         reader.readAsDataURL(file);
@@ -89,23 +89,23 @@ const setupDateInputs = () => {
     const setupDateInput = (inputId, displayId) => {
         const input = document.getElementById(inputId);
         const display = document.getElementById(displayId);
-        
+
         if (!input || !display) return;
-        
+
         // Initialize flatpickr
         setupDatePicker(inputId);
-        
+
         // Set initial value on display
         if (input.value) {
             display.value = formatReadableDateTime(input.value);
         }
-        
+
         // Handle display click to show picker
         display.addEventListener("click", (event) => {
             event.preventDefault();
             input.click();
         });
-        
+
         // Update display when date changes
         input.addEventListener("input", () => {
             display.value = formatReadableDateTime(input.value);
@@ -113,28 +113,28 @@ const setupDateInputs = () => {
     };
 
     setupDateInput('fechaIngreso', 'fechaIngresoDisplay');
-    
+
     // For simple date inputs
     const setupSimpleDateInput = (elementId) => {
         const element = document.getElementById(elementId);
         if (!element) return;
-        
+
         const today = new Date();
         const formattedDate = today.toISOString().split('T')[0];
         element.value = formattedDate;
-        
+
         element.addEventListener("click", (event) => {
             event.preventDefault();
             element.showPicker();
         });
     };
-    
+
     setupSimpleDateInput('fechaBaja');
 };
 
 // addUser : Done
 async function addUser() {
-    Swal.fire({ 
+    Swal.fire({
         html: DOMPurify.sanitize(`
             <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
                 <i class="fa-solid fa-user-plus" style="margin-right:0.9rem;"></i>Añadir Usuario
@@ -176,9 +176,9 @@ async function addUser() {
                     <label class="label">Área</label>
                     <select id="area" class="input">
                         <option value="" hidden> 🔔 Selecciona un área</option>
-                        ${Object.keys(areaToPuestos).map(area => 
-                            `<option value="${area}">${area}</option>`
-                        ).join('')}
+                        ${Object.keys(areaToPuestos).map(area =>
+            `<option value="${area}">${area}</option>`
+        ).join('')}
                     </select>
                 </div>
                 <div class="column">
@@ -202,7 +202,7 @@ async function addUser() {
             <div class="columns is-vcentered">
                                     
                 <div class="column">
-                    <label class="label">Foto de Perfil</label>
+                    <label class="label">Foto de Perfil (opcional)</label>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="file has-name is-boxed" style="flex: 1;">
                             <label class="input" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-right:0.3rem;">
@@ -247,22 +247,22 @@ async function addUser() {
                 const fechaIngreso = $('#fechaIngreso').val();
                 const privilegio = $('#privilegio').val().trim();
                 const fileInput = document.getElementById('foto');
-                
+
                 // Base validation
-                if (!nombre || !apellidoP || !apellidoM || !email || !password || 
+                if (!nombre || !apellidoP || !apellidoM || !email || !password ||
                     !area || !puesto || !fechaIngreso || !privilegio) {
                     return Swal.showValidationMessage('Todos los campos a excepción de la foto son requeridos.');
                 }
 
                 // Character validation 
                 const forbiddenCharsPattern = /[\{\}\:\$\=\'\*\[\]]/;
-                if (forbiddenCharsPattern.test(nombre) || 
-                    forbiddenCharsPattern.test(apellidoP) || 
+                if (forbiddenCharsPattern.test(nombre) ||
+                    forbiddenCharsPattern.test(apellidoP) ||
                     forbiddenCharsPattern.test(apellidoM) ||
                     forbiddenCharsPattern.test(email)) {
                     return Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
                 }
-                
+
                 // Email format validation
                 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailPattern.test(email)) {
@@ -280,7 +280,7 @@ async function addUser() {
                     })
 
                 });
-                const emailData = await emailResponse.json(); 
+                const emailData = await emailResponse.json();
                 if (!emailData.success) return Swal.showValidationMessage('Tomar captura y reportar soporte técnico #130.');
                 if (emailData.exists) return Swal.showValidationMessage('El correo electrónico ya se encuentra ocupado.');
 
@@ -296,18 +296,18 @@ async function addUser() {
                 formData.append('puesto', puesto);
                 formData.append('fechaIngreso', fechaIngreso);
                 formData.append('privilegio', privilegio);
-                
+
                 // Append the file if it exists
                 if (fileInput.files[0]) {
                     formData.append('files', fileInput.files[0]);
                 }
-                
+
                 // Single fetch call
                 const response = await fetch('/usuarios/addUser', {
                     method: 'POST',
                     body: formData
                 });
-                
+
                 const data = await response.json();
 
                 await Swal.fire({
@@ -401,13 +401,13 @@ async function deactivateUser(button) {
             cancelButton: 'default-button-css',
         },
         preConfirm: async () => {
-            try {                
+            try {
                 const response = await fetch('/usuarios/deactivateUser', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({userId})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId })
                 });
-                
+
                 const data = await response.json();
 
                 await Swal.fire({
@@ -455,21 +455,21 @@ async function changePassword(button) {
         preConfirm: async () => {
             const password = $('#password').val().trim();
             const passwordError = $('#password-error');
-        
+
             // Validate password
             if (!password) return Swal.showValidationMessage('La contraseña es obligatoria.');
-            
+
             // Validate against special characters as per the model
             const invalidCharsRegex = /[\{\}\:\$\=\'\*\[\]]/;
             if (invalidCharsRegex.test(password)) return Swal.showValidationMessage('La contraseña contiene caracteres no permitidos ({ } : $ = \' * [ ])');
 
-            try {        
+            try {
                 const response = await fetch('/usuarios/changePassword', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({userId: userId, password: password})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: userId, password: password })
                 });
-                
+
                 const data = await response.json();
 
                 await Swal.fire({
@@ -487,12 +487,60 @@ async function changePassword(button) {
     });
 }
 
-// requires cliente validation of the teams, editUser : ----
+// editUser : Done
 async function editUser(button) {
-    
-    try {
-        Swal.fire({
-            html: DOMPurify.sanitize(`
+    // Get attributes from the button
+    const userId = DOMPurify.sanitize(button.getAttribute('userId'));
+    const Anombre = DOMPurify.sanitize(button.getAttribute('nombre'));
+    const AapellidoP = DOMPurify.sanitize(button.getAttribute('apellidoP'));
+    const AapellidoM = DOMPurify.sanitize(button.getAttribute('apellidoM'));
+    const Aemail = DOMPurify.sanitize(button.getAttribute('email'));
+    const AfechaIngreso = DOMPurify.sanitize(button.getAttribute('fechaIngreso'));
+    const AfechaTermino = DOMPurify.sanitize(button.getAttribute('fechaTermino'));
+    console.log("AfechaTermino: ", AfechaTermino);
+    const Aarea = DOMPurify.sanitize(button.getAttribute('area'));
+    const Apuesto = DOMPurify.sanitize(button.getAttribute('puesto'));
+    const Aprivilegio = DOMPurify.sanitize(button.getAttribute('privilegio'));
+
+    // Function to convert Spanish date to ISO format
+    const convertSpanishDateToISO = (spanishDate) => {
+        if (!spanishDate) return null;
+        
+        // Handle various date formats
+        const months = {
+            'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
+            'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
+        };
+        
+        // Parse the Spanish date format like "8 de marzo de 2025"
+        const parts = spanishDate.split(' ');
+        if (parts.length >= 5) {
+            const day = parseInt(parts[0], 10);
+            const monthName = parts[2].toLowerCase();
+            const year = parseInt(parts[4], 10);
+            
+            if (!isNaN(day) && months.hasOwnProperty(monthName) && !isNaN(year)) {
+                const date = new Date(year, months[monthName], day);
+                // Format to ISO with time component for flatpickr
+                return date.toISOString().split('.')[0];
+            }
+        }
+        
+        // Try to parse as a Date object if it's not in the expected format
+        const date = new Date(spanishDate);
+        if (!isNaN(date.getTime())) {
+            return date.toISOString().split('.')[0];
+        }
+        
+        return null;
+    };
+
+    // Convert dates to ISO format
+    const fechaIngresoISO = convertSpanishDateToISO(AfechaIngreso);
+    const fechaTerminoISO = convertSpanishDateToISO(AfechaTermino);
+
+    Swal.fire({
+        html: DOMPurify.sanitize(`
             <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">
                 <i class="fa-solid fa-pencil" style="margin-right:0.9rem;"></i>Editar Usuario
             </h2>
@@ -500,31 +548,32 @@ async function editUser(button) {
             <div class="columns is-vcentered">
                 <div class="column">
                     <label class="label">Nombre</label>
-                    <input class="input" id="nombre" required>
+                    <input class="input" id="nombre" value="${Anombre}" required>
                 </div>
                 <div class="column">
                     <label class="label">Apellido Paterno</label>
-                    <input class="input" id="apellidoP" required>
+                    <input class="input" id="apellidoP" value="${AapellidoP}" required>
                 </div>
                 <div class="column">
                     <label class="label">Apellido Materno</label>
-                    <input class="input" id="apellidoM" required>
+                    <input class="input" id="apellidoM" value="${AapellidoM}" required>
                 </div>
             </div>
 
             <div class="columns is-vcentered">
                 <div class="column">
                     <label class="label">Email</label>
-                    <input class="input" id="email" type="email" required>
-                </div>
-                <div class="column">
-                    <label class="label">Contraseña</label>
-                    <input class="input" id="password" type="password" required>
+                    <input class="input" id="email" type="email" value="${Aemail}" required>
                 </div>
                 <div class="column">
                     <label class="label">Fecha de ingreso</label>
                     <input type="text" id="fechaIngreso" style="opacity: 0; position: absolute;" required>
                     <input type="text" id="fechaIngresoDisplay" class="input" readonly>
+                </div>
+                <div class="column">
+                    <label class="label">Fecha de término</label>
+                    <input type="text" id="fechaTermino" style="opacity: 0; position: absolute;">
+                    <input type="text" id="fechaTerminoDisplay" class="input" readonly>
                 </div>
             </div>
 
@@ -533,9 +582,9 @@ async function editUser(button) {
                     <label class="label">Área</label>
                     <select id="area" class="input">
                         <option value="" hidden> 🔔 Selecciona un área</option>
-                        ${Object.keys(areaToPuestos).map(area => 
-                            `<option value="${area}">${area}</option>`
-                        ).join('')}
+                        ${Object.keys(areaToPuestos).map(area =>
+            `<option value="${area}" ${area === Aarea ? 'selected' : ''}>${area}</option>`
+        ).join('')}
                     </select>
                 </div>
                 <div class="column">
@@ -548,148 +597,175 @@ async function editUser(button) {
                     <label class="label">Privilegio</label>
                     <select id="privilegio" class="input">
                         <option value="" hidden> 🔔 Selecciona un privilegio</option>
-                        <option value="colaborador">Colaborador</option>
-                        <option value="rHumanos">Recursos Humanos</option>
-                        <option value="jefeInmediato">Jefe Inmediato</option>
-                        <option value="direccion">Dirección</option>
+                        <option value="colaborador" ${Aprivilegio === 'colaborador' ? 'selected' : ''}>Colaborador</option>
+                        <option value="rHumanos" ${Aprivilegio === 'rHumanos' ? 'selected' : ''}>Recursos Humanos</option>
+                        <option value="jefeInmediato" ${Aprivilegio === 'jefeInmediato' ? 'selected' : ''}>Jefe Inmediato</option>
+                        <option value="direccion" ${Aprivilegio === 'direccion' ? 'selected' : ''}>Dirección</option>
                     </select>
                 </div>
             </div>
-
-            <div class="columns is-vcentered">
-                                    
-                <div class="column">
-                    <label class="label">Foto de Perfil</label>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div class="file has-name is-boxed" style="flex: 1;">
-                            <label class="input" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-right:0.3rem;">
-                                <i class="fas fa-upload" style="margin: 0rem 0.3rem;font-size: 1.1rem;"></i>
-                                <span>Selecciona una imagen cuadrada</span>
-                                <input type="file" name="foto" class="file-input" id="foto" style="display: none;">
-                            </label>
-                        </div>
-                        <div class="input" style="margin-top: 0; width: 48px; height: 48px; position: relative; overflow: hidden; border-radius: 50%; border: 2px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                            <img 
-                                id="profile-img" 
-                                style="position: absolute; top: 50%; left: 50%; width: auto; height: auto; transform: translate(-50%, -50%);">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            `),
-            confirmButtonText: '(En Construcción)',
-            cancelButtonText: 'Cancelar',
-            cancelButtonColor: '#f0466e',
-            showCancelButton: true,
-            allowOutsideClick: false,
-            width: '1011px',
-            customClass: {
-                confirmButton: 'default-button-css',
-                cancelButton: 'default-button-css',
-            },
-            didOpen: () => {
-                setupAreaToPuestoRelationship();
-                setupImagePreview();
-                setupDateInputs();
-            },
-            preConfirm: async () => {
-                /*
-                try {
-                    
-                    // Get all form values
-                    const nombre = $('#nombre').val().trim();
-                    const apellidoP = $('#apellidoP').val().trim();
-                    const apellidoM = $('#apellidoM').val().trim();
-                    const email = $('#email').val().trim();
-                    const area = $('#area').val().trim();
-                    const puesto = $('#puesto').val().trim();
-                    const fechaIngreso = $('#fechaIngreso').val();
-                    const fechaBaja = $('#fechaBaja').val();
-                    const jefeInmediato = $('#jefeInmediato').val().trim();
-                    const privilegio = $('#privilegio').val().trim();
-                    const fileInput = document.getElementById('foto');
-                    
-                    // Basic validation
-                    if (!nombre || !apellidoP || !apellidoM || !email || !area || 
-                        !fechaIngreso || !jefeInmediato || !puesto || !privilegio) {
-                        return Swal.showValidationMessage('Todos los campos son requeridos.');
-                    }
-                    
-                    // Character validation
-                    const forbiddenCharsPattern = /[\{\}\:\$\=\'\*\[\]]/;
-                    if (forbiddenCharsPattern.test(nombre) || 
-                        forbiddenCharsPattern.test(apellidoP) || 
-                        forbiddenCharsPattern.test(apellidoM) ||
-                        forbiddenCharsPattern.test(email) || 
-                        forbiddenCharsPattern.test(area) || 
-                        forbiddenCharsPattern.test(privilegio) ||
-                        forbiddenCharsPattern.test(jefeInmediato) || 
-                        forbiddenCharsPattern.test(puesto)) {
-                        return Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
-                    }
-                    
-                    // Check if email changed and verify no collision
-                    if (email !== user.email) {
-                        const emailResponse = await fetch('/usuarios/doesEmailExists', {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({ email, userId: user._id })
-                        });
-                        const emailData = await emailResponse.json();
-                        if (!emailData.success) throw new Error('Error checking email');
-                        if (emailData.exists) {
-                            return Swal.showValidationMessage('Email existente. Ese email ya está ocupado por otro usuario.');
-                        }
-                    }
-                    
-                    // Create form data
-                    const formData = new FormData();
-                    formData.append('userId', user._id);
-                    formData.append('nombre', nombre);
-                    formData.append('apellidoP', apellidoP);
-                    formData.append('apellidoM', apellidoM);
-                    formData.append('email', email);
-                    formData.append('area', area);
-                    formData.append('puesto', puesto);
-                    formData.append('fechaIngreso', fechaIngreso);
-                    formData.append('fechaBaja', fechaBaja);
-                    formData.append('jefeInmediato', jefeInmediato);
-                    formData.append('privilegio', privilegio);
-                    formData.append('estaActivo', user.estaActivo);
-                    
-                    // Append file if exists
-                    if (fileInput.files[0]) {
-                        formData.append('file', fileInput.files[0]);
-                    }
-                    
-                    // Single fetch for edit
-                    const response = await fetch('/usuarios/editUser', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        Swal.fire({
-                            title: 'Usuario actualizado',
-                            icon: 'success',
-                            width: "500px",
-                            text: 'El usuario se actualizó correctamente.'
-                        }).then(() => {
-                            location.reload();
-                        });
+        `),
+        confirmButtonText: 'Guardar',
+        cancelButtonText: 'Cancelar',
+        cancelButtonColor: '#f0466e',
+        showCancelButton: true,
+        allowOutsideClick: false,
+        width: '1011px',
+        customClass: {
+            confirmButton: 'default-button-css',
+            cancelButton: 'default-button-css',
+        },
+        didOpen: () => {
+            // Setup relationships and date pickers
+            setupAreaToPuestoRelationship();
+            
+            // Setup date inputs with extended functionality for flatpickr
+            const setupDateInput = (inputId, displayId, initialDate, readableDate) => {
+                const input = document.getElementById(inputId);
+                const display = document.getElementById(displayId);
+                
+                if (!input || !display) return;
+                
+                // Initialize flatpickr
+                const picker = setupDatePicker(inputId);
+                
+                // Set initial date if provided
+                if (initialDate) {
+                    picker.setDate(initialDate);
+                    // Set the readable date display
+                    if (readableDate) {
+                        display.value = readableDate;
                     } else {
-                        throw new Error(data.message || 'Error al actualizar el usuario');
+                        display.value = formatReadableDateTime(initialDate);
                     }
-                } catch (error) {
-                    console.error('Error:', error);
-                    showErrorAlert('002');
                 }
-                */
+                
+                // Handle display click to show picker
+                display.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    picker.open();
+                });
+                
+                // Update display when date changes
+                input.addEventListener("change", () => {
+                    if (input.value) {
+                        display.value = formatReadableDateTime(input.value);
+                    } else {
+                        display.value = '';
+                    }
+                });
+            };
+            
+            // Initialize date pickers with values
+            setupDateInput('fechaIngreso', 'fechaIngresoDisplay', fechaIngresoISO, AfechaIngreso);
+            setupDateInput('fechaTermino', 'fechaTerminoDisplay', fechaTerminoISO, AfechaTermino);
+            
+            // Set initial value for puesto based on area
+            const areaSelect = document.getElementById('area');
+            const puestoSelect = document.getElementById('puesto');
+            
+            if (areaSelect && puestoSelect && Aarea) {
+                // Populate puesto options based on selected area
+                const puestos = areaToPuestos[Aarea] || [];
+                puestoSelect.innerHTML = '<option value="" hidden>🔔 Selecciona un puesto</option>';
+                puestos.forEach(puesto => {
+                    const option = document.createElement('option');
+                    option.value = puesto;
+                    option.textContent = puesto;
+                    if (puesto === Apuesto) {
+                        option.selected = true;
+                    }
+                    puestoSelect.appendChild(option);
+                });
             }
-        });
-    } catch (error) {
-        location.reload();
-    }
+        },
+        preConfirm: async () => {
+            try {
+                // Get all form values
+                const nombre = $('#nombre').val().trim();
+                const apellidoP = $('#apellidoP').val().trim();
+                const apellidoM = $('#apellidoM').val().trim();
+                const email = $('#email').val().trim();
+                const area = $('#area').val().trim();
+                const puesto = $('#puesto').val().trim();
+                const fechaIngreso = $('#fechaIngreso').val();
+                const fechaTermino = $('#fechaTermino').val();
+                const privilegio = $('#privilegio').val().trim();
+
+                // Basic validation
+                if (!nombre || !apellidoP || !apellidoM || !email || !area ||
+                    !fechaIngreso || !puesto || !privilegio) {
+                    return Swal.showValidationMessage('Todos los campos son requeridos excepto la fecha de término.');
+                }
+
+                // Character validation
+                const forbiddenCharsPattern = /[\{\}\:\$\=\'\*\[\]]/;
+                if (forbiddenCharsPattern.test(nombre) ||
+                    forbiddenCharsPattern.test(apellidoP) ||
+                    forbiddenCharsPattern.test(apellidoM) ||
+                    forbiddenCharsPattern.test(email) ||
+                    forbiddenCharsPattern.test(area) ||
+                    forbiddenCharsPattern.test(privilegio) ||
+                    forbiddenCharsPattern.test(puesto)) {
+                    return Swal.showValidationMessage('Uno o más campos contienen caracteres no permitidos.');
+                }
+
+                // Email format validation
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(email)) {
+                    return Swal.showValidationMessage('El formato del correo electrónico no es válido.');
+                }
+
+                // Check if email changed and verify no collision
+                if (email !== Aemail) {
+                    const emailResponse = await fetch('/usuarios/doesEmailExists', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, userId })
+                    });
+                    const emailData = await emailResponse.json();
+                    if (!emailData.success) return Swal.showValidationMessage('Tomar captura y reportar soporte técnico #131.');
+                    if (emailData.exists) {
+                        return Swal.showValidationMessage('Email existente. Ese email ya está ocupado por otro usuario.');
+                    }
+                }
+
+                // Instead of FormData
+                const jsonData = {
+                    userId: userId,
+                    nombre: nombre,
+                    apellidoP: apellidoP,
+                    apellidoM: apellidoM,
+                    email: email,
+                    area: area,
+                    puesto: puesto,
+                    fechaIngreso: fechaIngreso,
+                    privilegio: privilegio
+                };
+
+                // Only add fechaTermino if it has a value
+                if (fechaTermino) jsonData.fechaTermino = fechaTermino;
+
+                const response = await fetch('/usuarios/editUser', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(jsonData)
+                });
+
+                const data = await response.json();
+
+                await Swal.fire({
+                    title: data.success ? 'Usuario editado' : data.messageTitle,
+                    icon: data.success ? 'success' : 'error',
+                    text: data.success ? 'Se ha editado el usuario correctamente.' : data.messageText,
+                    width: "500px"
+                });
+
+                location.reload();
+
+            } catch (error) {
+                location.reload();
+            }
+        }
+    });
 }
