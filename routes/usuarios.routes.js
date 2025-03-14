@@ -64,5 +64,10 @@ router.post("/changePassword", controller.changePassword);
 // editUser : rHumanos : Done
 router.post("/editUser", controller.editUser); 
 
+// createTeam : rHumanos : Done
+router.post("/createTeam", controller.createTeam); 
+
+// editTeam : rHumanos : ---
+router.post("/editTeam", controller.editTeam); 
 
 module.exports = router;

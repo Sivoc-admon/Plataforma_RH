@@ -1,9 +1,15 @@
 const mongoose = require('mongoose');
 
+
+//from
+// const team = await teamsSchema.find({ jefeInmediatoId: res.locals.userId }).select('-__v');
+//to
+// const team = await teamsSchema.find({ jefeInmediatoIds: { $in: [res.locals.userId] } }).select('-__v');
+
+
 const teamsSchema = new mongoose.Schema({
-    jefeInmediatoId: {
+    jefeInmediatoIds: [{
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
         ref: 'usuarios',
         validate: {
             validator: function(v) {
@@ -11,10 +17,10 @@ const teamsSchema = new mongoose.Schema({
             },
             message: props => `${props.value} no es un ObjectId válido.`
         }
-    },
+    }],
     colaboradoresIds: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'usuarios', 
+        ref: 'usuarios',
         validate: {
             validator: function(v) {
                 return mongoose.Types.ObjectId.isValid(v);

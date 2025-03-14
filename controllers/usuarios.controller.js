@@ -72,6 +72,9 @@ exports.addUser = async (req, res) => {
 
         // 4. Save user to database - model validation happens here
         await usersModel.create(newUser);
+
+        // if jefe inmediato created, 
+
         return res.status(200).json({ success: true });
 
     } catch (error) {
@@ -198,13 +201,25 @@ exports.configureTeamView = async (req, res) => {
         let teamsRows = "";
 
         if (res.locals.userPrivilege === "rHumanos" || res.locals.userPrivilege === "direccion") {
-            teamsRows = await teamsModel.find({}).populate('jefeInmediatoId colaboradoresIds', 'nombre apellidoP apellidoM area puesto').select('-password -fechaBaja -fechaIngreso -email -foto -__v');
+            // Updated to use the new schema structure with jefeInmediatoIds as an array
+            teamsRows = await teamsModel.find({})
+                .populate({
+                    path: 'jefeInmediatoIds',
+                    select: 'nombre apellidoP apellidoM area puesto' 
+                })
+                .populate({
+                    path: 'colaboradoresIds', 
+                    select: 'nombre apellidoP apellidoM area puesto'
+                })
+                .select('-password -fechaBaja -fechaIngreso -email -foto -__v');
+                
             return res.render('usuarios/configureTeamView.ejs', { teamsRows });
         } else {
             return res.redirect("/login");
         }
 
     } catch (error) {
+        console.error("Error in configureTeamView:", error);
         return res.status(500).send("Tomar captura y favor de informar a soporte técnico. (#185)");
     }
 };
@@ -241,6 +256,55 @@ exports.doesEmailExists = async (req, res) => {
 
         // Si no hay usuario, responde con `exists: false`
         if (!user) return res.status(200).json({ success: true, exists: false });
+
+        // Si el email ya existe, responde indicando que existe
+        return res.status(200).json({ success: true, exists: true });
+
+    } catch (error) {
+        return res.status(500).json({ success: false });
+    }
+};
+
+// createTeam : rHumanos : Done
+exports.createTeam = async (req, res) => {
+    try {
+
+        if (res.locals.userPrivilege !== "direccion" && res.locals.userPrivilege !== "rHumanos")
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Rempámpanos!",
+                messageText: "Espera un poco y vuelve a intentarlo."
+            });
+
+        const team = await teamsModel.create({});
+
+        // Si no hay usuario, responde con `exists: false`
+        if (!team) return res.status(200).json({ success: true, exists: false });
+
+        // Si el email ya existe, responde indicando que existe
+        return res.status(200).json({ success: true, exists: true });
+
+    } catch (error) {
+        return res.status(500).json({ success: false });
+    }
+};
+
+// editTeam : rHumanos : Done
+// ver y asignar así de putazo
+exports.editTeam = async (req, res) => {
+    try {
+
+        if (res.locals.userPrivilege !== "direccion" && res.locals.userPrivilege !== "rHumanos")
+            return res.status(400).json({
+                success: false,
+                messageTitle: "¡Rempámpanos!",
+                messageText: "Espera un poco y vuelve a intentarlo."
+            });
+
+        const team = await teamsModel.create({});
+
+        // Si no hay usuario, responde con `exists: false`
+        if (!team) return res.status(200).json({ success: true, exists: false });
 
         // Si el email ya existe, responde indicando que existe
         return res.status(200).json({ success: true, exists: true });

@@ -476,7 +476,8 @@ exports.downloadPDF = async (req, res) => {
         // Permits module for "jefeInmediato"
         if (res.locals.userPrivilege === "jefeInmediato") {
             // get all members from the team, map all their permits in a single array
-            const team = await teamsSchema.find({ jefeInmediatoId: res.locals.userId }).select('-__v');
+            const team = await teamsSchema.find({ jefeInmediatoIds: { $in: [res.locals.userId] } }).select('-__v');
+
             if (team.length > 0) {
                 const teamData = team[0];
                 const permitPromises = teamData.colaboradoresIds.map(userId => {
@@ -667,7 +668,7 @@ exports.downloadExcel = async (req, res) => {
         let permitsRows = [];
 
         if (res.locals.userPrivilege === "jefeInmediato") {
-            const team = await teamsSchema.find({ jefeInmediatoId: res.locals.userId }).select('-__v');
+            const team = await teamsSchema.find({ jefeInmediatoIds: { $in: [res.locals.userId] } }).select('-__v');
             if (team.length > 0) {
                 const teamData = team[0];
                 const permitPromises = teamData.colaboradoresIds.map(userId => {
@@ -785,7 +786,7 @@ exports.accessPermitsModule = async (req, res) => {
 
             // Permits module for "jefeInmediato"
         } else if (res.locals.userPrivilege === "jefeInmediato") {
-            const team = await teamsSchema.find({ jefeInmediatoId: res.locals.userId }).select('-__v');
+            const team = await teamsSchema.find({ jefeInmediatoIds: { $in: [res.locals.userId] } }).select('-__v');
             if (team.length > 0) {
                 const teamData = team[0];
                 const permitPromises = teamData.colaboradoresIds.map(userId => {
