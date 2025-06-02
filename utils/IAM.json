@@ -12,6 +12,7 @@
             "downloadExcel": true
         },
         "vacaciones": {
+            "new": true
         },
         "cursos": {
 
