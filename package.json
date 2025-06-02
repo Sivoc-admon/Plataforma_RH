@@ -1,7 +1,7 @@
 {
   "name": "plataforma_rh",
   "version": "0.0.1",
-    "release-it": {
+  "release-it": {
     "npm": false
   },
   "main": "server.js",
@@ -30,5 +30,8 @@
     "validator": "^13.12.0"
   },
   "description": "SIVOC es una empresa de servicio dedicada a la administración y puesta en marcha, construcción, venta y comercialización para sistemas de: generación, transmisión, transformación y distribución de energía eléctrica, energías renovables, comunicaciones y telecomunicaciones para baja, media, alta y extra alta tensión.",
-  "devDependencies": {}
+  "devDependencies": {
+    "@release-it/conventional-changelog": "^10.0.1",
+    "release-it": "^19.0.3"
+  }
 }
