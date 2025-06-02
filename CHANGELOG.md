@@ -1,5 +1,13 @@
 # Changelog
 
+* chore: release v0.0.2 (7891334)
+* fix: Se corrigió el changelog 02 (9314372)
+* fix: Se corrigió el changelog (0dc095b)
+* fix: Se corrigió el changelog (8a80a25)
+* Update package.json (6130569)
+* feat: Se añadió el registro de cambios al proyecto (72ba3d0)
+* docs: actualiza changelog para la versión 0.0.3 (a80bfde)
+
 ## [0.0.2](https://github.com/Sivoc-admon/Plataforma_RH/compare/0.0.3...0.0.2) (2025-06-02)
 
 ### Added
