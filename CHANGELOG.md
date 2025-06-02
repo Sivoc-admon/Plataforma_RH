@@ -7,6 +7,11 @@ y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.0.2] - 2025-06-01
+
+### Cambios
+- Documentación inicial del changelog y estructura de versiones.
+
 ## [0.0.1] - 2025-06-01
 
 ### Agregado
