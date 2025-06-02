@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.5](https://github.com/Sivoc-admon/Plataforma_RH/compare/0.0.4...0.0.5) (2025-06-02)
+
+### Changed
+
+* cambios en la instalación con npm ([5c7b561](https://github.com/Sivoc-admon/Plataforma_RH/commit/5c7b5618aec6023d2515dcd1b00a03eac2509e30))
+
 ## [0.0.4](https://github.com/Sivoc-admon/Plataforma_RH/compare/0.0.3...0.0.4) (2025-06-02)
 
 ### Added
