@@ -1,6 +1,6 @@
 {
   "name": "plataforma_rh",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "release-it": {
     "git": {
       "commitMessage": "chore: release v${version}"
