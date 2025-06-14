@@ -1,19 +1,15 @@
-// Importar el modelo para utilizarlo
-// const xxx = require('../models/usuarios.model.js');
-
-
-/* --- MODEL LOGIC --- */
-
-
-
-/* --- VIEWS LOGIC --- */
-
-// Renderizar página de inicio (homepage)
-exports.getCoursesView = (req, res) => {
+// 
+/**
+ * Renderiza la página principal de cursos (En construcción)
+ * 
+ * @param {object} request - Objeto de solicitud
+ * @param {object} response - Objeto de respuesta
+ */
+exports.getCoursesView = (request, response) => {
     try {
-        res.render('cursos/cursos.ejs');
+        response.render('cursos/cursos.ejs');
     } catch (error) {
         console.error(error);
-        res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
+        response.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
 };

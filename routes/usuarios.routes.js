@@ -1,73 +1,63 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/usuarios.controller');
-const configureFileUpload = require("../utils/configureFileUpload");
+const configureFileUpload = require('../utils/configureFileUpload');
 
-// File upload validation & configuration
-const ensureFilesArray = (req, res, next) => {
-    if (!req.files)
-        req.files = [];
+/**
+ * Middleware que crea un array vacío si no subieron archivos
+ * 
+ * @param {object} request - Objeto de solicitud
+ * @param {object} response - Objeto de respuesta
+ * @param {Function} next - Función para continuar con el siguiente middleware
+ */
+const ensureFilesArray = (request, response, next) => {
+    if (!request.files)
+    {request.files = [];}
     next();
 };
 const allowedFileExtensions = ['png', 'jpeg', 'jpg'];
 const MAX_SIZE_MB = 3 * 1024 * 1024; // 3MB in bytes
 const allowedFileTypes = [
-    "image/png",
-    "image/jpeg",
-    "image/jpg",
+    'image/png',
+    'image/jpeg',
+    'image/jpg',
 ];
 const MAX_FILES = 1;
 
 // accessUsersModule : rHumanos : Done
-router.get("/accessUsersModule", controller.accessUsersModule);
+router.get('/accessUsersModule', controller.accessUsersModule);
 
 // addUser : rHumanos : Done
-const upload = configureFileUpload("uploads/usuarios", allowedFileTypes, allowedFileExtensions, MAX_SIZE_MB, MAX_FILES);
-router.post("/addUser",
+const upload = configureFileUpload('uploads/usuarios', allowedFileTypes, allowedFileExtensions, MAX_SIZE_MB, MAX_FILES);
+router.post('/addUser',
     ensureFilesArray,
-    (req, res, next) => { 
-        upload.array("files", MAX_FILES)(req, res, (err) => {
-            if (err) {
-                return res.status(400).json({ 
-                    success: false, 
-                    messageTitle: "Error con el archivo", 
-                    messageText: "El archivo se encuentra en un formato inválido"
-                });
-            }
-            next(); // Si no hay error, continuar con el controlador
-        });
-    },
-controller.addUser);
-router.post("/doesEmailExists", controller.doesEmailExists)
+    ...upload.array('files', MAX_FILES), // Errors go to Express default handler
+    controller.addUser
+);
+router.post('/doesEmailExists', controller.doesEmailExists);
 
 // restoreUsersView : rHumanos : Done
-router.get("/restoreUsersView", controller.restoreUsersView);
+router.get('/restoreUsersView', controller.restoreUsersView);
 
 // activateUser : rHumanos : Done
-router.post("/activateUser", controller.activateUser);
+router.post('/activateUser', controller.activateUser);
 
 // restoreUsersView : rHumanos : Done
-router.get("/configureTeamView", controller.configureTeamView);
-
-// downloadPDF : rHumanos : Done
-router.get("/downloadPDF", controller.downloadPDF);
-
-// downloadExcel : rHumanos : Done
-router.get("/downloadExcel", controller.downloadExcel);
+router.get('/configureTeamView', controller.configureTeamView);
 
 // deactivateUser : rHumanos : Done
-router.post("/deactivateUser", controller.deactivateUser);
+router.post('/deactivateUser', controller.deactivateUser);
 
 // changePassword : rHumanos : Done
-router.post("/changePassword", controller.changePassword);
+router.post('/changePassword', controller.changePassword);
 
 // editUser : rHumanos : Done
-router.post("/editUser", controller.editUser); 
+router.post('/editUser', controller.editUser); 
 
 // createTeam : rHumanos : Done
-router.post("/createTeam", controller.createTeam); 
+router.post('/createTeam', controller.createTeam); 
 
 // editTeam : rHumanos : ---
-router.post("/editTeam", controller.editTeam); 
+router.post('/editTeam', controller.editTeam); 
 
 module.exports = router;

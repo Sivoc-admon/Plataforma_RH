@@ -7,13 +7,17 @@
 
 
 /* --- VIEWS LOGIC --- */
-
-// Renderizar página de inicio (homepage)
-exports.getVacationsView = (req, res) => {
+/**
+ * Renderizar la página principal de Vacaciones (En construcción)
+ *
+ * @param {object} request - Objeto de solicitud.
+ * @param {object} response - Objeto de respuesta.
+ */
+exports.getVacationsView = (request, response) => {
     try {
-        res.render('vacaciones/vacaciones.ejs');
+        response.render('vacaciones/vacaciones.ejs');
     } catch (error) {
         console.error(error);
-        res.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
+        response.status(500).send('Algo salió mal. Favor de contactar a soporte técnico.');
     }
 };
