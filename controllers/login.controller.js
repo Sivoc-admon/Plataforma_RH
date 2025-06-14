@@ -31,7 +31,7 @@ exports.postAuthentication = async (request, res) => {
             } else if (rootToken.accessToken !== ''){
                 res.cookie('__psmxoflxpspgolxps_mid', rootToken.accessToken, { httpOnly: true, secure: true, sameSite: 'Strict' });  
             }
-            global.activeUsers.add(rootToken.userId.toString()); // user set to ensure unique ids
+            //global.activeUsers.add(rootToken.userId.toString()); // user set to ensure unique ids
             return res.status(200).json({ success: true, authorized: true, redirectUrl: '/login/inicio'});
         }
 
@@ -56,7 +56,7 @@ exports.postAuthentication = async (request, res) => {
         } else if (isGenerated.accessToken !== ''){
             res.cookie('__psmxoflxpspgolxps_mid', isGenerated.accessToken, { httpOnly: true, secure: true, sameSite: 'Strict' });  
         }
-        global.activeUsers.add(user._id.toString()); // user set to ensure unique ids
+        //global.activeUsers.add(user._id.toString()); // user set to ensure unique ids
         return res.status(200).json({ success: true, authorized: true, redirectUrl: '/login/inicio'});
         
     } catch (error) {
@@ -70,7 +70,7 @@ exports.postAuthentication = async (request, res) => {
 
 /**
  * Función para generar un JWT Token de usuario raíz
- * @return {object} - Objeto que explique la respuesta y que contenga el accessToken
+ * @returns {object} - Objeto que explique la respuesta y que contenga el accessToken
  */
 async function genRootToken () {
     try {
@@ -91,7 +91,7 @@ async function genRootToken () {
  * @param user
  * @param jwtSent
  * @param remember
- * @return {object} - Objeto que explique la respuesta y que contenga el accessToken
+ * @returns {object} - Objeto que explique la respuesta y que contenga el accessToken
  */
 async function genTokenOnValidAuthentication (user, jwtSent, remember) {
     try {
@@ -136,6 +136,7 @@ exports.getLoginView = (request, response) => {
  * 
  * @param {object} request - Objeto de solicitud.
  * @param {object} response - Objeto de respuesta.
+ * @param res
  */
 exports.getInicioView = (request, res) => {
     try {

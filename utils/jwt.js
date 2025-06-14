@@ -10,7 +10,8 @@ const UNAUTHORIZED_REDIRECT = '/Unauthorized';
 const LOGIN_REDIRECT = '/login';
 
 /**
- * Authorization middleware that validates JWT tokens and manages user sessions
+ * Middleware de autorización que permite gestionar sesiones y JWT tokens
+ * 
  * @param {object} request - Express request object
  * @param {object} response - Express response object  
  * @param {Function} next - Express next middleware function

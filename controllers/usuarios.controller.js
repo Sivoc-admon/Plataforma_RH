@@ -153,7 +153,7 @@ exports.activateUser = async (request, response) => {
  * @param isoDate
  */
 const formatReadableDateTime = (isoDate) => {
-    if (isoDate == false) { return '(Por definir)'; }
+    if (!isoDate) { return '(Por definir)'; }
     const date = new Date(isoDate);
     const readableDate = date.toLocaleDateString('es-ES', {
         year: 'numeric',
@@ -336,7 +336,6 @@ exports.createTeam = async (request, response) => {
 };
 
 // editTeam : rHumanos : Done
-// ver y asignar así de putazo
 /**
  *
  * @param request
@@ -412,7 +411,7 @@ exports.deactivateUser = async (request, response) => {
         }
 
         // Log user out by removing from activeUsers
-        activeUsers.delete(userId);
+        //activeUsers.delete(userId);
 
         return res.status(200).json({ success: true });
     } catch (error) {
@@ -485,7 +484,7 @@ exports.changePassword = async (request, res) => {
         // If for some reason user not found, send 404
         if (!response) { return res.status(400).json({ success: false, messageTitle: '¡Repámpanos!', messageText: 'Espera un poco y vuelve a intentar.' }); }
 
-        activeUsers.delete(userId); // log him out 
+        //activeUsers.delete(userId); // log him out 
         return res.status(200).json({ success: true });
 
     } catch (error) {
@@ -612,10 +611,12 @@ exports.editUser = async (request, res) => {
         }
 
         // Log user out to apply changes
+        /*
         if (typeof activeUsers !== 'undefined' && activeUsers.has(userId)) {
             activeUsers.delete(userId);
         }
-
+            */
+           
         return res.status(200).json({ success: true });
 
     } catch (error) {

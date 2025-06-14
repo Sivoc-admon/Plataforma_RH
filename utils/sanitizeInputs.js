@@ -2,7 +2,7 @@ const mongoSanitize = require('mongo-sanitize');
 
 
 /**
- * Middleware global para sanitización automática de todo los inputs hacia MongoDB
+ * Middleware global para sanitización automática de los inputs hacia MongoDB
  *
  * @param {object} request - Objeto de solicitud
  * @param {object} response - Objeto de respuesta
