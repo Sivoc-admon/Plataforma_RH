@@ -49,7 +49,7 @@ const authorize = (request, response, next) => {
 function initializeResponseLocals(response) {
     const defaultLocals = {
         email: '',
-        privilegio: '',
+        privilege: '',
     };
 
     // Mapea directamente las variables de response con defaultLocals 
@@ -153,12 +153,33 @@ function validateActiveUser(userId) {
  * @param {object} decodedToken - Decoded JWT payload
  */
 function setUserLocals(response, decodedToken) {
-    response.locals.email = decodedToken.email || '';
-    response.locals.privilegio = decodedToken.privilegio || '';
+    response.locals.userName = decodedToken.name || '';
+    response.locals.userPhoto = sanitizePhotoPath(decodedToken.foto);
+    response.locals.userPrivilege = decodedToken.privilegio || '';
+    response.locals.userArea = decodedToken.area || '';
+    response.locals.userId = decodedToken.userId || '';
 }
 
 /**
- * Validar que el privilegio que tiene el usuario tenga permiso para dicha vista
+ * Sanitize photo path by removing 'public' prefix
+ * @param {string} photoPath - Original photo path
+ * @returns {string} Sanitized photo path
+ */
+function sanitizePhotoPath(photoPath) {
+    return photoPath ? photoPath.replace('public', '') : '';
+}
+
+/**
+ * Check if request is for lobby or profile access
+ * @param {string} url - Request URL
+ * @returns {boolean} true or false
+ */
+function isLobbyOrProfileAccess(url) {
+    return url === HOME_REDIRECT || url === '/getPfp';
+}
+
+/**
+ * Validate user permissions using IAM configuration (currently disabled)
  * @param {string} url - Request URL
  * @param {string} userPrivilege - User privilege level
  * @throws {Error} When user lacks required permissions

@@ -76,14 +76,14 @@ function setupSecurityMiddlewares() {
  */
 function setupRoutes() {
     app.use('/login', require('./routes/login.routes'));
-    app.use('/usuarios', require('./routes/usuarios.routes'));
+    //app.use('/usuarios', require('./routes/usuarios.routes'));
 }
 
 /**
  * Maneja la redirección a la página de login.
  * @function
- * @param {object} request - Objeto de solicitud de Express.
- * @param {object} response - Objeto de respuesta de Express.
+ * @param {object} request - Objeto de solicitud de Express
+ * @param {object} response - Objeto de respuesta de Express
  * @returns {void}
  */
 function handleHomeRedirect(request, response) {
@@ -179,7 +179,11 @@ async function initializeApp() {
     startServer();
 }
 
-// Inicializar la aplicación
+/* Client-side active sessions tracker */
+global.activeUsers = new Set();
+/*-------------*/
+
+// Iniciar la aplicación
 initializeApp().catch(error => {
     console.error('❌ Error al inicializar la aplicación:', error);
     process.exit(1);

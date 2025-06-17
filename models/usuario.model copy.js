@@ -123,4 +123,84 @@ const usuarioSchema = new mongoose.Schema({
     collection: COLLECTION_NAME
 });
 
+/**
+ * Middleware pre-save para validaciones adicionales.
+ * @function
+ * @returns {void}
+ */
+usuarioSchema.pre('save', function(next) {
+    // Validación adicional: verificar que el email no esté vacío después del trim
+    if (!this.email || this.email.trim().length === 0) {
+        return next(new Error('El email no puede estar vacío'));
+    }
+
+    // Validación adicional: verificar que el privilegio esté en mayúsculas
+    if (this.privilegio) {
+        this.privilegio = this.privilegio.toUpperCase();
+    }
+
+    next();
+});
+
+/**
+ * Middleware pre-update para validaciones en actualizaciones.
+ * @function
+ * @returns {void}
+ */
+usuarioSchema.pre(['updateOne', 'findOneAndUpdate'], function(next) {
+    const update = this.getUpdate();
+    
+    // Si se está actualizando el privilegio, asegurar que esté en mayúsculas
+    if (update.privilegio) {
+        update.privilegio = update.privilegio.toUpperCase();
+    }
+
+    // Si se está actualizando el email, asegurar que esté en minúsculas
+    if (update.email) {
+        update.email = update.email.toLowerCase();
+    }
+
+    next();
+});
+
+/**
+ * Método para obtener información pública del usuario (sin contraseña).
+ * @function
+ * @returns {object} Objeto con información pública del usuario.
+ */
+usuarioSchema.methods.toPublicJSON = function() {
+    const userObject = this.toObject();
+    delete userObject.password;
+    return userObject;
+};
+
+/**
+ * Método estático para buscar usuario por email.
+ * @function
+ * @param {string} email - Email del usuario a buscar.
+ * @returns {Promise<object|null>} Usuario encontrado o null.
+ */
+usuarioSchema.statics.findByEmail = function(email) {
+    return this.findOne({ email: email.toLowerCase().trim() });
+};
+
+/**
+ * Método estático para buscar usuarios por privilegio.
+ * @function
+ * @param {string} privilegio - Privilegio a buscar.
+ * @returns {Promise<Array>} Array de usuarios con el privilegio especificado.
+ */
+usuarioSchema.statics.findByPrivilegio = function(privilegio) {
+    return this.find({ privilegio: privilegio.toUpperCase() });
+};
+
+/**
+ * Método estático para buscar usuarios habilitados.
+ * @function
+ * @returns {Promise<Array>} Array de usuarios habilitados.
+ */
+usuarioSchema.statics.findEnabled = function() {
+    return this.find({ habilitado: true });
+};
+
 module.exports = mongoose.model(COLLECTION_NAME, usuarioSchema);

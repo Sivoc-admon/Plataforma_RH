@@ -1,5 +1,5 @@
 {
-    "direccion": {
+    "DIRECTIVO": {
         "usuarios": {
             "accessUsersModule": true
         },
@@ -18,7 +18,7 @@
 
         }
     },
-    "jefeInmediato": {
+    "JEFEINMEDIATO": {
         "usuarios": {
             "accessUsersModule": true
         },
@@ -37,7 +37,7 @@
          
         }
     },
-    "rHumanos": {
+    "PERSONALRRHH": {
         "usuarios": {
             "accessUsersModule": true
         },
@@ -56,7 +56,7 @@
 
         }
     },
-    "colaborador": {
+    "COLABORADOR": {
         "permisos": {
             "accessPermitsModule": true,
             "createPermitRequest": true,
