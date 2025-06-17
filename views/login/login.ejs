@@ -3,28 +3,35 @@
 
 <head>
     <meta charset="UTF-8">
-    <title> RH SIVOC </title>
+    <title>SIVOC Recursos Humanos</title>
+
+    <!-- Scripts JS Libraries -->
+    <script src="/js/scripts/swalFire.js" defer></script>
+    <script src="/js/login/login.js" defer></script>
 
     <!-- Frontend Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.5/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-center-radar.min.css">
+    <link rel="stylesheet"
+        href="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-center-radar.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/css/adminlte.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/icheck-bootstrap@3.0.1/icheck-bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-bs4@1.10.21/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-buttons-bs4@2.0.1/css/buttons.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/datatables.net-bs4@1.10.21/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/datatables.net-buttons-bs4@2.0.1/css/buttons.bootstrap4.min.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap">
 
-    <script src="/login.js" defer></script>
 </head>
 
-<body class="login-page">
+<body class="login-page" style="position: fixed; width: 100%;">
     <div class="login-box">
         <!-- Logo Section -->
         <div class="login-logo">
-            <img src="/SIVOC_LOGO.png" height="65" alt="Logo" >
+            <img src="/img/SIVOC_LOGO.png" height="65" alt="Logo">
         </div>
 
         <!-- Login Form Section -->
@@ -32,13 +39,10 @@
             <div class="card-header bg-gradient-info">
                 <h3 class="card-title float-none text-center">Sign in to start your session</h3>
             </div>
-            <div class="card-body login-card-body">
-                <!-- Backend Form Handling -->
-                <form id="idFormularioLogin" method="POST" action="/login/POSTAUTH">
-
+            <div class="card-body login-card-body">     
                     <!-- Email Input -->
                     <div class="input-group mb-3">
-                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                        <input id="email" name="email" class="form-control" placeholder="Email" maxlength="54">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope fa-lg text-info"></span>
@@ -48,7 +52,7 @@
 
                     <!-- Password Input -->
                     <div class="input-group mb-3">
-                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        <input id="password" type="password" name="password" class="form-control" placeholder="Password" maxlength="54">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock fa-lg text-info"></span>
@@ -60,30 +64,19 @@
                     <div class="row">
                         <div class="col-7">
                             <div class="icheck-primary">
-                                <input type="checkbox" name="remember" id="remember">
+                                <input id="remember" type="checkbox" name="remember" value="true">
                                 <label for="remember">Remember Me</label>
                             </div>
                         </div>
 
-                        <!-- Submit Button -->
+                        <!-- Submit Button XD -->
                         <div class="col-5">
-                            <button type="submit" class="btn btn-block btn-flat btn-primary">
+                            <button class="btn btn-block btn-flat btn-primary" onclick="logIn()">
                                 <span class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></span>
                                 Sign In
                             </button>
                         </div>
                     </div>
-                </form>
-            </div>
-
-            <!-- Footer with Links -->
-            <div class="card-footer text-center">
-                <p class="my-0">
-                    <a href="/">I forgot my password</a>
-                </p>
-                <p class="my-0">
-                    <a href="/">Register a new membership</a>
-                </p>
             </div>
         </div>
     </div>

@@ -1,0 +1,87 @@
+<%- include('../navbar.ejs') %>
+<link rel="stylesheet" href="/css/usuarios.css">
+<script src="/js/usuarios/configureTeamView.js" defer></script>
+
+<div class="inside-content-css">
+    <h1>Módulo Usuarios</h1>
+    
+    <div class="columns" style="margin-top: 1rem;">
+        <div class="column is-centered" style="text-align: center;">
+            <button class="default-button-css functionality-button-css" onclick="returnMainTable()">
+                <i class="fa-solid fa-circle-left default-icon-button-css"></i>
+                <p>Regresar al tablero</p>
+            </button>
+        </div>
+        <div class="column is-centered" style="text-align: center;">
+            <button class="default-button-css functionality-button-css" onclick="createTeam()">
+                <i class="fa-solid fa-users default-icon-button-css"></i>
+                <p>Crear equipo</p>
+            </button>
+        </div>
+    </div>
+    
+    <% if (teamsRows && teamsRows.length > 0) { %>
+    
+    <div class="container">
+        <h2 class="section-title" style="color: white">Panel de Equipos</h2>
+        
+        <div id="userList" class="team-grid">
+            <% teamsRows.forEach(team => { %> 
+                <li class="team-card" style="margin:0">
+
+                    <div class="team-header">
+                        <% if (team.jefeInmediatoIds && Array.isArray(team.jefeInmediatoIds) && team.jefeInmediatoIds.length > 0) { %>
+                            <h3>
+                                <% team.jefeInmediatoIds.forEach(jefeI => { %>
+                                        <% if (jefeI && jefeI.nombre) { %>
+                                            <%= jefeI.nombre %> 
+                                            <%= jefeI.apellidoP || '' %> - 
+                                            <%= jefeI.area || 'Sin área' %> 
+                                            (<%= jefeI.puesto || 'Sin puesto' %>)
+                                        <% } else { %>
+                                            Jefe inmediato sin datos
+                                        <% } %>
+                                <% }); %>
+                         </h3>
+                        <% } else { %>
+                            <h3 class="no-collaborators">No hay jefes inmediatos asignados</h3>
+                        <% } %>
+                        <button class="card-button" teamId="<% team._id %>" onclick="editTeam(this)">
+                            <i class="fa-solid fa-pencil"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="team-header">
+                        <% if (team.colaboradoresIds && Array.isArray(team.colaboradoresIds) && team.colaboradoresIds.length > 0) { %>
+                            <ul class="collaborator-list">
+                                <% team.colaboradoresIds.forEach(colaborador => { %>
+                                    <li>
+                                        <% if (colaborador && colaborador.nombre) { %>
+                                            <%= colaborador.nombre %> 
+                                            <%= colaborador.apellidoP || '' %> - 
+                                            <%= colaborador.area || 'Sin área' %> 
+                                            (<%= colaborador.puesto || 'Sin puesto' %>)
+                                        <% } else { %>
+                                            Colaborador sin datos
+                                        <% } %>
+                                    </li>
+                                <% }); %>
+                            </ul>
+                        <% } else { %>
+                            <p class="no-collaborators">No hay colaboradores asignados.</p>
+                        <% } %>
+                    </div>
+                </li>
+            <% }); %>
+        </div>
+    </div>
+    
+    <div class="pagination">
+        <button class="default-button-css" onclick="prevPage()">Anterior</button>
+        <button class="default-button-css" onclick="nextPage()">Siguiente</button>
+    </div>
+    
+    <% } else { %>
+        <h2 class="empty-message">El sistema no cuenta con Jefes Inmediatos. Prueba crear tu primer Jefe Inmediato. ✅</h2>
+    <% }; %>
+</div>

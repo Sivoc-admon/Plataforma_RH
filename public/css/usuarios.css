@@ -1,0 +1,273 @@
+.default-button-css {
+    background: linear-gradient(135deg, var(--light-blue), var(--dark-green));    
+    color: var(--white);
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    padding: 0.5rem 1rem;
+    position: relative;
+}
+
+.default-button-css:hover {
+    transform: scale(1.05);
+    background-color: var(--dark-green);
+}
+
+.default-button-css:active {
+    transform: scale(0.95);
+}
+
+.default-icon-button-css {
+    padding: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.table-button-css {
+    border-radius: 50%;
+    width:15px;
+    height:15px;
+    background-color: transparent;
+    color: var(--white);
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 18px;
+
+    display: flex;
+    /* Enable Flexbox */
+    justify-content: center;
+    /* Center icon horizontally */
+    align-items: center;
+}
+
+.table-button-css:hover {
+    background-color: transparent;
+    transform: scale(1.05);
+}
+
+.table-button-css:active {
+    transform: scale(0.95);
+}
+
+
+.input {
+    width: 100%;
+    height: 48px;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 3px solid var(--light-blue) !important;
+    margin: 0;
+    box-sizing: border-box;
+    margin-top: 3px; /* Espaciado entre el label y el input */
+}
+
+.input:hover{
+    border: 3px solid var(--dark-green) !important;
+}
+
+.table {
+    border: 3px solid var(--light-blue) ;
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    background-color: var(--white);
+}
+
+.table thead th {
+    border: none;
+    color: var(--white) !important;
+    text-align: center;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-family: var(--font);
+}
+
+.table tbody tr {
+    height: 3rem; /* Altura fija para las filas */
+}
+
+.table tbody td {
+    font-weight: bold;
+    text-align: center;
+    padding: 0.75rem;
+    vertical-align: middle; 
+    max-width: 180px;
+    min-width: 150px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    border: 1px solid #ccc;
+}
+
+.table tbody tr:hover {
+    background-color: white;
+}
+
+/* Flatpickr Styles */
+.flatpickr-day:hover , .flatpickr-day.selected{
+    background: var(--dark-green) !important; /* Naranja */
+    border-color:  var(--dark-green) !important;
+    color: white;
+}
+.flatpickr-calendar {
+    border: 2px solid var(--light-blue);
+    border-radius: 8px;
+    color: white;
+}
+
+
+
+
+
+
+
+/* configureTeamView *//* configureTeamView */
+.section-title {
+    background: linear-gradient(135deg, var(--dark-green), var(--light-blue));
+    padding: 15px;
+    color: white;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.team-card {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 20px;
+    background: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.team-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.team-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.team-header h3 {
+    margin: 0;
+    color: var(--dark-green);
+    font-weight: bold;
+    padding-right: 40px;
+}
+
+.card-button {
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background-color: white;
+    color: var(--dark-green);
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--dark-green);
+    transition: all 0.2s ease;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.card-button:hover {
+    background-color: var(--dark-green);
+    color: white;
+}
+
+.team-content {
+    margin-top: 10px;
+}
+
+.collaborator-list {
+    padding-left: 0;
+    list-style-position: inside;
+}
+
+.collaborator-list li {
+    margin-bottom: 8px;
+    padding: 8px;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.collaborator-list li:hover {
+    background-color: #e6e6e6;
+}
+
+.no-collaborators {
+    font-style: italic;
+    color: #777;
+    text-align: center;
+    padding: 10px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.pagination button {
+    min-width: 100px;
+}
+
+.empty-message {
+    font-size: 2rem;
+    display: block;
+    padding: 1rem;
+    margin: 2rem 0;
+    text-align: center;
+    color: var(--dark-green);
+    background-color: #f0f8f0;
+    border-radius: 8px;
+}
+
+/* Responsive: Una columna en pantallas pequeñas */
+@media (max-width: 768px) {
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+    }
+    
+    .team-header h3 {
+        font-size: 1.1rem;
+    }
+}
+
+/* Additional responsiveness for extra small screens */
+@media (max-width: 480px) {
+    .team-card {
+        padding: 15px 10px;
+    }
+    
+    .card-button {
+        width: 30px;
+        height: 30px;
+    }
+}

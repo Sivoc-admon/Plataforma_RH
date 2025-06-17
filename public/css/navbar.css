@@ -1,0 +1,139 @@
+@import url('global_values.css');
+
+/* Global css too */
+
+/* Estilos para el sidebar oculto */
+.sidebar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100%;
+    padding-top: 1rem;
+    padding-right: 5px;
+    background: linear-gradient(360deg, var(--dark-green), var(--black));    
+    color: var(--white);
+    z-index: -10;
+}
+
+html, body {
+    height: 100%; /* Ensure the elements take up the full viewport height */
+    margin: 0; /* Remove default margins */
+    padding: 0; /* Remove default padding */
+    overflow: auto; /* Add scrollbars only when content overflows */
+    background: radial-gradient(at bottom right, var(--white), var(--light-blue) 300%);
+    transition: margin-left 0.3s ease;
+    font-family: var(--font);
+}
+
+h1 {
+    font-size: 2rem;
+    text-align: center;
+    color: var(--black);
+    margin-bottom: 1rem;
+}
+
+.inside-content-css {
+    padding: 2rem;
+    margin: auto;
+    border-radius: 8px;
+
+    background-color: var(--white);
+    transition: margin-left 0.3s ease;
+
+    /* Fills the remaining space */
+    position: relative; /* Permite que la scrollbar funcione en base al contenido de la página */
+    height: fit-content;
+    width: 100%;
+    max-width: 1320px;
+
+}
+
+.icon-css {
+    font-size: 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    /* Enable Flexbox */
+    justify-content: center;
+    /* Center icon horizontally */
+    align-items: center;
+    /* Center icon vertically */
+    margin-right: 1rem;
+    margin-left: 0.5rem;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.sidebar.active {
+    display: block;
+}
+
+/* Estilos para el contenido principal */
+.content {
+    transition: margin-left 0.3s ease;
+}
+
+/* Desplazamiento cuando el sidebar está activo */
+.content.shifted {
+    margin-left: var(--sidebar-width);
+    height: 100%;
+}
+
+.menu-list a {
+    color: var(--white);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 1rem 0.5rem;
+    margin: 1rem 0.5rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 1);
+}
+
+.menu-list a:hover {
+    color: #000000 !important;
+    /* Negro para texto */
+    opacity: 1 !important;
+    /* Asegura opacidad completa */
+}
+
+.icon-text {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.icon-text svg {
+    width: 24px;
+    height: 24px;
+}
+
+.pfp-css {
+    width: 2rem;
+    height: 2rem;
+    margin-right: 0rem 1rem;
+    border-radius: 100%;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+}
+
+
+/* Estilos 404 */
+.fourOfour {
+    background: var(--black);   
+    color: var(--white);
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0rem 1rem;
+    position: relative;
+}
+
+.hidden { display: none; }
+
+.functionality-button-css {
+    width: 12rem;
+    height: 5rem;
+}
