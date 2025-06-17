@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.6](https://github.com/Sivoc-admon/Plataforma_RH/compare/0.0.5...0.0.6) (2025-06-17)
+
+### Fixed
+
+* pequeño error en package.json ([6dd5747](https://github.com/Sivoc-admon/Plataforma_RH/commit/6dd57474ac645ba00fef256b4e0828ef6c8dd6c8))
+
+### Changed
+
+* Refactorización global previa a la construcción ([cb28d26](https://github.com/Sivoc-admon/Plataforma_RH/commit/cb28d26d936270529da68d5398eb08c4b6626fdb))
+* Se agregó el EST-02 a los componentes existentes ([bdeffb4](https://github.com/Sivoc-admon/Plataforma_RH/commit/bdeffb4765131432cbee690a2fb5654f48d94be3))
+* Se refactorizó el middleware para autenticación ([a1212f6](https://github.com/Sivoc-admon/Plataforma_RH/commit/a1212f6014b264940055f0864dff38b468c233c0))
+
 ## [0.0.5](https://github.com/Sivoc-admon/Plataforma_RH/compare/0.0.4...0.0.5) (2025-06-02)
 
 ### Changed
