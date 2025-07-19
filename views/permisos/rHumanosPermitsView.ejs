@@ -1,0 +1,160 @@
+<%- include('../navbar.ejs') %>
+
+    <script src="/js/permisos/rHumanosPermitsView.js" defer></script>
+
+    <link rel="stylesheet" href="/css/permisos.css">
+
+
+    <div class="inside-content-css">
+        <h1> Módulo Permisos</h1>
+
+        <% if (permitsRows.length !==0) { %>
+
+            <div class="columns" style="margin-top: 1rem;">
+
+                <div class="column is-centered" style="text-align: center;">
+                    <button class="default-button-css functionality-button-css" onclick="downloadPDF()">
+                        <i class="fa-solid fa-download default-icon-button-css"></i>
+                        <p>Descargar PDF</p>
+                    </button>
+                </div>
+
+                <div class="column is-centered" style="text-align: center;">
+                    <button class="default-button-css functionality-button-css" onclick="downloadExcel()">
+                        <i class="fa-solid fa-download default-icon-button-css"></i>
+                        <p>Descargar Excel</p>
+                    </button>
+                </div>
+
+            </div>
+
+
+
+            <div class="field">
+                <div class="control">
+                    <input class="input" type="text" id="searchInput" placeholder="Buscar por nombre, apellido o área"
+                        onkeyup="filterTable()">
+                </div>
+            </div>
+
+            <table class="table is-fullwidth is-hoverable">
+
+                <thead>
+                    <tr style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue));">
+                        <th class="has-text-centered">Nombre del colaborador</th>
+                        <th class="has-text-centered">Área del colaborador</th>
+                        <th class="has-text-centered">Registro y Filtro del permiso</th>
+                        <th class="has-text-centered">Fecha y hora de inicio</th>
+                        <th class="has-text-centered">Fecha y hora de término</th>
+                        <th class="has-text-centered">Documentos agregados</th>
+                        <th class="has-text-centered">Estatus del permiso actual</th>
+                        <th class="has-text-centered">Acciones disponibles</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableBody">
+                    <% permitsRows.forEach(permit=> { %>
+                        <tr>
+                            <td class="is-centered">
+                                <%= permit.userId.nombre + " " + permit.userId.apellidoP + " " + permit.userId.apellidoM
+                                    %>
+                            </td>
+                            <td class="is-centered">
+                                <%= permit.userId.area %>
+                            </td>
+                            <td class="is-centered">
+                                <%= permit.registro %> para <%= permit.filtro %>
+                            </td>
+                            <td class="is-centered">
+                                <%= permit.fechaInicio %>
+                            </td>
+                            <td class="is-centered">
+                                <%= permit.fechaTermino %>
+                            </td>
+                            <td class="is-centered">
+
+                                <% if (!permit.docPaths || permit.docPaths.length===0) { %>
+                                    No hay documentos
+                                    <% } else { %>
+                                        <% permit.docPaths.forEach(doc=> { %>
+                                            <div class="columns is-vcentered is-mobile">
+                                                <div class="column is-narrow">
+                                                    <button class="default-button-css table-button-css"
+                                                        permitId="<%= permit._id %>" filename="<%= doc.originalname %>"
+                                                        onclick="viewPermitsRowFile(this)">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="column"
+                                                    style="padding-left:0 !important; display: flex; align-items: center;">
+                                                    <span
+                                                        style="display: inline-block; max-width: 108px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                        <%= doc.originalname %>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <% }) %>
+                                                <% } %>
+                            </td>
+                            <td class="is-centered">
+                                <% if (permit.estatus==="Aprobado" ) { %>
+                                    <i class="fa-solid fa-thumbs-up status-css"
+                                        style="justify-self: center; margin-right: 0.5rem;"></i> Aprobado
+                                    <% } else if (permit.estatus==="Cancelado" ) { %>
+                                        <i class="fa-solid fa-thumbs-down status-css"
+                                            style="justify-self: center; margin-right: 0.5rem;"></i> Cancelado
+                                        <% } else if (permit.estatus==="Pendiente" ) { %>
+                                            <i class="fa-solid fa-clock status-css"
+                                                style="justify-self: center; margin-right: 0.5rem;"></i> Pendiente
+                                            <% } else if (permit.estatus==="Justificado" ) { %>
+                                                <i class="fa-solid fa-thumbs-up status-css"
+                                                    style="justify-self: center; margin-right: 0.5rem;"></i> Justificado
+                                                <% } else if (permit.estatus==="Injustificado" ) { %>
+                                                    <i class="fa-solid fa-thumbs-down status-css"
+                                                        style="justify-self: center; margin-right: 0.5rem;"></i>
+                                                    Injustificado
+                                                    <% } else { %>
+                                                        <%= permit.estatus %>
+                                                            <% } %>
+                            </td>
+
+
+                            <td class="is-centered">
+                                <% if (!permit.isVerified) { %>
+                                    <div class="columns is-centered">
+                                        <div class="column">
+                                            <button class="default-button-css table-button-css"
+                                                permitId="<%= permit._id %>"
+                                                currentStatus="<%= permit.estatus %>"
+                                                onclick="changeStatus(this)">
+                                                <i class="fa-solid fa-gear"></i>
+                                            </button>
+                                        </div>
+
+                                        <div class="column">
+                                            <button class="default-button-css table-button-css"
+                                                permitId="<%= permit._id %>"
+                                                currentStatus="<%= permit.estatus %>"
+                                                onclick="verifyPermit(this)">
+                                                <i class="fa-solid fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <% } else { %>
+                                        <i class="fa-solid fa-check status-css"
+                                            style="justify-self: center; margin-right: 0.5rem;"></i> Cerrado
+                                        <% } %>
+                            </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button class="default-button-css" onclick="prevPage()">Anterior</button>
+                <button class="default-button-css" onclick="nextPage()">Siguiente</button>
+            </div>
+            <% } else { %>
+                <h2 style="font-size:2.61rem; display: block; padding: 0.6rem; margin-bottom:1.5rem;">Ningún colaborador
+                    ha agregado ningún permiso ✅</h2>
+                <% }; %>
+    </div>

@@ -1,0 +1,75 @@
+{
+    "direccion": {
+        "usuarios": {
+            "accessUsersModule": true
+        },
+        "permisos": {
+            "accessPermitsModule": true,
+            "viewPermitsRowFile": true,
+            "changeStatus": true,
+            "verifyPermit": true,
+            "downloadPDF": true,
+            "downloadExcel": true
+        },
+        "vacaciones": {
+          
+        },
+        "cursos": {
+
+        }
+    },
+    "jefeInmediato": {
+        "usuarios": {
+            "accessUsersModule": true
+        },
+        "permisos": {
+            "accessPermitsModule": true,
+            "viewPermitsRowFile": true,
+            "changeStatus": true,
+            "verifyPermit": true,
+            "downloadPDF": true,
+            "downloadExcel": true
+        },
+        "vacaciones": {
+            
+        },
+        "cursos": {
+         
+        }
+    },
+    "rHumanos": {
+        "usuarios": {
+            "accessUsersModule": true
+        },
+        "permisos": {
+            "accessPermitsModule": true,
+            "viewPermitsRowFile": true,
+            "changeStatus": true,
+            "verifyPermit": true,
+            "downloadPDF": true,
+            "downloadExcel": true
+        },
+        "vacaciones": {
+           
+        },
+        "cursos": {
+
+        }
+    },
+    "colaborador": {
+        "permisos": {
+            "accessPermitsModule": true,
+            "createPermitRequest": true,
+            "viewPermitsRowFile": true,
+            "editPermit": true,
+            "deletePermit": true,
+            "sendPermit": true
+        },
+        "vacaciones": {
+
+        },
+        "cursos": {
+
+        }
+    }
+}
