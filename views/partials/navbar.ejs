@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIVOC Recursos Humanos</title>
+
+    <!-- Global Scripts JS Libraries -->
+    <script src="/js/scripts/swalFire.js" defer></script>
+    <script src="/js/scripts/pagination.js" defer></script>
+    <script src="/js/scripts/sidebar.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+
+
+    <!-- External CSS Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+
+    <!-- External JS Libraries -->
+    <script src="https://kit.fontawesome.com/84a524f45a.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/2.13.0/moment.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js" defer></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bulma.min.js" defer></script>
+</head>
+
+<body id="content" class="content">
+    <nav class="navbar" style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue)); 
+    padding: 0.5rem; height: 45px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    
+        <!-- Sidebar toggle icon -->
+        <i class="fa-solid fa-bars icon-css" style="color: var(--white); cursor: pointer; margin: 0rem 1rem;" onclick="toggleSidebar()"></i>
+        <!-- User information -->
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <img src="/getPfp" class="pfp-css" onerror="this.onerror=null; this.src='/img/SIVOC_PFP.png';">
+
+            <text class="is-size-5 has-text-white" style="margin-left: 1rem; margin-right: 1rem; text-shadow: 0 0 8px rgba(0, 0, 0, 1);"><%= userName %></text>
+        </div>
+    </nav>
+    
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <img src="/img/SIVOC_LOGO.png" style="width: 80%; display: block; margin: auto; margin-bottom: 1rem;">
+        <aside class="menu">
+            <ul class="menu-list" style="margin: 0.5rem 0.5rem;">
+                
+                <!-- Botón Inicio -->
+                <a href="/login/inicio" class="has-text-white is-size-5 mt-2">
+                    <i class="fa-solid fa-house icon-css"></i> Inicio
+                </a>
+                
+                <% if ( userPrivilege !== "colaborador") { %>
+                <!-- Botón Usuarios -->
+                <a href="/usuarios/accessUsersModule" class="has-text-white is-size-5 mt-2">
+                    <i class="fa-solid fa-users icon-css"></i> Usuarios
+                </a>
+                <% }; %>
+
+                <% if ( userId !== "000") { %>
+                <!-- Botón Permisos -->
+                <a href="/permisos/accessPermitsModule" class="has-text-white is-size-5 mt-2">
+                    <i class="fa-solid fa-clipboard-user icon-css"></i> Permisos
+                </a>
+                <!-- Botón Vacaciones -->
+                <a href="/vacaciones" class="has-text-white is-size-5 mt-2">
+                    <i class="fa-solid fa-umbrella-beach icon-css"></i> Vacaciones
+                </a>
+                <!-- Botón Cursos -->
+                <a href="/cursos" class="has-text-white is-size-5 mt-2">
+                    <i class="fa-solid fa-person-chalkboard icon-css"></i> Cursos
+                </a>
+                <% }; %>
+
+                <a href="/logout" class="has-text-white is-size-5 mt-2" class="has-text-white is-size-4 mt-2">
+                    <i class="fa-solid fa-right-from-bracket icon-css"></i> Cerrar Sesión
+                </a> 
+            </ul>
+        </aside>
+    </div>
+</body>
+</html>

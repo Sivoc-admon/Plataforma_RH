@@ -1,4 +1,3 @@
-// logIn button : Done
 async function logIn() {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
@@ -42,10 +41,10 @@ async function logIn() {
     }
 };
 
-// addEnterKeyListener : Done
 function addEnterKeyListener() {
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
+            event.preventDefault(); // Previene comportamiento por defecto como cerrar modal o hacer submit
             logIn();
         }
     });
@@ -54,10 +53,12 @@ function addEnterKeyListener() {
 // Initialize event listeners when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function () {
     addEnterKeyListener();
-
-    // Add click listener to login button if it exists
+    
     const loginButton = document.getElementById('loginButton');
     if (loginButton) {
-        loginButton.addEventListener('click', logIn);
+        loginButton.addEventListener('click', function (e) {
+            e.preventDefault(); // Previene submit si está dentro de un formulario
+            logIn();
+        });
     }
 });

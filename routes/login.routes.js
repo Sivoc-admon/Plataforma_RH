@@ -1,11 +1,12 @@
 /* --- Import routes.js logic --- */
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const controller = require('../controllers/login.controller');
+const { valLoginForm } = require('../services/form.validator'); 
 
-// Rutas
-router.get("/", controller.getLoginView);
-router.post("/POSTAUTH", controller.postAuthentication);
-router.get("/inicio", controller.getInicioView);
+// Rutas instantáneas (GET)
+router.get('/', (req, res) => { res.render('login.ejs'); });
+
+// Rutas para métodos HTTP (POST)
+router.post('/postAuth', valLoginForm, );
 
 module.exports = router;

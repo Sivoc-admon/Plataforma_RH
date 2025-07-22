@@ -1,0 +1,6 @@
+db-uri = 
+db-schema = 
+db-anon-role = 
+server-port = 
+jwt-secret = 
+jwt-aud =
