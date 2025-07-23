@@ -28,13 +28,16 @@
     "@release-it/conventional-changelog": "^10.0.1",
     "@types/express": "^5.0.3",
     "@types/multer": "^1.4.13",
+    "autoprefixer": "^10.4.21",
     "eslint": "^9.28.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsdoc": "^51.0.0",
     "eslint-plugin-security": "^3.0.1",
     "eslint-plugin-unicorn": "^60.0.0",
     "nodemon": "^3.1.9",
-    "release-it": "^19.0.3"
+    "postcss": "^8.5.6",
+    "release-it": "^19.0.3",
+    "tailwindcss": "^4.1.11"
   },
   "release-it": {
     "git": {

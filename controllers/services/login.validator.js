@@ -17,7 +17,7 @@ const AUTH_CONFIG = {
     sessionLifetime: process.env.SESSION_LIFETIME,
     defaultSessionTime: '18h',
     rootSessionTime: '30min',
-    errorMessage: process.env.ERROR_MESSAGE,
+    //errorMessage: process.env.ERROR_MESSAGE,
     routes: {
         dashboard: '/login/inicio'
     }
@@ -32,7 +32,7 @@ const AUTH_MESSAGES = {
     userDeactivated: 'Usuario desactivado.',
     incorrectPassword: 'Contraseña incorrecta.',
     tokenGenerationError: 'No se pudo generar el token.',
-    internalServerError: process.env.ERROR_MESSAGE,
+    //internalServerError: process.env.ERROR_MESSAGE,
 };
 
 /**

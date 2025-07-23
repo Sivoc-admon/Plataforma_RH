@@ -1,5 +1,9 @@
 const jwt = require('jsonwebtoken');
 const iam = require('../IAM.json');
+const { createJWTforMethod } = require('../scripts/postgrestHelper');
+
+// separa tus rutas con la etiqueta /api/ al inicio.
+const URL_TAG = process.env.URL_TAG; // `${URL_TAG}/login`
 
 /**
  * Middleware para otorgar RBAC a toda la aplicación.
@@ -17,8 +21,15 @@ const rbacMiddleware = (req, res, next) => {
 
     console.log("req.url: ", req.url);
 
+    // Rutas de utilidades: el sistema accede a estas rutas para obtener recursos
+    if (!req.url.startsWith(URL_TAG))
+        return next();
+
+    // si no es una ruta publica, remueve la etiqueta y lee el modulo de origen y la actividad
+    const reqUrl = req.url.substring(URL_TAG.length);
+
     // Rutas públicas: el usuario tiene permitido acceder sin importar su autenticación
-    if ((["/login", "/login/postAuth", "/notFound", "/logout", "/inicio"].includes(req.url)))
+    if ((["/login", "/login/postAuth", "/logout", "/inicio"].includes(reqUrl)))
         return next();
 
     // Decodificar JWT: Racionaliza el acceso de los tokens
@@ -31,7 +42,7 @@ const rbacMiddleware = (req, res, next) => {
         const refreshToken = req.cookies[process.env.RT_COOKIE_NAME];
         const newAccessToken = RT_helper(refreshToken); // PostgREST parametriza la consulta
         if (!newAccessToken) {
-            return res.redirect("/logout");
+            return res.redirect(`${URL_TAG}/logout`);
         }
         res.cookie(process.env.AT_COOKIE_NAME, newAccessToken, { // Refresca el accessToken
             httpOnly: true,
@@ -42,7 +53,7 @@ const rbacMiddleware = (req, res, next) => {
     }
 
     // RBAC Business Logic: Identifica si el usuario tiene permisos, sino, solo informalo.
-    const authorized = rbacBusinessLogic(req.url, payload);
+    const authorized = rbacBusinessLogic(reqUrl, payload);
     if (!authorized) {
         return res.status(403).json({ error: 'Acceso denegado: permisos insuficientes.' });
     }
@@ -53,6 +64,7 @@ const rbacMiddleware = (req, res, next) => {
 
 /**
  * Ejecuta la lógica de negocio para acceso basado en roles.
+ * Ya se verificó el acceso, el refresh y el logout. Ahora se verifican los permisos.
  * Solo se puede ejectuar esta lógica si ya fue racionalizada la sesión.
  * @param {string} reqUrl - La url que está manejando.
  * @param {json} decoded - El payload del JWT decodificado.
@@ -60,9 +72,8 @@ const rbacMiddleware = (req, res, next) => {
  * @throws {Error} Si los parámetros no son números válidos.
  */
 function rbacBusinessLogic(reqUrl, decoded) {
-    // aqui ya verificaste los accesos, ya se solucionaron los refreshes y los logouts
 
-    // Res.locals: Se debe actualizar la meta-data de la sesión activa
+    // (TO DO) Res.locals: Se debe actualizar la meta-data de la sesión activa
     //res.locals.userName = decoded.name;
     //res.locals.userPhoto = decoded.foto.replace("public", ""); // uploads . usuarios
     //res.locals.userPrivilege = decoded.privilegio;
@@ -70,45 +81,20 @@ function rbacBusinessLogic(reqUrl, decoded) {
     //res.locals.userId = decoded.userId;
 
     // Rutas semi-públicas: el usuario accede sin necesidad de IAM.json, solo login
-    const rutasSemipublicas = ['/uploads', '/inicio', '/myUserView'];
-    if (rutasSemipublicas.some(path => reqUrl.startsWith(path))) {
+    if ((['/inicio', '/myUserView'].includes(reqUrl)))
+        return true; // -> next();
+
+    // Rutas protegidas: el usuario tiene permitido acceder solo si IAM.json acepta el URL
+    const originModule = reqUrl.split('/').filter(part => part)[1] || ''; // Obtiene el módulo
+    const privilege = decoded.privilegio;
+    console.log("originModule : " + originModule);
+    console.log("privilege : " + privilege);
+    if (reqUrl && iam.privilege.originModule[reqUrl] === true) {
         return true; // -> next();
     }
 
-    // Particiones del URL: filtra el acceso por módulo, y luego por acción
-    const urlParts = req.url.split('/').filter(part => part);
-    const originModule = urlParts[0] || '';
-    const actionToExecute = urlParts[1] || '';
-    const privilege = decoded.privilegio;
-    const permissionPath = iam?.[privilege]?.[originModule]?.[actionToExecute];
-
-    console.log("originModule : " + originModule);
-    console.log("privilege : " + privilege);
-    console.log("actionToExecute : " + actionToExecute);
-    console.log("permissionPath: " + permissionPath);
-
-    if (!permissionPath)
-        return false; // -> "not next();" 
-
-    // Rutas protegidas: el usuario tiene permitido acceder solo si IAM.json acepta el URL
-
-
-
-    // yo creo que lo más sencillo sería, un json por tipo de rol
-    // y que su body pues sea: 
-    /*
-    {
-    "DIRECTIVO": {
-        "/usuarios/usersView/singleUserView/patchUser/datoLaboral": true,
-        "/usuarios/usersView/unactiveUsersView/singleUserView": true,
-    }
-    */
-    // ten la lista completa de URLs para todos los roles, recuerda que deben existir los switches
-
-
-
-
-
+    // El usuario no tiene permisos ejecutar la petición.
+    return false; // -> "not next();" 
 };
 
 /**
@@ -124,10 +110,12 @@ async function RT_helper(refreshToken) {
             return false; // -> '/logout'
         }
         const url = `${process.env.BACKEND_URL}/sesion_activa?select=user_id&token=eq.${refreshToken}`;
+        const httpMethod = 'GET';
+        const bearerToken = createJWTforMethod(httpMethod);
         const response = await fetch(url, {
-            method: 'GET',
+            method: httpMethod,
             headers: {
-                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + bearerToken,
             }
         });
         console.log("response from PostgREST: ", response);
@@ -151,7 +139,7 @@ async function RT_helper(refreshToken) {
         return newAccessToken;
 
     } catch (error) {
-        console.log(process.env.ERROR_MESSAGE, "003")
+        console.log(process.env.ERROR_MESSAGE, "002")
     }
 };
 

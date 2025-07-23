@@ -1,64 +1,68 @@
-async function logIn() {
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const remember = document.getElementById("remember").checked;
+// login.js
+function logInLogic() { // Renamed to avoid conflicts and encapsulate logic
+    return {
+        email: '',
+        password: '',
+        remember: false,
+        showPassword: false,
+        isLoading: false,
+        errorMessage: '',
 
-    if (!email || !password)
-        return Swal.fire({
-            title: 'Campos vacíos.',
-            icon: 'warning',
-            width: "500px",
-            text: 'Todos los campos son requeridos.'
-        });
+        async logIn() {
+            this.errorMessage = ''; // Limpiar mensaje previo
 
-    try {
-        const response = await fetch("/login/POSTAUTH", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                email: email,
-                password: password,
-                remember: remember,
-            })
-        });
-        const data = await response.json();
-        if (data.success) {
-            if (data.authorized)
-                window.location.href = data.redirectUrl;
-            else
-                return Swal.fire({
-                    title: 'Credenciales incorrectas.',
-                    icon: 'warning',
-                    width: "500px",
-                    text: data.message,
+            const email = this.email;
+            const password = this.password;
+            const remember = this.remember;
+
+            const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+            if (!email || !password || !isEmailValid) {
+                this.errorMessage = 'Asegúrate de llenar todos los campos correctamente.';
+                this.isLoading = false;
+                return;
+            }
+
+            this.isLoading = true;
+
+            try {
+                const response = await fetch("/login/POSTAUTH", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ email, password, remember })
                 });
-        }
-    } catch (error) {
-        console.error(error);
-        
-    }
-};
 
-function addEnterKeyListener() {
-    document.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Previene comportamiento por defecto como cerrar modal o hacer submit
-            logIn();
-        }
-    });
-};
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error de autenticación.');
+                }
 
-// Initialize event listeners when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function () {
-    addEnterKeyListener();
-    
-    const loginButton = document.getElementById('loginButton');
-    if (loginButton) {
-        loginButton.addEventListener('click', function (e) {
-            e.preventDefault(); // Previene submit si está dentro de un formulario
-            logIn();
-        });
-    }
-});
+                const data = await response.json();
+
+                if (data.success && data.authorized) {
+                    window.location.href = data.redirectUrl;
+                } else {
+                    this.errorMessage = data.message || 'Credenciales incorrectas.';
+                }
+
+            } catch (error) {
+                console.error('[Login Error]:', error);
+                this.errorMessage = error.message || 'No se pudo conectar con el servidor.';
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        init() {
+            // Add event listener for 'Enter' key press
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' && !this.isLoading) {
+                    event.preventDefault();
+                    this.logIn();
+                }
+            });
+        }
+    };
+}

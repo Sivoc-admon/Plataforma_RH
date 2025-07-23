@@ -10,7 +10,6 @@ require('dotenv').config();
 const { rbacMiddleware } = require('./utils/middlewares/rbac');
 const { startPostgrest } = require('./utils/scripts/postgrestRunner');
 const DEFAULT_PORT = 3000;
-const URL_TAG = process.env.URL_TAG;
 
 /**
  * Configura los middlewares globales de la aplicación
@@ -23,28 +22,10 @@ function setupMiddlewares() {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(rbacMiddleware);
-    app.get('/', (req, res) => { res.redirect(`${URL_TAG}/login`); });
-    app.use(`${URL_TAG}/login`, require('./routes/login.routes'));
-    //app.use('/usuarios', require('./routes/login.routes'));
 }
 
 /**
- * Maneja el cierre de sesión del usuario
- * @function
- * @param {object} request - Objeto de solicitud de Express
- * @param {object} response - Objeto de respuesta de Express
- * @returns {void}
- */
-app.get(`${URL_TAG}/logout`, handleLogout);
-function handleLogout(request, response) {
-    response.clearCookie(process.env.AT_COOKIE_NAME);
-    response.clearCookie(process.env.RT_COOKIE_NAME);
-    response.redirect(`${URL_TAG}/login`);
-}
-
-
-/**
- * Configura los archivos estáticos incluyendo el motor de vistas
+ * Configura los archivos estáticos y el motor de vistas
  * @function
  * @returns {void}
  */
@@ -54,6 +35,57 @@ function setupStaticFilesAndViews() {
     app.set('view engine', 'ejs');
 }
 
+/**
+ * Configura las rutas de la aplicación
+ * @function
+ * @returns {void}
+ */
+function setupRoutes() {
+    app.use('/login', require('./routes/login.routes'));
+    //app.use('/inicio', (req, res) => { res.render('inicio.ejs'); });
+
+    //app.use('/usuarios', require('./routes/usuarios.routes'));
+}
+
+/**
+ * Maneja la redirección a la página de login.
+ * @function
+ * @param {object} request - Objeto de solicitud de Express
+ * @param {object} response - Objeto de respuesta de Express
+ * @returns {void}
+ */
+app.get('/', handleHomeRedirect);
+
+function handleHomeRedirect(request, response) {
+    response.redirect('/login');
+}
+
+/**
+ * Maneja el cierre de sesión del usuario
+ * @function
+ * @param {object} request - Objeto de solicitud de Express
+ * @param {object} response - Objeto de respuesta de Express
+ * @returns {void}
+ */
+app.get('/logout', handleLogout);
+function handleLogout(request, response) {
+    response.clearCookie(process.env.COOKIE_NAME);
+    response.redirect('/login');
+}
+
+/**
+ * Maneja las solicitudes no autorizadas
+ * @function
+ * @param {object} request - Objeto de solicitud de Express.
+ * @param {object} response - Objeto de respuesta de Express.
+ * @returns {void}
+ */
+
+app.get('/Unauthorized', handleUnauthorized);
+function handleUnauthorized(request, response) {
+    response.clearCookie(process.env.COOKIE_NAME);
+    response.status(UNAUTHORIZED_STATUS_CODE).render('404.ejs');
+}
 
 /**
  * Maneja la solicitud de foto de perfil del usuario.
@@ -61,16 +93,18 @@ function setupStaticFilesAndViews() {
  * @param {object} request - Objeto de solicitud de Express.
  * @param {object} response - Objeto de respuesta de Express.
  * @returns {void}
-
+ */
 app.get('/getPfp', handleGetProfilePicture);
+
 function handleGetProfilePicture(request, response) {
     const filePath = path.join(__dirname, 'uploads', 'usuarios', response.locals.userPhoto);
-    
-     // Verifica si un archivo existe en el sistema de archivos
-     // @function
-     //  @param {string} filePath - Ruta del archivo a verificar
-     // @returns {boolean} True si el archivo existe, false en caso contrario
-     
+
+    /**
+     * Verifica si un archivo existe en el sistema de archivos
+     * @function
+     * @param {string} filePath - Ruta del archivo a verificar
+     * @returns {boolean} True si el archivo existe, false en caso contrario
+     */
     const doesfileExists = fs.existsSync(filePath);
 
     if (doesfileExists) {
@@ -79,7 +113,6 @@ function handleGetProfilePicture(request, response) {
 
     return response.status(NOT_FOUND_STATUS_CODE).send('Archivo no encontrado');
 }
- */
 
 /**
  * Inicia el servidor en el puerto especificado
@@ -94,7 +127,7 @@ function startServer() {
 }
 
 /**
- * Inicializa la aplicación y atrapa los errores de ejecución.
+ * Inicializa y configura la aplicación Express
  * @async
  * @function
  * @returns {Promise<void>}
@@ -102,9 +135,12 @@ function startServer() {
 async function initializeApp() {
     setupMiddlewares();
     setupStaticFilesAndViews();
+    setupRoutes();
     startServer();
-    //startPostgrest();
+    startPostgrest();
 }
+
+// Iniciar la aplicación
 initializeApp().catch(error => {
     console.log(process.env.ERROR_MESSAGE, "001");
     console.log(error);

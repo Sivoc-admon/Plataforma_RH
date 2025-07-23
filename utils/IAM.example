@@ -1,0 +1,36 @@
+{
+    "usuarios": {
+        "usuarios/usersView": false,
+        "usuarios/usersView/addUser": false,
+        "usuarios/usersView/singleUserView": false,
+        "usuarios/usersView/singleUserView/patchUser/datoLaboral": false,
+        "usuarios/usersView/singleUserView/patchUser/credenciales": false,
+        "usuarios/usersView/singleUserView/patchUser/deactivateUser": false,
+        "usuarios/usersView/singleUserView/patchUser/datoPersonal": false,
+        "usuarios/usersView/singleUserView/patchUser/fotoPerfil": false,
+        "usuarios/teamsView": false,
+        "usuarios/teamsView/deleteTeam": false,
+        "usuarios/teamsView/createTeam": false,
+        "usuarios/teamsView/patchTeam": false,
+        "usuarios/unactiveUsersView": false,
+        "usuarios/unactiveUsersView/activateUser": false,
+        "usuarios/unactiveUsersView/singleUserView": false,
+        "usuarios/usersView/downloadPDF": false,
+        "usuarios/usersView/downloadExcel": false
+    },
+    "permisos": {
+        "permisos/permitsView": false,
+        "permisos/permitsView/viewRowFile/:permitId/:filename": false,
+        "permisos/permitsView/changeStatus": false,
+        "permisos/permitsView/verifyPermit": false,
+        "permisos/permitsView/downloadPDF": false,
+        "permisos/permitsView/downloadExcel": false,
+        "permisos/permitsView/createPermit": false,
+        "permisos/permitsView/sendPermit": false,
+        "permisos/permitsView/editPermit": false,
+        "permisos/permitsView/editPermit/getInfo": false,
+        "permisos/permitsView/editPermit/patchInfo": false
+    },
+    "vacaciones": {},
+    "cursos": {}
+}

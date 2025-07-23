@@ -36,7 +36,7 @@ export default [
             'no-unused-vars': ['error', { vars: 'all', args: 'none' }],
             'camelcase': ['error', { properties: 'always' }],
             'max-len': ['error', 
-                { code: 90, ignoreUrls: true, 
+                { code: 120, ignoreUrls: true, 
                     ignoreStrings: true, 
                     ignoreTemplateLiterals: true }
             ],
