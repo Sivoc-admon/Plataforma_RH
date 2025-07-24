@@ -36,33 +36,6 @@ function setupStaticFilesAndViews() {
     app.set('view engine', 'ejs');
 }
 
-
-/**
- * Maneja la solicitud de foto de perfil del usuario.
- * @function
- * @param {object} request - Objeto de solicitud de Express.
- * @param {object} response - Objeto de respuesta de Express.
- * @returns {void}
-
-app.get('/getPfp', handleGetProfilePicture);
-function handleGetProfilePicture(request, response) {
-    const filePath = path.join(__dirname, 'uploads', 'usuarios', response.locals.userPhoto);
-    
-     // Verifica si un archivo existe en el sistema de archivos
-     // @function
-     //  @param {string} filePath - Ruta del archivo a verificar
-     // @returns {boolean} True si el archivo existe, false en caso contrario
-     
-    const doesfileExists = fs.existsSync(filePath);
-
-    if (doesfileExists) {
-        return response.sendFile(filePath);
-    }
-
-    return response.status(NOT_FOUND_STATUS_CODE).send('Archivo no encontrado');
-}
- */
-
 /**
  * Inicia el servidor en el puerto especificado
  * @function

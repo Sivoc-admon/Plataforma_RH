@@ -17,7 +17,6 @@ const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const ACCESS_TOKEN_EXPIRATION = process.env.ACCESS_TOKEN_EXPIRATION;
 const AT_COOKIE_NAME = process.env.AT_COOKIE_NAME;
 
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 const REFRESH_TOKEN_EXPIRATION = process.env.REFRESH_TOKEN_EXPIRATION;
 const RT_COOKIE_NAME = process.env.RT_COOKIE_NAME;
 
@@ -25,9 +24,9 @@ const NODE_ENV = process.env.NODE_ENV;
 const BACKEND_URL = process.env.BACKEND_URL;
 
 /**
- * POST /login/POSTAUTH
  * Otorga las cookies y crea la sesión activa en la base de datos.
- * @async
+ * TO DO, FIX
+ * @async /login/postAuth
  * @function
  * @param {Object} req - Objeto de solicitud de Express.
  * @param {Object} res - Objeto de respuesta de Express.
@@ -36,97 +35,170 @@ const BACKEND_URL = process.env.BACKEND_URL;
 async function postAuthentication(req, res) {
     try {
         const { email, password, remember } = req.body;
+        const doRefreshToken = true;
 
         // 1. isRootValid: Si el usuario ingresa como usuario raíz, otorga un solo access token 
-        const isRootValid = email === ROOT_USERNAME && bcrypt.compare(password, ROOT_PASSWORD);
+        const isRootValid = email === ROOT_USERNAME && await bcrypt.compare(password, ROOT_PASSWORD);
         if (isRootValid) {
-            const newAccessToken = jwt.sign({
-                nameDisplay: 'Usuario Raíz', userId: '000', email: ROOT_USERNAME,
-                privilegio: 'DIRECTIVO'
-            },
-                ACCESS_TOKEN_SECRET,
-                { expiresIn: ACCESS_TOKEN_EXPIRATION });
-
-            res.cookie(AT_COOKIE_NAME, newAccessToken, {
-                httpOnly: true,
-                secure: NODE_ENV === 'production', // Solo HTTPS en producción
-                sameSite: 'strict',
-                maxAge: parseFloat(ACCESS_TOKEN_EXPIRATION.slice(0, -1)) * 24 * 60 * 60 * 1000,
-            });
+            const tokenResponse = await setupTokenCookie(res, null, remember, isRootValid, !doRefreshToken);
             return res.status(200).json({ success: true });
         }
 
-        // 2. isUserValid: Si el usuario ingresa un usuario válido, crea su sesión por completo
-        const session = await isUserValid(email, password, remember);
-        // logic
-        return res.status(200).json({ success: true });
+        // 2. isUserValid: Si el usuario ingresa un usuario incorrecto, indicalo
+        const userValid = await isUserValid(email, password);
+        if (!userValid.success) return res.status(200).json({ success: true, message: userValid.message });
+
+        // 3. setupTokenCookie: Crea los tokens y las cookies de la sesión recién verificada
+        const AT_response = await setupTokenCookie(res, userValid.data, remember, isRootValid, !doRefreshToken);
+        if (!AT_response.success) return res.status(200).json({ success: true, message: AT_response.message });
+        if (remember) { // Crea una sesión larga solo si el usuario pide que lo recuerden
+            const RF_response = await setupTokenCookie(res, userValid.data, remember, isRootValid, doRefreshToken);
+            if (!RF_response.success) return res.status(200).json({ success: true, message: RF_response.message });
+        }
+        
+        // exit
+        return res.status(200).json({ success: true, message: '' });
 
     } catch (error) {
-        console.error();
+        //console.log(error);
         return res.status(500).json({
             success: false,
-            message: 'Error en autenticación:',
-            error: error,
+            message: (ERROR_MESSAGE + '003'),
         });
     }
 };
 
 /**
- * 
+ * Función para verficiar si un usuario es válido para crear una sesión
  * @async
  * @function
  * @param {string} email - Email del usuario.
  * @param {string} password - Contraseña del usuario.
- * @param {boolean} remember - Si recordar la sesión.
- * @returns {Promise<Object>} - Objeto JSON (AccessToken or False)
+ * @returns {Promise<Object>} - Objeto JSON indicando success si es válido
  */
-async function isUserValid(email, password, remember) {
-
-    // SELECT id, privilegio, password FROM usuario WHERE email = ${ email };
-    const fetchUrl = `${process.env.BACKEND_URL}/usuario?select=id,privilegio,password&email=eq.${email}`;
+async function isUserValid(email, password) {
+    // Ejecuta el fetch de la información del usuario
+    const fetchUrl = `${BACKEND_URL}/usuario?select=id,privilegio,password,habilitado,email&email=eq.${email}`;
     const fetchMethod = 'GET';
     const fetchBody = {};
-
-    // Ejecuta el fetch
     const response = await fetchPostgREST(fetchMethod, fetchUrl, fetchBody);
-    console.log("response from PostgREST 01: ", response);
-    const data = await response.json();
-    console.log("data from PostgREST: ", data);
+    const userDbData = await response.json();
 
-    return true;
-
-    if (!user) {
-        return response.status(401).json(
-            createErrorResponse(AUTH_MESSAGES.userNotFound)
-        );
-    }
-
-    if (!user.estaActivo) {
-        return response.status(401).json(
-            createErrorResponse(AUTH_MESSAGES.userDeactivated)
-        );
-    }
-
-    const isPasswordValid = await verifyPassword(password, user.password);
-    if (!isPasswordValid) {
-        return response.status(401).json(
-            createErrorResponse(AUTH_MESSAGES.incorrectPassword)
-        );
-    }
-
-    const tokenResponse = await generateTokenOnValidAuthentication(user, existingToken, remember);
-    if (!tokenResponse.success) {
-        return response.status(500).json({
+    // Determina si el usuario existe, si está activo, y si tiene credenciales correctas
+    if (userDbData.length === 0) {
+        return {
             success: false,
-            message: AUTH_MESSAGES.tokenGenerationError
-        });
+            message: 'El usuario no fue encontrado'
+        }
+    }
+    const userJson = userDbData[0]; // Consigue el objeto del usuario
+    if (!userJson.habilitado) {
+        return {
+            success: false,
+            message: 'El usuario no se encuentra habilitado para iniciar sesión'
+        }
+    }
+    const isPasswordValid = await bcrypt.compare(password, userJson.password);
+    if (!isPasswordValid) {
+        return {
+            success: false,
+            message: 'La contraseña es incorrecta'
+        }
     }
 
-    if (tokenResponse.accessToken !== '') {
-        setAuthCookie(response, tokenResponse.accessToken);
+    // Si la información ingresada es válida, otorga la información para generar tokens
+    return {
+        success: true,
+        message: '',
+        data: userJson
+    };
+};
+
+/**
+ * Función para CREAR una sola cookie (y/o token) de la sesión recién verificada 
+ * TO DO
+ * @async
+ * @function
+ * @param {object} res - Objeto de respuesta de Express.
+ * @param {object} userData - El JSON del usuario con la información de la DB
+ * @param {bool} isRootUser - Indica si el accessToken es para el usuario raíz
+ * @param {bool} doRefreshToken - Indica si se requiere de un refresh token
+ * @returns {bool} - Boolean que indica true si la operación fue exitosa
+ */
+async function setupTokenCookie(res, userData, isRootUser, doRefreshToken) {
+
+    // isRozot user??
+    const userPayload = isRootUser
+        ? { nameDisplay: 'Usuario Raíz', userId: '000', email: ROOT_USERNAME, privilegio: 'DIRECTIVO' }
+        : { nameDisplay: '(mock)userData.name', userId: userData.id, email: userData.email, privilegio: userData.privilegio };
+
+    // then, is doRefreshToken?? (newToken, maxAge, cookieName)
+    const newToken = doRefreshToken
+        ? require('crypto').randomBytes(64).toString('hex') // Utiliza hexadecimal para refresh
+        : jwt.sign(userPayload, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRATION });
+
+    const maxAge = doRefreshToken
+        ? parseFloat(REFRESH_TOKEN_EXPIRATION.slice(0, -1)) * 24 * 60 * 60 * 1000
+        : parseFloat(ACCESS_TOKEN_EXPIRATION.slice(0, -1)) * 24 * 60 * 60 * 1000;
+
+    const cookieName = doRefreshToken
+        ? RT_COOKIE_NAME
+        : AT_COOKIE_NAME;
+
+    // ship out cookie
+    res.cookie(cookieName, newToken, {
+        httpOnly: true,
+        secure: NODE_ENV === 'production', // Solo HTTPS en producción
+        sameSite: 'strict',
+        maxAge: maxAge,
+    });
+
+    // extra businessLogic the refresh token
+    if (doRefreshToken) {
+        const expires_at = new Date(Date.now() + maxAge);
+        const fetchUrl = `${BACKEND_URL}/sesion_activa`;
+        const fetchMethod = 'POST';
+        const fetchBody = {
+            user_id: userData.id,
+            token: newToken,
+            expires_at: expires_at
+        };
+        const response = await fetchPostgREST(fetchMethod, fetchUrl, fetchBody);
+        if (!response.ok) return { success: false, message: ERROR_MESSAGE + '004' };
     }
 
-    return false;
+    // exit
+    return {
+        success: true,
+        message: ''
+    }
 }
 
-module.exports = { postAuthentication };
+
+/**
+ * Remueve las cookies y también remueve la sesión de la base de datos
+ * @async /logout
+ * @function
+ * @param {Object} req - Objeto de solicitud de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<Object>} Respuesta JSON.
+ */
+
+async function doLogout(req, res) {
+    // Ejecuta el fetch para borrar la sesión del usuario
+    const user_id = res.locals.userId;
+    const fetchUrl = `${BACKEND_URL}/sesion_activa`;
+    const fetchMethod = 'DELETE';
+    const fetchBody = {
+        user_id: user_id
+    };
+    const response = await fetchPostgREST(fetchMethod, fetchUrl, fetchBody);
+    if (!response.ok) return { success: false, message: ERROR_MESSAGE + '005' };
+
+    // Finaliza la petición borrando las cookies y redirige al usuario a '/login'
+    res.clearCookie(process.env.AT_COOKIE_NAME);
+    res.clearCookie(process.env.RT_COOKIE_NAME);
+    return res.redirect(`${process.env.URL_TAG}/login`);
+}
+
+module.exports = { postAuthentication, doLogout, setupTokenCookie };

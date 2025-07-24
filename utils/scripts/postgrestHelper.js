@@ -1,7 +1,5 @@
 const jwt = require('jsonwebtoken');
 
-// TO DO, remover el body cuando es un método GET
-
 /**
  * Función para hacer fetch por completo a postgREST de manera segura.
  * @async
@@ -18,19 +16,21 @@ async function fetchPostgREST(fetchMethod, fetchUrl, fetchBody) {
         'UPDATE': 'update_only_role',
         'DELETE': 'delete_only_role',
     };
-    const role = roleMapping[fetchMethod] || 'read_only_role';
-    const bearerToken = jwt.sign({ role: role, aud: 'postgrest' }, process.env.POSTGREST_JWT);
+    const role = roleMapping[fetchMethod];
+    const bearerToken = jwt.sign({ role: role, aud: 'postgrest' }, process.env.POSTGREST_JWT,
+        { expiresIn: process.env.POSTGREST_TOKEN_EXPIRATION });
 
     // Ejecuta la petición HTTP según los parámetros recibidos
-    const response = await fetch(fetchUrl, {
+    const fetchOptions = {
         method: fetchMethod,
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken}`,
         },
-        // Solo se incluye el body si el método no es GET
-        ...(fetchMethod !== 'GET' && { body: fetchBody }),
-    });
+    }
+    if (fetchMethod !== 'GET') 
+        fetchOptions.body = JSON.stringify(fetchBody);
+    const response = await fetch(fetchUrl, fetchOptions);
     return response;
 }
 

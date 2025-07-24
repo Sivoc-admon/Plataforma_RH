@@ -24,6 +24,7 @@ function logInLogic() { // Renamed to avoid conflicts and encapsulate logic
             }
 
             this.isLoading = true;
+            let error_message = '';
 
             try {
                 const response = await fetch(`${URL_TAG}/login/postAuth`, {
@@ -33,19 +34,12 @@ function logInLogic() { // Renamed to avoid conflicts and encapsulate logic
                     },
                     body: JSON.stringify({ email, password, remember })
                 });
-
-                if (!response.ok) throw new Error;
-
                 const data = await response.json();
-
-                if (data.success && data.authorized) {
-                    window.location.href = `${URL_TAG}/inicio`;
-                } else {
-                    this.errorMessage = data.message || 'Credenciales incorrectas.';
-                }
-
+                error_message = data.message;
+                if (!response.ok) throw new Error;
+                if (data.success) window.location.href = `${URL_TAG}/inicio`;
             } catch (error) {
-                this.errorMessage = ERROR_MESSAGE + "004";
+                this.errorMessage = error_message;
             } finally {
                 this.isLoading = false;
             }
