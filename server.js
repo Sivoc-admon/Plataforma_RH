@@ -10,7 +10,6 @@ require('dotenv').config();
 const { rbacMiddleware } = require('./utils/middlewares/rbac');
 const { startPostgrest } = require('./utils/scripts/postgrestRunner');
 const DEFAULT_PORT = 3000;
-const URL_TAG = process.env.URL_TAG;
 
 /**
  * Configura los middlewares globales de la aplicación
@@ -23,25 +22,8 @@ function setupMiddlewares() {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(rbacMiddleware);
-    app.get('/', (req, res) => { res.redirect(`${URL_TAG}/login`); });
-    app.use(`${URL_TAG}/login`, require('./routes/login.routes'));
-    //app.use('/usuarios', require('./routes/login.routes'));
+    app.use('/', require('./routes/global.routes'));
 }
-
-/**
- * Maneja el cierre de sesión del usuario
- * @function
- * @param {object} request - Objeto de solicitud de Express
- * @param {object} response - Objeto de respuesta de Express
- * @returns {void}
- */
-app.get(`${URL_TAG}/logout`, handleLogout);
-function handleLogout(request, response) {
-    response.clearCookie(process.env.AT_COOKIE_NAME);
-    response.clearCookie(process.env.RT_COOKIE_NAME);
-    response.redirect(`${URL_TAG}/login`);
-}
-
 
 /**
  * Configura los archivos estáticos incluyendo el motor de vistas
@@ -103,7 +85,7 @@ async function initializeApp() {
     setupMiddlewares();
     setupStaticFilesAndViews();
     startServer();
-    //startPostgrest();
+    startPostgrest();
 }
 initializeApp().catch(error => {
     console.log(process.env.ERROR_MESSAGE, "001");

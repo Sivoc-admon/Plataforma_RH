@@ -1,38 +1,39 @@
 const jwt = require('jsonwebtoken');
 
-/**
- * Función para generar un JWT para utilizarlo como Bearer en PostgREST.
- * @param {string} method - Indica el método para el cual se usará el JWT.
- * @returns {string} - El Json Web Token.
- * @returns {bool} false - Regresa false en caso de fallar la ejecución.
- */
-function createJWTforMethod(method) {
+// TO DO, remover el body cuando es un método GET
 
-    // Elige el rol según el método HTTP, por defecto está READ.
+/**
+ * Función para hacer fetch por completo a postgREST de manera segura.
+ * @async
+ * @param {string} fetchMethod - Indica el método para el cual se usará el JWT.
+ * @param {string} fetchUrl - Indica el url que se consultará en postgREST.
+ * @param {object} fetchBody - Indica el cuerpo de la petición en formato JSON.
+ * @returns {object} response - El objeto de la respuesta del fetch.
+ */
+async function fetchPostgREST(fetchMethod, fetchUrl, fetchBody) {
+    // Genera el Bearer token para autorizar la consulta a postgREST
     const roleMapping = {
         'POST': 'create_only_role',
         'GET': 'read_only_role',
         'UPDATE': 'update_only_role',
         'DELETE': 'delete_only_role',
     };
-    const role = roleMapping[method] || 'read_only_role';
+    const role = roleMapping[fetchMethod] || 'read_only_role';
+    const bearerToken = jwt.sign({ role: role, aud: 'postgrest' }, process.env.POSTGREST_JWT);
 
-    // Crea el token y enviaselo a la petición
-    try {
-        const payload = {
-            role: role,
-            aud: "postgrest"
-        }
-        const token = jwt.sign(payload, process.env.POSTGREST_JWT);
-        return token; // token
-    } catch (error) {
-        console.log(process.env.ERRROR_MESSAGE, "003");
-    }
-
-    // Si la generación del Token falló, entonces regresa false
-    return false;
+    // Ejecuta la petición HTTP según los parámetros recibidos
+    const response = await fetch(fetchUrl, {
+        method: fetchMethod,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${bearerToken}`,
+        },
+        // Solo se incluye el body si el método no es GET
+        ...(fetchMethod !== 'GET' && { body: fetchBody }),
+    });
+    return response;
 }
 
 module.exports = {
-  createJWTforMethod,
+    fetchPostgREST,
 };

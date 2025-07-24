@@ -11,8 +11,8 @@ function logInLogic() { // Renamed to avoid conflicts and encapsulate logic
         async logIn() {
             this.errorMessage = ''; // Limpiar mensaje previo
 
-            const email = this.email;
-            const password = this.password;
+            const email = this.email.trim();
+            const password = this.password.trim();
             const remember = this.remember;
 
             const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -26,7 +26,7 @@ function logInLogic() { // Renamed to avoid conflicts and encapsulate logic
             this.isLoading = true;
 
             try {
-                const response = await fetch("/login/POSTAUTH", {
+                const response = await fetch(`${URL_TAG}/login/postAuth`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -34,22 +34,18 @@ function logInLogic() { // Renamed to avoid conflicts and encapsulate logic
                     body: JSON.stringify({ email, password, remember })
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Error de autenticación.');
-                }
+                if (!response.ok) throw new Error;
 
                 const data = await response.json();
 
                 if (data.success && data.authorized) {
-                    window.location.href = data.redirectUrl;
+                    window.location.href = `${URL_TAG}/inicio`;
                 } else {
                     this.errorMessage = data.message || 'Credenciales incorrectas.';
                 }
 
             } catch (error) {
-                console.error('[Login Error]:', error);
-                this.errorMessage = error.message || 'No se pudo conectar con el servidor.';
+                this.errorMessage = ERROR_MESSAGE + "004";
             } finally {
                 this.isLoading = false;
             }

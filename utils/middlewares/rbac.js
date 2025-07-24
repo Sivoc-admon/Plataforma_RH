@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
 const iam = require('../IAM.json');
-const { createJWTforMethod } = require('../scripts/postgrestHelper');
+const { fetchPostgREST } = require('../scripts/postgrestHelper');
 
 // separa tus rutas con la etiqueta /api/ al inicio.
 const URL_TAG = process.env.URL_TAG; // `${URL_TAG}/login`
+const ERROR_MESSAGE = process.env.ERROR_MESSAGE;
 
 /**
  * Middleware para otorgar RBAC a toda la aplicación.
@@ -11,13 +12,15 @@ const URL_TAG = process.env.URL_TAG; // `${URL_TAG}/login`
  * @returns next();
  * @throws {error} Elige entre JWT inválido o sesión erronea.
  */
-const rbacMiddleware = (req, res, next) => {
+const rbacMiddleware = async (req, res, next) => {
     // Default value of local session variables
     // res.locals.userId = res.locals.userId || '';
     // res.locals.userName = res.locals.userName || '';
     // res.locals.userPhoto = res.locals.userPhoto || '';
     // res.locals.userPrivilege = res.locals.userPrivilege || '';
     // res.locals.userArea = res.locals.userArea || '';
+    res.locals.URL_TAG = URL_TAG;
+    res.locals.ERROR_MESSAGE = ERROR_MESSAGE;
 
     console.log("req.url: ", req.url);
 
@@ -25,11 +28,11 @@ const rbacMiddleware = (req, res, next) => {
     if (!req.url.startsWith(URL_TAG))
         return next();
 
-    // si no es una ruta publica, remueve la etiqueta y lee el modulo de origen y la actividad
+    // Si no es una ruta publica, remueve la etiqueta y lee el modulo de origen y la actividad
     const reqUrl = req.url.substring(URL_TAG.length);
 
     // Rutas públicas: el usuario tiene permitido acceder sin importar su autenticación
-    if ((["/login", "/login/postAuth", "/logout", "/inicio"].includes(reqUrl)))
+    if ((["/login", "/login/postAuth", "/logout"].includes(reqUrl)))
         return next();
 
     // Decodificar JWT: Racionaliza el acceso de los tokens
@@ -40,7 +43,8 @@ const rbacMiddleware = (req, res, next) => {
         payload = decoded;
     } catch (error) {
         const refreshToken = req.cookies[process.env.RT_COOKIE_NAME];
-        const newAccessToken = RT_helper(refreshToken); // PostgREST parametriza la consulta
+        const newAccessToken = await RT_helper(refreshToken); // PostgREST parametriza la consulta
+        console.log("Catched non authetnicated, newAccessToken:", newAccessToken);
         if (!newAccessToken) {
             return res.redirect(`${URL_TAG}/logout`);
         }
@@ -109,16 +113,16 @@ async function RT_helper(refreshToken) {
         if (!refreshToken) {
             return false; // -> '/logout'
         }
-        const url = `${process.env.BACKEND_URL}/sesion_activa?select=user_id&token=eq.${refreshToken}`;
-        const httpMethod = 'GET';
-        const bearerToken = createJWTforMethod(httpMethod);
-        const response = await fetch(url, {
-            method: httpMethod,
-            headers: {
-                'Authorization': 'Bearer ' + bearerToken,
-            }
-        });
-        console.log("response from PostgREST: ", response);
+
+        // SELECT user_id FROM sesion_activa WHERE token = ${refreshToken};
+        const fetchMethod = 'GET';
+        const fetchUrl = `${process.env.BACKEND_URL}/sesion_activa?select=user_id&token=eq.${refreshToken}`;
+        const fetchBody = {};
+
+        // Ejecuta el fetch
+        const response = await fetchPostgREST(fetchMethod, fetchUrl, fetchBody);
+        console.log("response from PostgREST 02: ", response);
+
         if (!response) {
             return false; // -> '/logout'
         }
