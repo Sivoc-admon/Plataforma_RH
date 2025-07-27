@@ -1,23 +1,16 @@
 const jwt = require('jsonwebtoken');
 const iam = require('../IAM.json');
-const { fetchPostgREST } = require('../scripts/postgrestHelper');
 const { setupTokenCookie } = require("../../controllers/login.controller")
 const URL_TAG = process.env.URL_TAG;
 const ERROR_MESSAGE = process.env.ERROR_MESSAGE;
 
 /**
- * Middleware para otorgar RBAC a toda la aplicación.
+ * Middleware global para gestionar las sesiones
  * @params req res next
  * @returns next();
  * @throws {error} Elige entre JWT inválido o sesión erronea.
  */
-const rbacMiddleware = async (req, res, next) => {
-    // Default value of local session variables
-    // res.locals.userId = res.locals.userId || '';
-    // res.locals.userName = res.locals.userName || '';
-    // res.locals.userPhoto = res.locals.userPhoto || '';
-    // res.locals.userPrivilege = res.locals.userPrivilege || '';
-    // res.locals.userArea = res.locals.userArea || '';
+const sessionManager = async (req, res, next) => {
     res.locals.URL_TAG = URL_TAG;
     res.locals.ERROR_MESSAGE = ERROR_MESSAGE;
 
@@ -31,26 +24,29 @@ const rbacMiddleware = async (req, res, next) => {
     const reqUrl = req.url.substring(URL_TAG.length);
 
     // Rutas públicas: el usuario tiene permitido acceder sin importar su autenticación
-    console.log("dectecting url for public as: ", reqUrl)
     if ((["/login", "/login/postAuth", "/logout"].includes(reqUrl)))
         return next();
 
-    // Decodificar JWT: Racionaliza el acceso de los tokens
+    // Rutas privadas: el usuario solo tiene permitido continuar si tiene una sesión válida
+
+    // Verifica la autenticidad del *accessToken
     let payload = "";
     try {
         const accessToken = req.cookies[process.env.AT_COOKIE_NAME];
-        console.log("Current AT: ", accessToken);
         const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
         payload = decoded;
+
+        // En caso de que el token no sea auténtico...
+        // Consulta en la base de datos si el *refreshToken es auténtico
     } catch (error) {
         const refreshToken = req.cookies[process.env.RT_COOKIE_NAME];
-        console.log("Current RT: ", refreshToken);
         const rationaleResponse = await rationaleRefreshToken(refreshToken);
-        console.log("New RT: ", newAccessToken);
-        if (!rationaleResponse.isTokenValid) return res.redirect(`${URL_TAG}/logout`);
+        
+        if (!rationaleResponse.isTokenValid) {
+            return res.status(401).send('Tu sesión ha caducado. Por favor, inicia sesión nuevamente.');
+        }
 
-        // TO DO, también hay que corriger la propia función setupTokenCookie
-        // Darles responses y así
+
         const userData = {
             nameDisplay: res.locals.nameDisplay,
             userId: res.locals.userId,
@@ -60,7 +56,6 @@ const rbacMiddleware = async (req, res, next) => {
         const isRootUser = false;
         const doRefreshToken = false;
         const response = setupTokenCookie(res, userData, isRootUser, doRefreshToken);
-        // catch that error and then continue with rbac logic
     }
 
     // RBAC Business Logic: Identifica si el usuario tiene permisos, sino, solo informalo.
@@ -108,54 +103,4 @@ function rbacBusinessLogic(res, reqUrl, decoded) {
     return false; // -> "not next();" 
 };
 
-/**
- * Determina si existe un token no expirado en la DB relacionado con el usuario
- * @param {string} refreshToken - El token que se consultará.
- * @returns {bool} false - Indica que se debe ejecutar /logout
- * @returns {string} newAccessToken - El string del nuevo JWT AT.
- * @throws {Error} 
- */
-async function rationaleRefreshToken(refreshToken) {
-    if (!refreshToken) { // ERROR, NO PUEDES DECIR QUE NO TIENE RT
-        // pero si no lo tiene significa que no existe la sesión
-        // pero que pasa si si existe?
-        // ese valor solo se encuentra en res.locals
-        // alguna otra versión más segura?
-        // si tiene ambas cookies empty entonces redirigelo pero a /LOGIN
-        return false; // -> '/logout'
-    }
-
-    // Ejecuta el fetch SELECT user_id FROM sesion_activa WHERE token = ${refreshToken};
-    const fetchMethod = 'GET';
-    const fetchUrl = `${process.env.BACKEND_URL}/sesion_activa?select=user_id&token=eq.${refreshToken}`;
-    const fetchBody = {};
-    const response = await fetchPostgREST(fetchMethod, fetchUrl, fetchBody);
-    if (!response.ok) {
-        return {
-            success: false,
-            message: process.env.ERROR_MESSAGE + '002',
-            isTokenValid: false
-        };
-    }
-
-    // if response -> data -> .length === 0, return false; // -> '/logout'
-    console.log("response from PostgREST 02: ", response);
-    const tokenDbData = await response.json();
-    console.log("tokenDbData from postgREST: ", tokenDbData);
-
-    // Si el tokenDbData tiene una fecha más grande entonces ejecuta logOut
-    if (tokenDbData.expiresAt < Date.now()) {
-        return false; // -> '/logout' (logout deletes RT from database)
-    }
-
-    // Crea el accesToken de ese user id
-    const newAccessToken = jwt.sign({ id: tokenDbData.user_id }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRATION,
-    });
-
-    console.log("newAccessToken from fetchRT_helper: ", newAccessToken);
-    return newAccessToken;
-
-};
-
-module.exports = { rbacMiddleware };
+module.exports = { sessionManager };

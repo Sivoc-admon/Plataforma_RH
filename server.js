@@ -7,7 +7,7 @@ const app = express();
 require('dotenv').config();
 
 // Utilidades
-const { rbacMiddleware } = require('./utils/middlewares/rbac');
+const { sessionManager } = require('./utils/middlewares/sessionManager');
 const { startPostgrest } = require('./utils/scripts/postgrestRunner');
 const DEFAULT_PORT = 3000;
 

@@ -1,105 +1,104 @@
 {
     "DIRECTIVO": {
-        "usuarios": {
-            "usuarios/usersView": true,
-            "usuarios/usersView/addUser": true,
-            "usuarios/usersView/singleUserView": true,
-            "usuarios/usersView/singleUserView/patchUser/datoLaboral": true,
-            "usuarios/usersView/singleUserView/patchUser/credenciales": true,
-            "usuarios/usersView/singleUserView/patchUser/deactivateUser": true,
-            "usuarios/usersView/singleUserView/patchUser/datoPersonal": true,
-            "usuarios/usersView/singleUserView/patchUser/fotoPerfil": true,
-            "usuarios/teamsView": true,
-            "usuarios/teamsView/deleteTeam": true,
-            "usuarios/teamsView/createTeam": true,
-            "usuarios/teamsView/patchTeam": true,
-            "usuarios/unactiveUsersView": true,
-            "usuarios/unactiveUsersView/activateUser": true,
-            "usuarios/unactiveUsersView/singleUserView": true,
-            "usuarios/usersView/downloadPDF": true,
-            "usuarios/usersView/downloadExcel": true
+        "equipo": {
+            "verTableroEquipos": true,
+            "borrarEquipo": true,
+            "crearEquipo": true,
+            "editarEquipo": true
         },
-        "permisos": {
-            "permisos/permitsView": true,
-            "permisos/permitsView/viewRowFile/:permitId/:filename": true,
-            "permisos/permitsView/changeStatus": true,
-            "permisos/permitsView/verifyPermit": true,
-            "permisos/permitsView/downloadPDF": true,
-            "permisos/permitsView/downloadExcel": true
+        "usuario": {
+            "verTableroActivados": true,
+            "añadirUsuarios": true,
+            "verTableroDesactivados": true,
+            "descargarPdf": true,
+            "descargarExcel": true,
+            "editarUsuarios": true
         },
-        "vacaciones": {},
-        "cursos": {}
+        "permiso": {
+            "verTableroPermisos": true,
+            "verArchivos": true,
+            "cambiarEstado": true,
+            "verificarPermiso": true,
+            "descargarPdf": true,
+            "descargarExcel": true,
+            "crearPermiso": false,
+            "enviarPermiso": false,
+            "editarPermiso": false
+        },
+        "vacacion": {},
+        "curso": {},
+        "impartir_curso": {}
     },
     "JEFEINMEDIATO": {
-        "usuarios": {
-            "usuarios/usersView": true,
-            "usuarios/usersView/addUser": true,
-            "usuarios/usersView/singleUserView": true,
-            "usuarios/usersView/singleUserView/patchUser/datoLaboral": true,
-            "usuarios/usersView/singleUserView/patchUser/credenciales": true,
-            "usuarios/usersView/singleUserView/patchUser/deactivateUser": true,
-            "usuarios/usersView/singleUserView/patchUser/datoPersonal": true,
-            "usuarios/usersView/singleUserView/patchUser/fotoPerfil": true,
-            "usuarios/teamsView": true,
-            "usuarios/teamsView/deleteTeam": true,
-            "usuarios/teamsView/createTeam": true,
-            "usuarios/teamsView/patchTeam": true,
-            "usuarios/unactiveUsersView": true,
-            "usuarios/unactiveUsersView/activateUser": true,
-            "usuarios/unactiveUsersView/singleUserView": true,
-            "usuarios/usersView/downloadPDF": true,
-            "usuarios/usersView/downloadExcel": true,
-            "permisos/permitsView": true,
-            "permisos/permitsView/viewRowFile/:permitId/:filename": true,
-            "permisos/permitsView/changeStatus": true,
-            "permisos/permitsView/verifyPermit": true,
-            "permisos/permitsView/downloadPDF": true,
-            "permisos/permitsView/downloadExcel": true
+        "equipo": {
+            "verTableroEquipos": true,
+            "borrarEquipo": true,
+            "crearEquipo": true,
+            "editarEquipo": true
         },
-        "permisos": {},
-        "vacaciones": {},
-        "cursos": {}
+        "usuario": {
+            "verTableroActivados": true,
+            "añadirUsuarios": true,
+            "verTableroDesactivados": true,
+            "descargarPdf": true,
+            "descargarExcel": true,
+            "editarUsuarios": true
+        },
+        "permiso": {
+            "verTableroPermisos": true,
+            "verArchivos": true,
+            "cambiarEstado": true,
+            "verificarPermiso": true,
+            "descargarPdf": true,
+            "descargarExcel": true
+        },
+        "vacacion": {},
+        "curso": {},
+        "impartir_curso": {}
     },
     "PERSONALRRHH": {
-        "usuarios": {
-            "usuarios/usersView": true,
-            "usuarios/usersView/addUser": true,
-            "usuarios/usersView/singleUserView": true,
-            "usuarios/usersView/singleUserView/patchUser/datoLaboral": true,
-            "usuarios/usersView/singleUserView/patchUser/credenciales": true,
-            "usuarios/usersView/singleUserView/patchUser/deactivateUser": true,
-            "usuarios/usersView/singleUserView/patchUser/datoPersonal": true,
-            "usuarios/usersView/singleUserView/patchUser/fotoPerfil": true,
-            "usuarios/teamsView": true,
-            "usuarios/teamsView/deleteTeam": true,
-            "usuarios/teamsView/createTeam": true,
-            "usuarios/teamsView/patchTeam": true,
-            "usuarios/unactiveUsersView": true,
-            "usuarios/unactiveUsersView/activateUser": true,
-            "usuarios/unactiveUsersView/singleUserView": true,
-            "usuarios/usersView/downloadPDF": true,
-            "usuarios/usersView/downloadExcel": true,
-            "permisos/permitsView": true,
-            "permisos/permitsView/viewRowFile/:permitId/:filename": true,
-            "permisos/permitsView/changeStatus": true,
-            "permisos/permitsView/verifyPermit": true,
-            "permisos/permitsView/downloadPDF": true,
-            "permisos/permitsView/downloadExcel": true
+        "equipo": {
+            "verTableroEquipos": true,
+            "borrarEquipo": true,
+            "crearEquipo": true,
+            "editarEquipo": true
         },
-        "permisos": {},
-        "vacaciones": {},
-        "cursos": {}
+        "usuario": {
+            "verTableroActivados": true,
+            "añadirUsuarios": true,
+            "verTableroDesactivados": true,
+            "descargarPdf": true,
+            "descargarExcel": true,
+            "editarUsuarios": true
+        },
+        "permiso": {
+            "verTableroPermisos": true,
+            "verArchivos": true,
+            "cambiarEstado": true,
+            "verificarPermiso": true,
+            "descargarPdf": true,
+            "descargarExcel": true
+        },
+        "vacacion": {},
+        "curso": {},
+        "impartir_curso": {}
     },
     "COLABORADOR": {
+        "equipo": {},
+        "usuario": {},
+        "permiso": {
+            "crearPermiso": true,
+            "enviarPermiso": true,
+            "editarPermiso": true
+        },
+        "vacacion": {},
+        "curso": {},
+        "impartir_curso": {},
         "usuarios": {},
         "permisos": {
-            "permisos/permitsView": true,
-            "permisos/permitsView/createPermit": true,
-            "permisos/permitsView/sendPermit": true,
-            "permisos/permitsView/viewRowFile/:permitId/:filename": true,
-            "permisos/permitsView/editPermit": true,
-            "permisos/permitsView/editPermit/getInfo": true,
-            "permisos/permitsView/editPermit/patchInfo": true
+            "crearPermiso": false,
+            "enviarPermiso": false,
+            "editarPermiso": false
         },
         "vacaciones": {},
         "cursos": {}

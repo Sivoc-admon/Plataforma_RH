@@ -2,10 +2,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { fetchPostgREST } = require('../utils/scripts/postgrestHelper');
 
-
-// Debido a que /login es el unico que otorga Cookies y REFRESH tokens
-// no es necesario modificar nada al rbac.js, porque simplemente no otorgas el REFRESH TOKEN y listin listón
-
 /**
  * Constantes para la configuración del módulo de autenticación.
  */
@@ -55,7 +51,7 @@ async function postAuthentication(req, res) {
             const RF_response = await setupTokenCookie(res, userValid.data, remember, isRootValid, doRefreshToken);
             if (!RF_response.success) return res.status(200).json({ success: true, message: RF_response.message });
         }
-        
+
         // exit
         return res.status(200).json({ success: true, message: '' });
 
@@ -78,10 +74,21 @@ async function postAuthentication(req, res) {
  */
 async function isUserValid(email, password) {
     // Ejecuta el fetch de la información del usuario
-    const fetchUrl = `${BACKEND_URL}/usuario?select=id,privilegio,password,habilitado,email&email=eq.${email}`;
-    const fetchMethod = 'GET';
-    const fetchBody = {};
-    const response = await fetchPostgREST(fetchMethod, fetchUrl, fetchBody);
+    const pgRestRequest = {
+        fetchMethod: 'GET',
+        fetchUrl: `${BACKEND_URL}/usuario?select=id,privilegio,password,habilitado,email&email=eq.${email}`,
+        fetchBody: {}
+    }
+
+    // Captura el error al consultar la base de datos
+    const response = await fetchPostgREST(pgRestRequest);
+    if (!response.ok) {
+        return {
+            success: false,
+            message: process.env.ERROR_MESSAGE + '006'
+        };
+    }
+
     const userDbData = await response.json();
 
     // Determina si el usuario existe, si está activo, y si tiene credenciales correctas
@@ -127,25 +134,23 @@ async function isUserValid(email, password) {
  */
 async function setupTokenCookie(res, userData, isRootUser, doRefreshToken) {
 
-    // isRozot user??
+    // Elige el payload correcto según si el usuario es el RootUser o un usuario común
     const userPayload = isRootUser
         ? { nameDisplay: 'Usuario Raíz', userId: '000', email: ROOT_USERNAME, privilegio: 'DIRECTIVO' }
         : { nameDisplay: '(mock)userData.name', userId: userData.id, email: userData.email, privilegio: userData.privilegio };
 
-    // then, is doRefreshToken?? (newToken, maxAge, cookieName)
-    const newToken = doRefreshToken
+    // Elige si la cookie será para un *refreshToken o un *accessToken (newToken, maxAge, cookieName)
+    const newToken = doRefreshToken //newToken
         ? require('crypto').randomBytes(64).toString('hex') // Utiliza hexadecimal para refresh
         : jwt.sign(userPayload, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRATION });
-
-    const maxAge = doRefreshToken
+    const maxAge = doRefreshToken //maxAge
         ? parseFloat(REFRESH_TOKEN_EXPIRATION.slice(0, -1)) * 24 * 60 * 60 * 1000
         : parseFloat(ACCESS_TOKEN_EXPIRATION.slice(0, -1)) * 24 * 60 * 60 * 1000;
-
-    const cookieName = doRefreshToken
+    const cookieName = doRefreshToken //cookieName
         ? RT_COOKIE_NAME
         : AT_COOKIE_NAME;
 
-    // ship out cookie
+    // Envia al navegador la cookie
     res.cookie(cookieName, newToken, {
         httpOnly: true,
         secure: NODE_ENV === 'production', // Solo HTTPS en producción
@@ -153,18 +158,29 @@ async function setupTokenCookie(res, userData, isRootUser, doRefreshToken) {
         maxAge: maxAge,
     });
 
-    // extra businessLogic the refresh token
+    // Si el token es *refreshToken entonces también añadelo a la base de datos (sesion_activa)
     if (doRefreshToken) {
+
+        // Ejecuta el fetch SELECT user_id FROM sesion_activa WHERE token = ${refreshToken};
         const expires_at = new Date(Date.now() + maxAge);
-        const fetchUrl = `${BACKEND_URL}/sesion_activa`;
-        const fetchMethod = 'POST';
-        const fetchBody = {
-            user_id: userData.id,
-            token: newToken,
-            expires_at: expires_at
-        };
-        const response = await fetchPostgREST(fetchMethod, fetchUrl, fetchBody);
-        if (!response.ok) return { success: false, message: ERROR_MESSAGE + '004' };
+        const pgRestRequest = {
+            fetchMethod: 'POST',
+            fetchUrl: `${BACKEND_URL}/sesion_activa`,
+            fetchBody: {
+                user_id: userData.id,
+                token: newToken,
+                expires_at: expires_at
+            }
+        }
+
+        // Captura el error al consultar la base de datos
+        const response = await fetchPostgREST(pgRestRequest);
+        if (!response.ok) {
+            return {
+                success: false,
+                message: process.env.ERROR_MESSAGE + '004',
+            };
+        }
     }
 
     // exit
@@ -187,13 +203,20 @@ async function setupTokenCookie(res, userData, isRootUser, doRefreshToken) {
 async function doLogout(req, res) {
     // Ejecuta el fetch para borrar la sesión del usuario
     const user_id = res.locals.userId;
-    const fetchUrl = `${BACKEND_URL}/sesion_activa`;
-    const fetchMethod = 'DELETE';
-    const fetchBody = {
-        user_id: user_id
-    };
-    const response = await fetchPostgREST(fetchMethod, fetchUrl, fetchBody);
-    if (!response.ok) return { success: false, message: ERROR_MESSAGE + '005' };
+    const pgRestRequest = {
+        fetchMethod: 'DELETE',
+        fetchUrl: `${BACKEND_URL}/sesion_activa`,
+        fetchBody: { user_id: user_id }
+    }
+    
+    // Captura el error al consultar la base de datos
+    const response = await fetchPostgREST(pgRestRequest);
+    if (!response.ok) {
+        return {
+            success: false,
+            message: process.env.ERROR_MESSAGE + '005'
+        };
+    }
 
     // Finaliza la petición borrando las cookies y redirige al usuario a '/login'
     res.clearCookie(process.env.AT_COOKIE_NAME);
