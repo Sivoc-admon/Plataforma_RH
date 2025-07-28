@@ -21,7 +21,7 @@ function setupMiddlewares() {
     app.use(cookieParser());
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
-    app.use(rbacMiddleware);
+    app.use(sessionManager);
     app.use('/', require('./routes/global.routes'));
 }
 

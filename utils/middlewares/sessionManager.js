@@ -14,6 +14,8 @@ const ERROR_MESSAGE = process.env.ERROR_MESSAGE;
 const sessionManager = async (req, res, next) => {
     res.locals.URL_TAG = URL_TAG;
     res.locals.ERROR_MESSAGE = ERROR_MESSAGE;
+    console.log("req.url:", req.url);
+
 
     // Rutas de utilidades: el sistema accede a estas rutas para obtener recursos
     if (!req.url.startsWith(URL_TAG))
@@ -25,6 +27,7 @@ const sessionManager = async (req, res, next) => {
     // Rutas públicas: el usuario tiene permitido acceder sin importar su autenticación
     if ((["/login", "/login/postAuth", "/logout"].includes(reqUrl)))
         return next();
+    console.log("reqUrl:", reqUrl);
 
     // Obten las variables de la petición sin importar el estado de su sesión
     let payload = "";
@@ -44,12 +47,12 @@ const sessionManager = async (req, res, next) => {
 
         // Detén la petición por completo en caso que el *refreshToken sea inválido (case 3)
         if (!rationaleResponse.token) { // case3 -> both tokens are invalid
-            return res.status(401).send('Tu sesión ha caducado. Por favor, inicia sesión nuevamente.');
+            return res.status(401).send('22Tu sesión ha caducado. Por favor, inicia sesión nuevamente.');
         }
 
         // O en otro caso, renueva el *accessToken en caso que su token de sesión sea válido
         const isRootUser = false;
-        const doRefreshToken = false; 
+        const doRefreshToken = false;
         const setupATresponse = setupTokenCookie(res, previousPayload, isRootUser, doRefreshToken);
         if (!setupATresponse.success) return res.status(500).send(setupATresponse.message);
 
@@ -100,11 +103,10 @@ async function rationaleRefreshToken(refreshToken) {
 
     // Debido a que el *refreshToken no es válido, regresa false
     const tokenDbData = await response.json();
-    console.log("tokenDbData from rationaleRefreshToken:", tokenDbData);
     if (!tokenDbData || tokenDbData.length === 0 || tokenDbData.expiresAt < Date.now()) {
         return {
             success: true,
-            message: 'Tu sesión ha caducado. Por favor, inicia sesión nuevamente.',
+            message: '',
             token: false
         };
     }

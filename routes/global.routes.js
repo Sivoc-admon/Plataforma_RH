@@ -11,7 +11,7 @@ router.get(`${URL_TAG}/inicio`, (req, res) => { res.render('inicio.ejs'); });
 
 // Rutas relacionadas con el Login
 router.post(`${URL_TAG}/login/postAuth`, postAuthentication);
-//router.get(`${URL_TAG}/logout`, doLogout);
+router.get(`${URL_TAG}/logout`, doLogout);
 
 
 module.exports = router;

@@ -36,7 +36,7 @@ function logInLogic() { // Renamed to avoid conflicts and encapsulate logic
                 });
                 const data = await response.json();
                 error_message = data.message;
-                if (!response.ok) throw new Error;
+                if (!response.ok || !data.success) throw new Error;
                 if (data.success) window.location.href = `${URL_TAG}/inicio`;
             } catch (error) {
                 this.errorMessage = error_message;

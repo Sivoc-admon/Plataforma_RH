@@ -20,43 +20,46 @@ const NODE_ENV = process.env.NODE_ENV;
 const BACKEND_URL = process.env.BACKEND_URL;
 
 /**
- * Otorga las cookies y crea la sesión activa en la base de datos.
- * TO DO, FIX
+ * Controla la creación de una sesión a través del LogIn en "public/login.js"
  * @async /login/postAuth
  * @function
  * @param {Object} req - Objeto de solicitud de Express.
  * @param {Object} res - Objeto de respuesta de Express.
  * @returns {Promise<Object>} Respuesta JSON con el resultado de la autenticación.
+ * @returns false = Se mostrará al usuario el campo Promise<Object>.message
+ * @returns true = Se redirecionará el usuario a "/inicio"
  */
 async function postAuthentication(req, res) {
     try {
         const { email, password, remember } = req.body;
         const doRefreshToken = true;
 
-        // 1. isRootValid: Si el usuario ingresa como usuario raíz, otorga un solo access token 
+        // 1. isRootValid: Si el usuario ingresa como usuario raíz, otorga un solo *accessToken 
         const isRootValid = email === ROOT_USERNAME && await bcrypt.compare(password, ROOT_PASSWORD);
         if (isRootValid) {
-            const tokenResponse = await setupTokenCookie(res, null, remember, isRootValid, !doRefreshToken);
+            const tokenResponse = await setupTokenCookie(res, null, isRootValid, !doRefreshToken);
+            if (!tokenResponse.success) return res.status(200).json({ success: true, message: tokenResponse.message });
             return res.status(200).json({ success: true });
         }
 
         // 2. isUserValid: Si el usuario ingresa un usuario incorrecto, indicalo
         const userValid = await isUserValid(email, password);
-        if (!userValid.success) return res.status(200).json({ success: true, message: userValid.message });
+        if (!userValid.success) return res.status(200).json({ success: false, message: userValid.message });
 
         // 3. setupTokenCookie: Crea los tokens y las cookies de la sesión recién verificada
-        const AT_response = await setupTokenCookie(res, userValid.data, remember, isRootValid, !doRefreshToken);
-        if (!AT_response.success) return res.status(200).json({ success: true, message: AT_response.message });
+        const AT_response = await setupTokenCookie(res, userValid.data, isRootValid, !doRefreshToken);
+        if (!AT_response.success) return res.status(200).json({ success: false, message: AT_response.message });
+
         if (remember) { // Crea una sesión larga solo si el usuario pide que lo recuerden
-            const RF_response = await setupTokenCookie(res, userValid.data, remember, isRootValid, doRefreshToken);
-            if (!RF_response.success) return res.status(200).json({ success: true, message: RF_response.message });
+            const RF_response = await setupTokenCookie(res, userValid.data, isRootValid, doRefreshToken);
+            if (!RF_response.success) return res.status(200).json({ success: false, message: RF_response.message });
         }
 
         // exit
         return res.status(200).json({ success: true, message: '' });
 
     } catch (error) {
-        //console.log(error);
+        console.log(error);
         return res.status(500).json({
             success: false,
             message: (ERROR_MESSAGE + '003'),
@@ -208,7 +211,7 @@ async function doLogout(req, res) {
         fetchUrl: `${BACKEND_URL}/sesion_activa`,
         fetchBody: { user_id: user_id }
     }
-    
+
     // Captura el error al consultar la base de datos
     const response = await fetchPostgREST(pgRestRequest);
     if (!response.ok) {
