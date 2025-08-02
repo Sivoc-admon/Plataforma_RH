@@ -1,7 +1,6 @@
 /* Utilizando Node.js v20.13.1 */
 const express = require('express');
 const path = require('path');
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const app = express();
 require('dotenv').config();
@@ -11,6 +10,7 @@ const { sessionManager } = require('./utils/middlewares/sessionManager');
 const { startPostgrest } = require('./utils/scripts/postgrestRunner');
 const DEFAULT_PORT = 3000;
 
+
 /**
  * Configura los middlewares globales de la aplicación
  * @function
@@ -19,8 +19,6 @@ const DEFAULT_PORT = 3000;
 function setupMiddlewares() {
     app.use(express.json());
     app.use(cookieParser());
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
     app.use(sessionManager);
     app.use('/', require('./routes/global.routes'));
 }
@@ -51,7 +49,6 @@ function startServer() {
 /**
  * Inicializa la aplicación y atrapa los errores de ejecución.
  * @async
- * @function
  * @returns {Promise<void>}
  */
 async function initializeApp() {

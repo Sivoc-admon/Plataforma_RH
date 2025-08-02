@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const iam = require('../IAM.json');
 const { fetchPostgREST } = require('../scripts/postgrestHelper');
 const { setupTokenCookie } = require("../../controllers/login.controller")
 const URL_TAG = process.env.URL_TAG;
@@ -14,8 +13,7 @@ const ERROR_MESSAGE = process.env.ERROR_MESSAGE;
 const sessionManager = async (req, res, next) => {
     res.locals.URL_TAG = URL_TAG;
     res.locals.ERROR_MESSAGE = ERROR_MESSAGE;
-    console.log("req.url:", req.url);
-
+    //console.log("req.url:", req.url);
 
     // Rutas de utilidades: el sistema accede a estas rutas para obtener recursos
     if (!req.url.startsWith(URL_TAG))
@@ -27,7 +25,6 @@ const sessionManager = async (req, res, next) => {
     // Rutas públicas: el usuario tiene permitido acceder sin importar su autenticación
     if ((["/login", "/login/postAuth", "/logout"].includes(reqUrl)))
         return next();
-    console.log("reqUrl:", reqUrl);
 
     // Obten las variables de la petición sin importar el estado de su sesión
     let payload = "";
@@ -43,25 +40,25 @@ const sessionManager = async (req, res, next) => {
         // Consulta en la base de datos si el *refreshToken es auténtico
         const refreshToken = req.cookies[process.env.RT_COOKIE_NAME];
         const rationaleResponse = await rationaleRefreshToken(refreshToken);
-        if (!rationaleResponse.success) return res.status(500).send(rationaleResponse.message);
+        if (!rationaleResponse.success) return res.status(205).send(rationaleResponse.message);
 
         // Detén la petición por completo en caso que el *refreshToken sea inválido (case 3)
         if (!rationaleResponse.token) { // case3 -> both tokens are invalid
-            return res.status(401).send('22Tu sesión ha caducado. Por favor, inicia sesión nuevamente.');
+            return res.status(401).send('Tu sesión ha caducado. Por favor, inicia sesión nuevamente en la página de LogIn');
         }
 
         // O en otro caso, renueva el *accessToken en caso que su token de sesión sea válido
-        const isRootUser = false;
-        const doRefreshToken = false;
-        const setupATresponse = setupTokenCookie(res, previousPayload, isRootUser, doRefreshToken);
-        if (!setupATresponse.success) return res.status(500).send(setupATresponse.message);
-
         const previousPayload = {
             name: res.locals.nameDisplay || 'mockName',
             id: res.locals.userId || 'mockId',
             email: res.locals.email || 'mockEmail',
             privilegio: res.locals.privilegio || 'mockPrivilegio'
         };
+        const isRootUser = false;
+        const doRefreshToken = false;
+        const setupATresponse = setupTokenCookie(res, previousPayload, isRootUser, doRefreshToken);
+        if (!setupATresponse.success) return res.status(205).send(setupATresponse.message);
+
         payload = previousPayload; // case4 -> reload *accessToken
     }
 
@@ -69,7 +66,7 @@ const sessionManager = async (req, res, next) => {
     res.locals.nameDisplay = payload.nameDisplay;
     res.locals.userId = payload.userId;
     res.locals.email = payload.email;
-    res.locals.privilegio = payload.privilegio;
+    res.locals.privilegio = "JEFEINMEDIATO";
 
     // exit
     return next();
@@ -79,7 +76,7 @@ const sessionManager = async (req, res, next) => {
  * Determina si existe un token no expirado en la DB relacionado con el usuario
  * @param {string} refreshToken - El token que se consultará.
  * @returns {bool} false - Indica que se debe ejecutar /logout
- * @returns {string} newAccessToken - El string del nuevo JWT AT.
+ * @returns {bool} true - Indica que se debe ejecutar /logout
  * @throws {Error} 
  */
 async function rationaleRefreshToken(refreshToken) {
@@ -115,7 +112,7 @@ async function rationaleRefreshToken(refreshToken) {
     return {
         success: true,
         message: '',
-        token: newAccessToken
+        token: true
     };
 };
 

@@ -1,86 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
+<!---------->
+<!-- BODY -->
+<!---------->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIVOC Recursos Humanos</title>
+<!-- Navbar Content -->
+<nav class="navbar">
+    <!-- Sidebar toggle icon -->
+    <svg class="icon-css" style="color: var(--white); cursor: pointer; margin: 0rem 1rem;" onclick="toggleSidebar()"
+        fill="currentColor" viewBox="0 0 24 24">
+        <path fill-rule="evenodd"
+            d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z"
+            clip-rule="evenodd" />
+    </svg>
 
-    <!-- Global JS Libraries -->
-    <script src="/js/scripts/swalFire.js" defer></script>
-    <script src="/js/scripts/pagination.js" defer></script>
-    <script src="/js/scripts/flatpickr.js" defer></script>
-    <script src="/js/scripts/flatpickr.spanish.js" defer></script>
-    <script src="/js/scripts/sidebar.js" defer></script>
-
-    <!-- Global CSS Libraries -->
-    <link rel="stylesheet" href="/css/fontAwesome.css">
-    <link rel="stylesheet" href="/css/bulma.css">
-    <link rel="stylesheet" href="/css/flatpickr.css">
-    <link rel="stylesheet" href="/css/navbar.css">
-
-</head>
-
-<body id="content" class="content">
-    <nav class="navbar"
-        style="background: linear-gradient(135deg, var(--dark-green), var(--light-blue)); 
-    padding: 0.5rem; height: 45px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-
-        <!-- Sidebar toggle icon -->
-        <i class="fa-solid fa-bars icon-css" style="color: var(--white); cursor: pointer; margin: 0rem 1rem;"
-            onclick="toggleSidebar()"></i>
-        <!-- User information -->
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <img src="/getPfp" class="pfp-css" onerror="this.onerror=null; this.src='/img/SIVOC_PFP.png';">
-
-            <text class="is-size-5 has-text-white"
-                style="margin-left: 1rem; margin-right: 1rem; text-shadow: 0 0 8px rgba(0, 0, 0, 1);">
-                <%= userName %>
-            </text>
-        </div>
-    </nav>
-
-
-    <!-- Sidebar -->
-    <div id="sidebar" class="sidebar">
-        <img src="/img/SIVOC_LOGO.png" style="width: 80%; display: block; margin: auto; margin-bottom: 1rem;">
-        <aside class="menu">
-            <ul class="menu-list" style="margin: 0.5rem 0.5rem;">
-
-                <!-- Botón Inicio -->
-                <a href="/login/inicio" class="has-text-white is-size-5 mt-2">
-                    <i class="fa-solid fa-house icon-css"></i> Inicio
-                </a>
-
-                <% if ( userPrivilege !=="colaborador" ) { %>
-                    <!-- Botón Usuarios -->
-                    <a href="/usuarios/accessUsersModule" class="has-text-white is-size-5 mt-2">
-                        <i class="fa-solid fa-users icon-css"></i> Usuarios
-                    </a>
-                    <% }; %>
-
-                        <% if ( userId !=="000" ) { %>
-                            <!-- Botón Permisos -->
-                            <a href="/permisos/accessPermitsModule" class="has-text-white is-size-5 mt-2">
-                                <i class="fa-solid fa-clipboard-user icon-css"></i> Permisos
-                            </a>
-                            <!-- Botón Vacaciones -->
-                            <a href="/vacaciones" class="has-text-white is-size-5 mt-2">
-                                <i class="fa-solid fa-umbrella-beach icon-css"></i> Vacaciones
-                            </a>
-                            <!-- Botón Cursos -->
-                            <a href="/cursos" class="has-text-white is-size-5 mt-2">
-                                <i class="fa-solid fa-person-chalkboard icon-css"></i> Cursos
-                            </a>
-                            <% }; %>
-
-                                <a href="/logout" class="has-text-white is-size-5 mt-2"
-                                    class="has-text-white is-size-4 mt-2">
-                                    <i class="fa-solid fa-right-from-bracket icon-css"></i> Cerrar Sesión
-                                </a>
-            </ul>
-        </aside>
+    <!-- User information -->
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <img src="/getPfp" class="pfp-css" onerror="this.onerror=null; this.src='/img/SIVOC_PFP.png';"
+            alt="Foto de perfil">
+        <span class="text-white text-lg ml-4 mr-4" style="text-shadow: 0 0 8px rgba(0, 0, 0, 1);">
+            (mockEjs)userName
+        </span>
     </div>
-</body>
+</nav>
 
-</html>
+<!---------->
+<!-- BODY -->
+<!---------->

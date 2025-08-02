@@ -21,8 +21,7 @@ const BACKEND_URL = process.env.BACKEND_URL;
 
 /**
  * Controla la creación de una sesión a través del LogIn en "public/login.js"
- * @async /login/postAuth
- * @function
+ * @async
  * @param {Object} req - Objeto de solicitud de Express.
  * @param {Object} res - Objeto de respuesta de Express.
  * @returns {Promise<Object>} Respuesta JSON con el resultado de la autenticación.
@@ -32,6 +31,7 @@ const BACKEND_URL = process.env.BACKEND_URL;
 async function postAuthentication(req, res) {
     try {
         const { email, password, remember } = req.body;
+        console.log("postAuthentication remember:", remember);
         const doRefreshToken = true;
 
         // 1. isRootValid: Si el usuario ingresa como usuario raíz, otorga un solo *accessToken 
@@ -60,7 +60,7 @@ async function postAuthentication(req, res) {
 
     } catch (error) {
         console.log(error);
-        return res.status(500).json({
+        return res.status(400).json({
             success: false,
             message: (ERROR_MESSAGE + '003'),
         });
@@ -70,7 +70,6 @@ async function postAuthentication(req, res) {
 /**
  * Función para verficiar si un usuario es válido para crear una sesión
  * @async
- * @function
  * @param {string} email - Email del usuario.
  * @param {string} password - Contraseña del usuario.
  * @returns {Promise<Object>} - Objeto JSON indicando success si es válido
@@ -126,9 +125,7 @@ async function isUserValid(email, password) {
 
 /**
  * Función para CREAR una sola cookie (y/o token) de la sesión recién verificada 
- * TO DO
  * @async
- * @function
  * @param {object} res - Objeto de respuesta de Express.
  * @param {object} userData - El JSON del usuario con la información de la DB
  * @param {bool} isRootUser - Indica si el accessToken es para el usuario raíz
@@ -178,6 +175,8 @@ async function setupTokenCookie(res, userData, isRootUser, doRefreshToken) {
 
         // Captura el error al consultar la base de datos
         const response = await fetchPostgREST(pgRestRequest);
+        console.log("fetchPostgREST response:", response);
+        console.log("fetchPostgREST isError?:", response.ok);
         if (!response.ok) {
             return {
                 success: false,
@@ -196,8 +195,7 @@ async function setupTokenCookie(res, userData, isRootUser, doRefreshToken) {
 
 /**
  * Remueve las cookies y también remueve la sesión de la base de datos
- * @async /logout
- * @function
+ * @async
  * @param {Object} req - Objeto de solicitud de Express.
  * @param {Object} res - Objeto de respuesta de Express.
  * @returns {Promise<Object>} Respuesta JSON.
