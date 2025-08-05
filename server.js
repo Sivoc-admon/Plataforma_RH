@@ -11,6 +11,9 @@ const { sessionManager } = require('./utils/middlewares/sessionManager');
 const { startPostgrest } = require('./utils/scripts/postgrestRunner');
 const DEFAULT_PORT = 3000;
 
+// Performance
+const compression = require('compression')
+app.use(compression())
 
 /**
  * Configura los middlewares globales de la aplicación

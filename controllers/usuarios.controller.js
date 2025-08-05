@@ -5,7 +5,6 @@ const { fetchPostgREST } = require('../utils/scripts/postgrestHelper');
  * Constantes para la configuración del módulo de usuarios.
  */
 const ERROR_MESSAGE = process.env.ERROR_MESSAGE;
-const NODE_ENV = process.env.NODE_ENV;
 const BACKEND_URL = process.env.BACKEND_URL;
 
 /**
@@ -31,11 +30,20 @@ async function verTableroActivados(req, res) {
     // Captura el error al consultar la base de datos
     const response = await fetchPostgREST(pgRestRequest);
     if (!response.ok) {
-        return res.status(500).send(process.env.ERROR_MESSAGE + '007');
+        return res.status(500).send(ERROR_MESSAGE + '007');
     }
 
     const dataUsuarios = await response.json();
-    console.log("dataUsuarios; from postgREST usuarios: ", dataUsuarios);
+    //console.log("dataUsuarios; from postgREST usuarios: ", dataUsuarios);
+    /*
+        ...{
+            id: 36,
+            id_equipo: null,
+            email: 'daguilar@ingenieria-sivoc.com',
+            privilegio: 'COLABORADOR',
+            habilitado: true
+        }
+    */
 
     // Despliega la vista // TO DO full modulo-usuarios dummy data script
     // la base de datos de sivoc_scripting será wipeOut wipeIn con puros scripts

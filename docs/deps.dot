@@ -7,9 +7,9 @@ strict digraph "dependency-cruiser output"{
     "canvg" [label=<canvg> tooltip="canvg" ]
     "child_process" [label=<child_process> tooltip="child_process" URL="https://nodejs.org/api/child_process.html" color="grey" fontcolor="grey"]
     subgraph "cluster_controllers" {label="controllers" "controllers/login.controller.js" [label=<login.controller.js> tooltip="login.controller.js" URL="controllers/login.controller.js" ] }
+    "controllers/login.controller.js" -> "utils/middlewares/sessionManager.js"
     "controllers/login.controller.js" -> "utils/scripts/postgrestHelper.js"
     "controllers/login.controller.js" -> "node_modules/bcryptjs" [penwidth="1.0"]
-    "controllers/login.controller.js" -> "crypto" [style="dashed" penwidth="1.0"]
     "controllers/login.controller.js" -> "node_modules/jsonwebtoken" [penwidth="1.0"]
     subgraph "cluster_controllers" {label="controllers" "controllers/usuarios.controller.js" [label=<usuarios.controller.js> tooltip="usuarios.controller.js" URL="controllers/usuarios.controller.js" ] }
     "controllers/usuarios.controller.js" -> "utils/IAM.json"
@@ -19,10 +19,12 @@ strict digraph "dependency-cruiser output"{
     "html2canvas" [label=<html2canvas> tooltip="html2canvas" ]
     subgraph "cluster_node_modules" {label="node_modules" "node_modules/bcryptjs" [label=<bcryptjs> tooltip="bcryptjs" URL="https://www.npmjs.com/package/bcryptjs" shape="box3d" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] }
     subgraph "cluster_node_modules" {label="node_modules" "node_modules/canvg" [label=<canvg> tooltip="canvg" URL="https://www.npmjs.com/package/canvg" shape="box3d" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] }
+    subgraph "cluster_node_modules" {label="node_modules" "node_modules/compression" [label=<compression> tooltip="compression" URL="https://www.npmjs.com/package/compression" shape="box3d" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] }
     subgraph "cluster_node_modules" {label="node_modules" "node_modules/cookie-parser" [label=<cookie-parser> tooltip="cookie-parser" URL="https://www.npmjs.com/package/cookie-parser" shape="box3d" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] }
     subgraph "cluster_node_modules" {label="node_modules" "node_modules/dompurify" [label=<dompurify> tooltip="dompurify" URL="https://www.npmjs.com/package/dompurify" shape="box3d" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] }
     subgraph "cluster_node_modules" {label="node_modules" "node_modules/dotenv" [label=<dotenv> tooltip="dotenv" URL="https://www.npmjs.com/package/dotenv" shape="box3d" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] }
     subgraph "cluster_node_modules" {label="node_modules" "node_modules/express" [label=<express> tooltip="express" URL="https://www.npmjs.com/package/express" shape="box3d" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] }
+    subgraph "cluster_node_modules" {label="node_modules" "node_modules/express-rate-limit" [label=<express-rate-limit> tooltip="express-rate-limit" URL="https://www.npmjs.com/package/express-rate-limit" shape="box3d" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] }
     subgraph "cluster_node_modules" {label="node_modules" "node_modules/html2canvas" [label=<html2canvas> tooltip="html2canvas" URL="https://www.npmjs.com/package/html2canvas" shape="box3d" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] }
     subgraph "cluster_node_modules" {label="node_modules" "node_modules/jsonwebtoken" [label=<jsonwebtoken> tooltip="jsonwebtoken" URL="https://www.npmjs.com/package/jsonwebtoken" shape="box3d" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] }
     subgraph "cluster_node_modules" {label="node_modules" "node_modules/jspdf" [label=<jspdf> tooltip="jspdf" URL="https://www.npmjs.com/package/jspdf" shape="box3d" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] }
@@ -45,10 +47,12 @@ strict digraph "dependency-cruiser output"{
     "public/js/scripts/jspdf.js" -> "worker_threads" [style="dashed" penwidth="1.0"]
     subgraph "cluster_public" {label="public" subgraph "cluster_public/js" {label="js" subgraph "cluster_public/js/scripts" {label="scripts" "public/js/scripts/luxon.js" [label=<luxon.js> tooltip="no-orphans" URL="public/js/scripts/luxon.js" fillcolor="#ccffcc" fontcolor="orange" color="orange"] } } }
     subgraph "cluster_public" {label="public" subgraph "cluster_public/js" {label="js" subgraph "cluster_public/js/scripts" {label="scripts" "public/js/scripts/tabulator.js" [label=<tabulator.js> tooltip="no-orphans" URL="public/js/scripts/tabulator.js" fillcolor="#ccffcc" fontcolor="orange" color="orange"] } } }
+    subgraph "cluster_public" {label="public" subgraph "cluster_public/js" {label="js" subgraph "cluster_public/js/scripts" {label="scripts" "public/js/scripts/validator.js" [label=<validator.js> tooltip="no-orphans" URL="public/js/scripts/validator.js" fillcolor="#ccffcc" fontcolor="orange" color="orange"] } } }
     subgraph "cluster_public" {label="public" subgraph "cluster_public/js" {label="js" subgraph "cluster_public/js/scripts" {label="scripts" "public/js/scripts/xlsx.js" [label=<xlsx.js> tooltip="no-orphans" URL="public/js/scripts/xlsx.js" fillcolor="#ccffcc" fontcolor="orange" color="orange"] } } }
     subgraph "cluster_public" {label="public" subgraph "cluster_public/js" {label="js" subgraph "cluster_public/js/usuarios" {label="usuarios" "public/js/usuarios/tableroUsuariosActivados.js" [label=<tableroUsuariosActivados.js> tooltip="no-orphans" URL="public/js/usuarios/tableroUsuariosActivados.js" fillcolor="#ccffcc" fontcolor="orange" color="orange"] } } }
     subgraph "cluster_routes" {label="routes" "routes/global.routes.js" [label=<global.routes.js> tooltip="global.routes.js" URL="routes/global.routes.js" ] }
     "routes/global.routes.js" -> "controllers/login.controller.js"
+    "routes/global.routes.js" -> "utils/middlewares/rateLimiter.js"
     "routes/global.routes.js" -> "routes/usuarios.routes.js"
     "routes/global.routes.js" -> "node_modules/express" [penwidth="1.0"]
     subgraph "cluster_routes" {label="routes" "routes/usuarios.routes.js" [label=<usuarios.routes.js> tooltip="usuarios.routes.js" URL="routes/usuarios.routes.js" ] }
@@ -58,15 +62,18 @@ strict digraph "dependency-cruiser output"{
     "server.js" -> "routes/global.routes.js"
     "server.js" -> "utils/middlewares/sessionManager.js"
     "server.js" -> "utils/scripts/postgrestRunner.js"
+    "server.js" -> "node_modules/compression" [penwidth="1.0"]
     "server.js" -> "node_modules/cookie-parser" [penwidth="1.0"]
     "server.js" -> "node_modules/dotenv" [penwidth="1.0"]
     "server.js" -> "node_modules/express" [penwidth="1.0"]
     "server.js" -> "path" [style="dashed" penwidth="1.0"]
     "tailwind.config.js" [label=<tailwind.config.js> tooltip="no-orphans" URL="tailwind.config.js" fillcolor="#ccffcc" fontcolor="orange" color="orange"]
     subgraph "cluster_utils" {label="utils" "utils/IAM.json" [label=<IAM.json> tooltip="IAM.json" URL="utils/IAM.json" fillcolor="#ffee44"] }
+    subgraph "cluster_utils" {label="utils" subgraph "cluster_utils/middlewares" {label="middlewares" "utils/middlewares/rateLimiter.js" [label=<rateLimiter.js> tooltip="rateLimiter.js" URL="utils/middlewares/rateLimiter.js" ] } }
+    "utils/middlewares/rateLimiter.js" -> "node_modules/express-rate-limit" [penwidth="1.0"]
     subgraph "cluster_utils" {label="utils" subgraph "cluster_utils/middlewares" {label="middlewares" "utils/middlewares/sessionManager.js" [label=<sessionManager.js> tooltip="sessionManager.js" URL="utils/middlewares/sessionManager.js" ] } }
-    "utils/middlewares/sessionManager.js" -> "controllers/login.controller.js"
     "utils/middlewares/sessionManager.js" -> "utils/scripts/postgrestHelper.js"
+    "utils/middlewares/sessionManager.js" -> "crypto" [style="dashed" penwidth="1.0"]
     "utils/middlewares/sessionManager.js" -> "node_modules/jsonwebtoken" [penwidth="1.0"]
     subgraph "cluster_utils" {label="utils" subgraph "cluster_utils/scripts" {label="scripts" "utils/scripts/postgrestHelper.js" [label=<postgrestHelper.js> tooltip="postgrestHelper.js" URL="utils/scripts/postgrestHelper.js" ] } }
     "utils/scripts/postgrestHelper.js" -> "node_modules/jsonwebtoken" [penwidth="1.0"]

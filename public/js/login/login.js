@@ -1,5 +1,5 @@
 // login.js
-function logInLogic() { // Renamed to avoid conflicts and encapsulate logic
+function logInLogic() {
     return {
         email: '',
         password: '',
@@ -15,9 +15,11 @@ function logInLogic() { // Renamed to avoid conflicts and encapsulate logic
             const password = this.password.trim();
             const remember = this.remember;
 
-            const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            const isEmailValid = validator.isEmail(email);
+            const isPasswordShort = validator.isLength(String(password), { max: 33 });
+            const isEmailShort = validator.isLength(String(email), { max: 54 });
 
-            if (!email || !password || !isEmailValid) {
+            if (!email || !password || !isEmailValid || !isPasswordShort || !isEmailShort) {
                 this.errorMessage = 'Asegúrate de llenar todos los campos correctamente.';
                 this.isLoading = false;
                 return;

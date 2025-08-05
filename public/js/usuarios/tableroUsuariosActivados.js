@@ -50,7 +50,7 @@ function usersModule() {
             if (typeof window.usersData !== 'undefined') {
                 this.usersRows = window.usersData;
             }
-            
+
             // Initialize Tabulator table
             this.$nextTick(() => {
                 this.initializeTable();
@@ -141,7 +141,7 @@ function usersModule() {
                         title: "Acciones",
                         field: "actions",
                         formatter: (cell) => {
-                            return `
+                            return DOMPurify.sanitize(`
                                 <div class="flex justify-center space-x-2">
                                     <button class="edit-btn inline-flex items-center justify-center w-8 h-8 text-blue-600 bg-blue-100 rounded-full hover:bg-blue-200 transition-colors duration-150">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@ function usersModule() {
                                         </svg>
                                     </button>
                                 </div>
-                            `;
+                            `);
                         },
                         width: 150,
                         hozAlign: "center",
@@ -185,10 +185,10 @@ function usersModule() {
                 if (this.searchQuery.trim()) {
                     this.table.setFilter([
                         [
-                            {field: "nombre", type: "like", value: this.searchQuery},
-                            {field: "apellidoP", type: "like", value: this.searchQuery},
-                            {field: "apellidoM", type: "like", value: this.searchQuery},
-                            {field: "area", type: "like", value: this.searchQuery}
+                            { field: "nombre", type: "like", value: this.searchQuery },
+                            { field: "apellidoP", type: "like", value: this.searchQuery },
+                            { field: "apellidoM", type: "like", value: this.searchQuery },
+                            { field: "area", type: "like", value: this.searchQuery }
                         ]
                     ]);
                 } else {
@@ -205,12 +205,6 @@ function usersModule() {
                 month: 'long',
                 day: 'numeric'
             });
-        },
-
-        validateInput(value, pattern) {
-            if (!value || value.trim() === '') return false;
-            if (pattern && !pattern.test(value.trim())) return false;
-            return true;
         },
 
         // Privilege display helpers
@@ -248,9 +242,8 @@ function usersModule() {
         // Show notification
         showNotification(title, message, type = 'success') {
             const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
-                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-            }`;
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                }`;
             notification.innerHTML = DOMPurify.sanitize(`
                 <div class="flex items-center">
                     <div class="flex-1">
@@ -293,7 +286,8 @@ function usersModule() {
         // Add User functionality
         addUser() {
             this.resetNewUserForm();
-            this.openModal(`
+            this.openModal(
+                DOMPurify.sanitize(`
                 <div class="px-6 py-4">
                     <div class="flex items-center mb-6">
                         <svg class="w-8 h-8 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -391,7 +385,7 @@ function usersModule() {
                         </div>
                     </form>
                 </div>
-            `);
+            `));
         },
 
         // Submit add user form
@@ -407,8 +401,7 @@ function usersModule() {
                     return;
                 }
 
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailPattern.test(this.newUser.email)) {
+                if (!validator.isEmail(this.newUser.email)) {
                     this.showNotification('Error', 'El formato del correo electrónico no es válido.', 'error');
                     return;
                 }
@@ -420,12 +413,12 @@ function usersModule() {
                     body: JSON.stringify({ email: this.newUser.email })
                 });
                 const emailData = await emailResponse.json();
-                
+
                 if (!emailData.success) {
                     this.showNotification('Error', 'Error técnico #130.', 'error');
                     return;
                 }
-                
+
                 if (emailData.exists) {
                     this.showNotification('Error', 'El correo electrónico ya se encuentra ocupado.', 'error');
                     return;
@@ -473,7 +466,8 @@ function usersModule() {
             this.newUser = { ...user };
             this.availablePuestos = this.areaToPuestos[user.area] || [];
 
-            this.openModal(`
+            this.openModal(
+                DOMPurify.sanitize(`
                 <div class="px-6 py-4">
                     <div class="flex items-center mb-6">
                         <svg class="w-8 h-8 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -565,7 +559,7 @@ function usersModule() {
                         </div>
                     </form>
                 </div>
-            `);
+            `));
         },
 
         // Submit edit user form
@@ -581,8 +575,7 @@ function usersModule() {
                     return;
                 }
 
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailPattern.test(this.newUser.email)) {
+                if (!validator.isEmail(this.newUser.email)) {
                     this.showNotification('Error', 'El formato del correo electrónico no es válido.', 'error');
                     return;
                 }
@@ -628,7 +621,8 @@ function usersModule() {
 
         // Deactivate User functionality
         deactivateUser(user) {
-            this.openModal(`
+            this.openModal(
+                DOMPurify.sanitize(`
                 <div class="px-6 py-4">
                     <div class="flex items-center mb-6">
                         <svg class="w-8 h-8 mr-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -657,7 +651,7 @@ function usersModule() {
                         </button>
                     </div>
                 </div>
-            `);
+            `));
         },
 
         // Confirm deactivate user
@@ -688,7 +682,8 @@ function usersModule() {
 
         // Change Password functionality
         changePassword(user) {
-            this.openModal(`
+            this.openModal(
+                DOMPurify.sanitize(`
                 <div class="px-6 py-4">
                     <div class="flex items-center mb-6">
                         <svg class="w-8 h-8 mr-3 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -721,7 +716,7 @@ function usersModule() {
                         </div>
                     </form>
                 </div>
-            `);
+            `));
         },
 
         // Confirm change password

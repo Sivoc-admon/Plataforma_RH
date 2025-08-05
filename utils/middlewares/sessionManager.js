@@ -2,19 +2,12 @@ const jwt = require('jsonwebtoken');
 const { fetchPostgREST } = require('../scripts/postgrestHelper');
 const URL_TAG = process.env.URL_TAG;
 const ERROR_MESSAGE = process.env.ERROR_MESSAGE;
-
-/**
- * Constantes para la configuración del módulo de autenticación.
- */
 const ROOT_USERNAME = process.env.ROOT_USERNAME;
-
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const ACCESS_TOKEN_EXPIRATION = process.env.ACCESS_TOKEN_EXPIRATION;
 const AT_COOKIE_NAME = process.env.AT_COOKIE_NAME;
-
 const REFRESH_TOKEN_EXPIRATION = process.env.REFRESH_TOKEN_EXPIRATION;
 const RT_COOKIE_NAME = process.env.RT_COOKIE_NAME;
-
 const NODE_ENV = process.env.NODE_ENV;
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -45,14 +38,14 @@ const sessionManager = async (req, res, next) => {
 
     // Verifica la autenticidad del *accessToken
     try {
-        const accessToken = req.cookies[process.env.AT_COOKIE_NAME];
-        const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+        const accessToken = req.cookies[AT_COOKIE_NAME];
+        const decoded = jwt.verify(accessToken, ACCESS_TOKEN_SECRET);
         payload = decoded; // case1&2 -> accessToken Working
 
     } catch (error) {
         // En caso de que el token no sea auténtico...
         // Consulta en la base de datos si el *refreshToken es auténtico
-        const refreshToken = req.cookies[process.env.RT_COOKIE_NAME];
+        const refreshToken = req.cookies[RT_COOKIE_NAME];
         const rationaleResponse = await rationaleRefreshToken(refreshToken);
         if (!rationaleResponse.success) return res.status(205).send(rationaleResponse.message);
 
@@ -98,7 +91,7 @@ async function rationaleRefreshToken(refreshToken) {
     // Ejecuta el fetch SELECT user_id FROM sesion_activa WHERE token = ${refreshToken};
     const pgRestRequest = {
         fetchMethod: 'GET',
-        fetchUrl: `${process.env.BACKEND_URL}/sesion_activa?select=user_id&token=eq.${refreshToken}`,
+        fetchUrl: `${BACKEND_URL}/sesion_activa?select=user_id&token=eq.${refreshToken}`,
         fetchBody: {}
     }
 
@@ -107,7 +100,7 @@ async function rationaleRefreshToken(refreshToken) {
     if (!response.ok) {
         return {
             success: false,
-            message: process.env.ERROR_MESSAGE + '002',
+            message: ERROR_MESSAGE + '002',
             token: false
         };
     }
@@ -143,17 +136,16 @@ async function findActiveSession(userId) {
     // http://localhost:3010/sesion_activa
     const pgRestRequest = {
         fetchMethod: 'GET',
-        fetchUrl: `${process.env.BACKEND_URL}/sesion_activa?user_id=eq.${userId}`,
+        fetchUrl: `${BACKEND_URL}/sesion_activa?user_id=eq.${userId}`,
         fetchBody: {}
     }
 
     // Captura el error al consultar la base de datos
     const response = await fetchPostgREST(pgRestRequest);
-    console.log("findActiveSession's fetch:", response);
     if (!response.ok) {
         return {
             success: false,
-            message: process.env.ERROR_MESSAGE + '008',
+            message: ERROR_MESSAGE + '008',
             hasLongSession: false
         };
     }
@@ -231,7 +223,7 @@ async function setupTokenCookie(res, userData, isRootUser, doRefreshToken) {
         if (!response.ok) {
             return {
                 success: false,
-                message: process.env.ERROR_MESSAGE + '004',
+                message: ERROR_MESSAGE + '004',
             };
         }
     }

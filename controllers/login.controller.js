@@ -8,15 +8,6 @@ const { setupTokenCookie, findActiveSession } = require('../utils/middlewares/se
 const ERROR_MESSAGE = process.env.ERROR_MESSAGE;
 const ROOT_USERNAME = process.env.ROOT_USERNAME;
 const ROOT_PASSWORD = process.env.ROOT_PASSWORD;
-
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
-const ACCESS_TOKEN_EXPIRATION = process.env.ACCESS_TOKEN_EXPIRATION;
-const AT_COOKIE_NAME = process.env.AT_COOKIE_NAME;
-
-const REFRESH_TOKEN_EXPIRATION = process.env.REFRESH_TOKEN_EXPIRATION;
-const RT_COOKIE_NAME = process.env.RT_COOKIE_NAME;
-
-const NODE_ENV = process.env.NODE_ENV;
 const BACKEND_URL = process.env.BACKEND_URL;
 
 /**
