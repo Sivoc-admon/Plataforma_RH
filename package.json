@@ -1,11 +1,20 @@
 {
   "name": "plataforma_rh",
   "version": "1.0.0",
+  "description": "SIVOC es una empresa de servicio dedicada a la administración y puesta en marcha, construcción, venta y comercialización para sistemas de: generación, transmisión, transformación y distribución de energía eléctrica, energías renovables, comunicaciones y telecomunicaciones para baja, media, alta y extra alta tensión.",
   "main": "server.js",
+  "directories": {
+    "test": "tests"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "playwright": "^1.54.2"
+  }
 }

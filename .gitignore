@@ -3,6 +3,11 @@ node_modules/
 npm-debug.log
 .env
 
+# Video documentation output
+videos/
+test-results/
+playwright-report/
+
 # Logs
 logs/
 *.log
