@@ -1,8 +1,23 @@
 const jwt = require('jsonwebtoken');
 const { fetchPostgREST } = require('../scripts/postgrestHelper');
-const { setupTokenCookie } = require("../../controllers/login.controller")
 const URL_TAG = process.env.URL_TAG;
 const ERROR_MESSAGE = process.env.ERROR_MESSAGE;
+
+/**
+ * Constantes para la configuración del módulo de autenticación.
+ */
+const ROOT_USERNAME = process.env.ROOT_USERNAME;
+
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+const ACCESS_TOKEN_EXPIRATION = process.env.ACCESS_TOKEN_EXPIRATION;
+const AT_COOKIE_NAME = process.env.AT_COOKIE_NAME;
+
+const REFRESH_TOKEN_EXPIRATION = process.env.REFRESH_TOKEN_EXPIRATION;
+const RT_COOKIE_NAME = process.env.RT_COOKIE_NAME;
+
+const NODE_ENV = process.env.NODE_ENV;
+const BACKEND_URL = process.env.BACKEND_URL;
+
 
 /**
  * Middleware global para gestionar las sesiones
@@ -13,7 +28,6 @@ const ERROR_MESSAGE = process.env.ERROR_MESSAGE;
 const sessionManager = async (req, res, next) => {
     res.locals.URL_TAG = URL_TAG;
     res.locals.ERROR_MESSAGE = ERROR_MESSAGE;
-    //console.log("req.url:", req.url);
 
     // Rutas de utilidades: el sistema accede a estas rutas para obtener recursos
     if (!req.url.startsWith(URL_TAG))
@@ -66,14 +80,14 @@ const sessionManager = async (req, res, next) => {
     res.locals.nameDisplay = payload.nameDisplay;
     res.locals.userId = payload.userId;
     res.locals.email = payload.email;
-    res.locals.privilegio = "JEFEINMEDIATO";
+    res.locals.privilegio = payload.privilegio;
 
     // exit
     return next();
 };
 
 /**
- * Determina si existe un token no expirado en la DB relacionado con el usuario
+ * Determina si existe un token no ha expirado en la DB relacionado con el usuario
  * @param {string} refreshToken - El token que se consultará.
  * @returns {bool} false - Indica que se debe ejecutar /logout
  * @returns {bool} true - Indica que se debe ejecutar /logout
@@ -116,4 +130,117 @@ async function rationaleRefreshToken(refreshToken) {
     };
 };
 
-module.exports = { sessionManager };
+
+/**
+ * Determina si existe una sesión activa (refreshToken) para un user ID
+ * @param {int} userId - El id que se consultará.
+ * @returns {object} - success:true + hasLongSession:true = sesión activa y no requiere de sesión token
+ * @throws {Error} 
+ */
+async function findActiveSession(userId) {
+
+    // Ejecuta el fetch SELECT * FROM sesion_activa WHERE user_id = ${userId};
+    // http://localhost:3010/sesion_activa
+    const pgRestRequest = {
+        fetchMethod: 'GET',
+        fetchUrl: `${process.env.BACKEND_URL}/sesion_activa?user_id=eq.${userId}`,
+        fetchBody: {}
+    }
+
+    // Captura el error al consultar la base de datos
+    const response = await fetchPostgREST(pgRestRequest);
+    console.log("findActiveSession's fetch:", response);
+    if (!response.ok) {
+        return {
+            success: false,
+            message: process.env.ERROR_MESSAGE + '008',
+            hasLongSession: false
+        };
+    }
+
+    // Debido a que no existe una sesión activa envia false
+    const tokenDbData = await response.json();
+    if (!tokenDbData || tokenDbData.length === 0) {
+        return {
+            success: true,
+            message: '',
+            hasLongSession: false
+        };
+    }
+
+    // En caso contrario, regresa true indicando que se deberá generar un *accessToken
+    return {
+        success: true,
+        message: '',
+        hasLongSession: true
+    };
+};
+
+/**
+ * Función para CREAR una sola cookie (y/o token) de la sesión recién verificada 
+ * @async
+ * @param {object} res - Objeto de respuesta de Express.
+ * @param {object} userData - El JSON del usuario con la información de la DB
+ * @param {bool} isRootUser - Indica si el accessToken es para el usuario raíz
+ * @param {bool} doRefreshToken - Indica si se requiere de un refresh token
+ * @returns {bool} - Boolean que indica true si la operación fue exitosa
+ */
+async function setupTokenCookie(res, userData, isRootUser, doRefreshToken) {
+
+    // Elige el payload correcto según si el usuario es el RootUser o un usuario común
+    const userPayload = isRootUser
+        ? { nameDisplay: 'Usuario Raíz', userId: '000', email: ROOT_USERNAME, privilegio: 'DIRECTIVO' }
+        : { nameDisplay: '(mock)userData.name', userId: userData.id, email: userData.email, privilegio: userData.privilegio };
+
+    // Elige si la cookie será para un *refreshToken o un *accessToken (newToken, maxAge, cookieName)
+    const newToken = doRefreshToken //newToken
+        ? require('crypto').randomBytes(64).toString('hex') // Utiliza hexadecimal para refresh
+        : jwt.sign(userPayload, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRATION });
+    const maxAge = doRefreshToken //maxAge
+        ? parseFloat(REFRESH_TOKEN_EXPIRATION.slice(0, -1)) * 24 * 60 * 60 * 1000
+        : parseFloat(ACCESS_TOKEN_EXPIRATION.slice(0, -1)) * 24 * 60 * 60 * 1000;
+    const cookieName = doRefreshToken //cookieName
+        ? RT_COOKIE_NAME
+        : AT_COOKIE_NAME;
+
+    // Envia al navegador la cookie
+    res.cookie(cookieName, newToken, {
+        httpOnly: true,
+        secure: NODE_ENV === 'production', // Solo HTTPS en producción
+        sameSite: 'strict',
+        maxAge: maxAge,
+    });
+
+    // Si el token es *refreshToken entonces también añadelo a la base de datos (sesion_activa)
+    if (doRefreshToken) {
+
+        // Ejecuta el fetch SELECT user_id FROM sesion_activa WHERE token = ${refreshToken};
+        const expires_at = new Date(Date.now() + maxAge);
+        const pgRestRequest = {
+            fetchMethod: 'POST',
+            fetchUrl: `${BACKEND_URL}/sesion_activa`,
+            fetchBody: {
+                user_id: userData.id,
+                token: newToken,
+                expires_at: expires_at
+            }
+        }
+
+        // Captura el error al consultar la base de datos
+        const response = await fetchPostgREST(pgRestRequest);
+        if (!response.ok) {
+            return {
+                success: false,
+                message: process.env.ERROR_MESSAGE + '004',
+            };
+        }
+    }
+
+    // exit
+    return {
+        success: true,
+        message: ''
+    }
+};
+
+module.exports = { sessionManager, findActiveSession, setupTokenCookie };

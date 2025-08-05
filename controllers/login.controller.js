@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { fetchPostgREST } = require('../utils/scripts/postgrestHelper');
-
+const { setupTokenCookie, findActiveSession } = require('../utils/middlewares/sessionManager');
 /**
  * Constantes para la configuración del módulo de autenticación.
  */
@@ -31,7 +31,6 @@ const BACKEND_URL = process.env.BACKEND_URL;
 async function postAuthentication(req, res) {
     try {
         const { email, password, remember } = req.body;
-        console.log("postAuthentication remember:", remember);
         const doRefreshToken = true;
 
         // 1. isRootValid: Si el usuario ingresa como usuario raíz, otorga un solo *accessToken 
@@ -50,9 +49,12 @@ async function postAuthentication(req, res) {
         const AT_response = await setupTokenCookie(res, userValid.data, isRootValid, !doRefreshToken);
         if (!AT_response.success) return res.status(200).json({ success: false, message: AT_response.message });
 
-        if (remember) { // Crea una sesión larga solo si el usuario pide que lo recuerden
-            const RF_response = await setupTokenCookie(res, userValid.data, isRootValid, doRefreshToken);
-            if (!RF_response.success) return res.status(200).json({ success: false, message: RF_response.message });
+        if (remember) { // Crea una sesión larga solo si el usuario pide que lo recuerden y si no tiene una sesión activa
+            const userSession = await findActiveSession(userValid.data.id);
+            if (!userSession.hasLongSession) {
+                const RF_response = await setupTokenCookie(res, userValid.data, isRootValid, doRefreshToken);
+                if (!RF_response.success) return res.status(200).json({ success: false, message: RF_response.message });
+            }
         }
 
         // exit
@@ -124,76 +126,6 @@ async function isUserValid(email, password) {
 };
 
 /**
- * Función para CREAR una sola cookie (y/o token) de la sesión recién verificada 
- * @async
- * @param {object} res - Objeto de respuesta de Express.
- * @param {object} userData - El JSON del usuario con la información de la DB
- * @param {bool} isRootUser - Indica si el accessToken es para el usuario raíz
- * @param {bool} doRefreshToken - Indica si se requiere de un refresh token
- * @returns {bool} - Boolean que indica true si la operación fue exitosa
- */
-async function setupTokenCookie(res, userData, isRootUser, doRefreshToken) {
-
-    // Elige el payload correcto según si el usuario es el RootUser o un usuario común
-    const userPayload = isRootUser
-        ? { nameDisplay: 'Usuario Raíz', userId: '000', email: ROOT_USERNAME, privilegio: 'DIRECTIVO' }
-        : { nameDisplay: '(mock)userData.name', userId: userData.id, email: userData.email, privilegio: userData.privilegio };
-
-    // Elige si la cookie será para un *refreshToken o un *accessToken (newToken, maxAge, cookieName)
-    const newToken = doRefreshToken //newToken
-        ? require('crypto').randomBytes(64).toString('hex') // Utiliza hexadecimal para refresh
-        : jwt.sign(userPayload, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRATION });
-    const maxAge = doRefreshToken //maxAge
-        ? parseFloat(REFRESH_TOKEN_EXPIRATION.slice(0, -1)) * 24 * 60 * 60 * 1000
-        : parseFloat(ACCESS_TOKEN_EXPIRATION.slice(0, -1)) * 24 * 60 * 60 * 1000;
-    const cookieName = doRefreshToken //cookieName
-        ? RT_COOKIE_NAME
-        : AT_COOKIE_NAME;
-
-    // Envia al navegador la cookie
-    res.cookie(cookieName, newToken, {
-        httpOnly: true,
-        secure: NODE_ENV === 'production', // Solo HTTPS en producción
-        sameSite: 'strict',
-        maxAge: maxAge,
-    });
-
-    // Si el token es *refreshToken entonces también añadelo a la base de datos (sesion_activa)
-    if (doRefreshToken) {
-
-        // Ejecuta el fetch SELECT user_id FROM sesion_activa WHERE token = ${refreshToken};
-        const expires_at = new Date(Date.now() + maxAge);
-        const pgRestRequest = {
-            fetchMethod: 'POST',
-            fetchUrl: `${BACKEND_URL}/sesion_activa`,
-            fetchBody: {
-                user_id: userData.id,
-                token: newToken,
-                expires_at: expires_at
-            }
-        }
-
-        // Captura el error al consultar la base de datos
-        const response = await fetchPostgREST(pgRestRequest);
-        console.log("fetchPostgREST response:", response);
-        console.log("fetchPostgREST isError?:", response.ok);
-        if (!response.ok) {
-            return {
-                success: false,
-                message: process.env.ERROR_MESSAGE + '004',
-            };
-        }
-    }
-
-    // exit
-    return {
-        success: true,
-        message: ''
-    }
-}
-
-
-/**
  * Remueve las cookies y también remueve la sesión de la base de datos
  * @async
  * @param {Object} req - Objeto de solicitud de Express.
@@ -225,4 +157,4 @@ async function doLogout(req, res) {
     return res.redirect(`${process.env.URL_TAG}/login`);
 }
 
-module.exports = { postAuthentication, doLogout, setupTokenCookie };
+module.exports = { postAuthentication, doLogout };

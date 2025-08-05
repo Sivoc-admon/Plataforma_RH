@@ -438,7 +438,7 @@ function usersModule() {
                 });
 
                 const fileInput = document.querySelector('input[type="file"]');
-                if (fileInput && fileInput.files[0]) {
+                if (fileInput?.files[0]) {
                     formData.append('files', fileInput.files[0]);
                 }
 
@@ -462,6 +462,7 @@ function usersModule() {
                 }
 
             } catch (error) {
+                console.log("error catch", error);
                 this.showNotification('Error', 'Error de conexión.', 'error');
             }
         },
@@ -620,6 +621,7 @@ function usersModule() {
                 }
 
             } catch (error) {
+                console.log("error catch", error);
                 this.showNotification('Error', 'Error de conexión.', 'error');
             }
         },
@@ -679,6 +681,7 @@ function usersModule() {
                 }
 
             } catch (error) {
+                console.log("error catch", error);
                 this.showNotification('Error', 'Error de conexión.', 'error');
             }
         },
@@ -751,6 +754,7 @@ function usersModule() {
                 }
 
             } catch (error) {
+                console.log("error catch", error);
                 this.showNotification('Error', 'Error de conexión.', 'error');
             }
         },
@@ -760,6 +764,7 @@ function usersModule() {
             try {
                 window.location.href = '/usuarios/restoreUsersView';
             } catch (error) {
+                console.log("error catch", error);
                 this.showNotification('Error', 'Error al navegar.', 'error');
             }
         },
@@ -768,6 +773,7 @@ function usersModule() {
             try {
                 window.location.href = '/usuarios/configureTeamView';
             } catch (error) {
+                console.log("error catch", error);
                 this.showNotification('Error', 'Error al navegar.', 'error');
             }
         },
@@ -783,6 +789,7 @@ function usersModule() {
                     this.showNotification('Éxito', 'PDF descargado correctamente.');
                 }
             } catch (error) {
+                console.log("error catch", error);
                 this.showNotification('Error', 'Error al descargar PDF.', 'error');
             }
         },
@@ -796,6 +803,7 @@ function usersModule() {
                     this.showNotification('Éxito', 'Excel descargado correctamente.');
                 }
             } catch (error) {
+                console.log("error catch", error);
                 this.showNotification('Error', 'Error al descargar Excel.', 'error');
             }
         }

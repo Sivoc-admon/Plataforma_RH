@@ -33,7 +33,6 @@ async function fetchPostgREST(requestJSON) {
         fetchOptions.body = JSON.stringify(requestJSON.fetchBody);
     }
     const response = await fetch(requestJSON.fetchUrl, fetchOptions);
-    //console.log("response from PostgREST as", fetchOptions.method, ": ", response);
     return response;
 }
 
