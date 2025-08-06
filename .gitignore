@@ -5,9 +5,6 @@ node_modules/
 # SonarQube
 .scannerwork
 
-# PostgREST
-postgrest.conf
-
 # File containers
 uploads/cursos/*
 uploads/permisos/*

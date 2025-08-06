@@ -2,7 +2,7 @@
 const rateLimit = require('express-rate-limit');
 const generalLimiter = rateLimit({
     windowMs: 30 * 1000, // 1 minuto
-    max: 6, // máximo N peticiones al endpoint por IP por minuto
+    max: 6, // 600 for testing, // máximo N peticiones al endpoint por IP por minuto
     handler: (req, res, next) => {
         return res.status(429).json({
             success: false,
