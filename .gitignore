@@ -1,0 +1,12 @@
+# .gitignore
+.env
+database/
+pgdata/
+
+# Source code
+src/node_modules
+
+# Docker-specific
+*.pid
+*.sock
+docker-compose.yml
