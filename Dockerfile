@@ -1,17 +1,25 @@
-# Lightweight Node.js v20 image
-FROM node:20-alpine
+# Etapa de build (instala dependencias)
+FROM node:20-alpine AS builder
 
-# File inside the image containing de source code
+# Establece el directorio de trabajo
 WORKDIR /src
 
-# Files that will be copied 
+# Copia solo los archivos de configuración para instalar dependencias
 COPY src/package*.json ./
 
-# Once you have the .config files run npm install as always
-RUN npm install
+# Instala solo dependencias de producción (excluye devDependencies)
+RUN npm install --production
 
-# Uncomment on production (To create a docker img the code)
+# Copia el resto del código fuente (luego filtramos con .dockerignore)
 COPY src/ .
 
-# Execute the application as always
-CMD [ "node" , "app.js"]
+# Etapa de runtime final (imagen más pequeña)
+FROM node:20-alpine
+
+WORKDIR /src
+
+# Copia solo lo necesario desde el builder
+COPY --from=builder /src /src
+
+# Comando de inicio
+CMD ["node", "app.js"]
