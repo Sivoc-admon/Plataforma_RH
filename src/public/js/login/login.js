@@ -29,7 +29,7 @@ function logInLogic() {
             let error_message = '';
 
             try {
-                const response = await fetch(`${URL_TAG}/login/postAuth`, {
+                const response = await fetch(`${NGINX_TAG}${URL_TAG}/login/postAuth`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -39,7 +39,7 @@ function logInLogic() {
                 const data = await response.json();
                 error_message = data.message;
                 if (!response.ok || !data.success) throw new Error;
-                if (data.success) window.location.href = `${URL_TAG}/inicio`;
+                if (data.success) window.location.href = `${NGINX_TAG}${URL_TAG}/inicio`;
             } catch (error) {
                 this.errorMessage = error_message;
             } finally {

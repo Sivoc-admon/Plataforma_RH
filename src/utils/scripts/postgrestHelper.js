@@ -18,7 +18,7 @@ async function fetchPostgREST(requestJSON) {
         'DELETE': 'delete_only_role',
     };
     const role = roleMapping[requestJSON.fetchMethod];
-    const bearerToken = jwt.sign({ role: role, aud: 'postgrest' }, process.env.POSTGREST_JWT,
+    const bearerToken = jwt.sign({ role: role, aud: 'postgrest' }, process.env.PGRST_JWT_SECRET,
         { expiresIn: process.env.POSTGREST_TOKEN_EXPIRATION });
 
     // Ejecuta la petición HTTP según los parámetros recibidos

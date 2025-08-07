@@ -145,7 +145,7 @@ async function doLogout(req, res) {
     // Finaliza la petición borrando las cookies y redirige al usuario a '/login'
     res.clearCookie(process.env.AT_COOKIE_NAME);
     res.clearCookie(process.env.RT_COOKIE_NAME);
-    return res.redirect(`${process.env.URL_TAG}/login`);
+    return res.redirect(`${process.env.NGINX_TAG}${process.env.URL_TAG}/login`);
 }
 
 module.exports = { postAuthentication, doLogout };

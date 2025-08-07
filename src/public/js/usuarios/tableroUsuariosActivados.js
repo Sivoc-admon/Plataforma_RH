@@ -757,7 +757,7 @@ function usersModule() {
         // Navigation functions
         async restoreUsersView() {
             try {
-                window.location.href = '/usuarios/restoreUsersView';
+                window.location.href = '${NGINX_TAG}/usuarios/restoreUsersView';
             } catch (error) {
                 console.log("error catch", error);
                 this.showNotification('Error', 'Error al navegar.', 'error');
@@ -766,7 +766,7 @@ function usersModule() {
 
         async configureTeamView() {
             try {
-                window.location.href = '/usuarios/configureTeamView';
+                window.location.href = '${NGINX_TAG}/usuarios/configureTeamView';
             } catch (error) {
                 console.log("error catch", error);
                 this.showNotification('Error', 'Error al navegar.', 'error');

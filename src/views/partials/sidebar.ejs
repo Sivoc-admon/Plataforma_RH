@@ -5,14 +5,14 @@
 
 <!-- Sidebar Content -->
 <div id="sidebar" class="sidebar">
-    <img src="/img/SIVOC_LOGO.png" style="width: 80%; display: block; margin: auto; margin-bottom: 1rem;"
+    <img src="<%- NGINX_TAG %>/img/SIVOC_LOGO.png" style="width: 80%; display: block; margin: auto; margin-bottom: 1rem;"
         alt="Logo SIVOC">
 
     <aside class="menu">
         <ul class="menu-list">
             <!-- Botón Inicio -->
             <li>
-                <a href="<%- URL_TAG %>/inicio" class="text-white text-lg">
+                <a href="<%- NGINX_TAG %><%- URL_TAG %>/inicio" class="text-white text-lg">
                     <svg class="icon-css" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -23,9 +23,9 @@
             </li>
 
             <!-- Botón Usuarios (condicional) -->
-            <% if (["DIRECTIVO", "JEFEINMEDIATO", "PERSONALRRHH"].includes(privilegio)) { %>
+            <% if (["DIRECTIVO", "JEFEINMEDIATO", "PERSONALRRHH"].includes(privilegio)) { %> 
             <li>
-                <a href="<%- URL_TAG %>/usuarios" class="text-white text-lg">
+                <a href="<%- NGINX_TAG %><%- URL_TAG %>/usuarios" class="text-white text-lg">
                     <svg class="icon-css" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -36,10 +36,10 @@
             </li>
             <% }; %>
 
-            <!-- Botones adicionales (condicional) -->
-            <!-- <% if ( userId !== "000" ) { %> -->
+            <!-- Botones adicionales (ocultos para el root user) -->
+            <% if ( userId !== "000" ) { %>
             <li>
-                <a href="<%- URL_TAG %>/permisos/accessPermitsModule" class="text-white text-lg">
+                <a href="<%- NGINX_TAG %><%- URL_TAG %>/permisos/accessPermitsModule" class="text-white text-lg">
                     <svg class="icon-css" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -50,7 +50,7 @@
             </li>
 
             <li>
-                <a href="<%- URL_TAG %>/vacaciones" class="text-white text-lg">
+                <a href="<%- NGINX_TAG %><%- URL_TAG %>/vacaciones" class="text-white text-lg">
                     <svg class="icon-css" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -61,7 +61,7 @@
             </li>
 
             <li>
-                <a href="<%- URL_TAG %>/cursos" class="text-white text-lg">
+                <a href="<%- NGINX_TAG %><%- URL_TAG %>/cursos" class="text-white text-lg">
                     <svg class="icon-css" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -70,10 +70,10 @@
                     Cursos
                 </a>
             </li>
-            <!-- <% }; %> -->
+            <% }; %> 
 
             <li>
-                <a href="<%- URL_TAG %>/logout" class="text-white text-lg">
+                <a href="<%- NGINX_TAG %><%- URL_TAG %>/logout" class="text-white text-lg">
                     <svg class="icon-css" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"

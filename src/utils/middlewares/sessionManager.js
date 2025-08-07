@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { fetchPostgREST } = require('../scripts/postgrestHelper');
+const NGINX_TAG = process.env.NGINX_TAG;
 const URL_TAG = process.env.URL_TAG;
 const ERROR_MESSAGE = process.env.ERROR_MESSAGE;
 const ROOT_USERNAME = process.env.ROOT_USERNAME;
@@ -19,10 +20,16 @@ const BACKEND_URL = process.env.BACKEND_URL;
  * @throws {error} Elige entre JWT inválido o sesión erronea.
  */
 const sessionManager = async (req, res, next) => {
+    // Global variables
+    res.locals.NGINX_TAG = NGINX_TAG;
     res.locals.URL_TAG = URL_TAG;
     res.locals.ERROR_MESSAGE = ERROR_MESSAGE;
 
+    // TO DO
+    res.locals.reqUrl = req.url; 
+
     // Rutas de utilidades: el sistema accede a estas rutas para obtener recursos
+    // No hay necesidad de agregar NGINX_TAG porque las rutas siguen siendo internas
     if (!req.url.startsWith(URL_TAG))
         return next();
 
@@ -133,7 +140,6 @@ async function rationaleRefreshToken(refreshToken) {
 async function findActiveSession(userId) {
 
     // Ejecuta el fetch SELECT * FROM sesion_activa WHERE user_id = ${userId};
-    // http://localhost:3010/sesion_activa
     const pgRestRequest = {
         fetchMethod: 'GET',
         fetchUrl: `${BACKEND_URL}/sesion_activa?user_id=eq.${userId}`,

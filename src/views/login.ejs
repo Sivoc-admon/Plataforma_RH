@@ -6,7 +6,7 @@
     <%- include('./partials/globalHeaders.ejs') %>
 
     <!-- Login settings -->
-    <script src="/js/login/login.js"></script>
+    <script src="<%- NGINX_TAG %>/js/login/login.js"></script>
     <style>
         .icon-envelope::before {
             content: "✉";
@@ -56,7 +56,7 @@
     <div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8" x-data="logInLogic()" x-init="init()">
             <div class="text-center">
-                <img src="/img/SIVOC_LOGO.png" alt="SIVOC Logo" class="mx-auto h-16 w-auto">
+                <img src="<%- NGINX_TAG %>/img/SIVOC_LOGO.png" alt="SIVOC Logo" class="mx-auto h-16 w-auto">
             </div>
 
             <div class="login-card bg-white rounded-lg shadow-xl p-8">

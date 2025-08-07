@@ -4,10 +4,11 @@ const router = express.Router();
 const { postAuthentication, doLogout } = require("../controllers/login.controller");
 const { generalLimiter } = require("../utils/middlewares/rateLimiter");
 
+const NGINX_TAG = process.env.NGINX_TAG;
 const URL_TAG = process.env.URL_TAG;
 
-// Rutas por defecto
-router.get('/', (req, res) => { res.redirect(`${URL_TAG}/login`); });
+// Rutas por defecto (los redirects ocupan ${NGINX_TAG} )
+router.get('/', (req, res) => { res.redirect(`${NGINX_TAG}${URL_TAG}/login`) });
 router.get(`${URL_TAG}/inicio`, (req, res) => { res.render('inicio.ejs'); });
 
 // Rutas relacionadas con el Login

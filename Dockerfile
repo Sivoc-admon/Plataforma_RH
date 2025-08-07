@@ -2,16 +2,16 @@
 FROM node:20-alpine
 
 # File inside the image containing de source code
-WORKDIR /app
+WORKDIR /src
 
 # Files that will be copied 
-COPY package*.json .
+COPY src/package*.json ./
 
 # Once you have the .config files run npm install as always
 RUN npm install
 
-# To clone the source code as it is
-COPY . .
+# Uncomment on production (To create a docker img the code)
+COPY src/ .
 
 # Execute the application as always
 CMD [ "node" , "app.js"]

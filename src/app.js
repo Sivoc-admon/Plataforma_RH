@@ -4,15 +4,10 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const app = express();
 app.disable('x-powered-by'); // <-- "security through obscurity"
-require('dotenv').config();
 
 // Utilidades
 const { sessionManager } = require('./utils/middlewares/sessionManager');
-const DEFAULT_PORT = 3000;
-
-// Performance
-const compression = require('compression')
-app.use(compression())
+const nginxRouter = express(); // <- router app for nginx
 
 /**
  * Configura los middlewares globales de la aplicación
@@ -22,6 +17,7 @@ app.use(compression())
 function setupMiddlewares() {
     app.use(express.json());
     app.use(cookieParser());
+    app.set('trust proxy', true); // <- permite rateLimiter funcionar con nginx
     app.use(sessionManager);
     app.use('/', require('./routes/global.routes'));
 }
@@ -43,9 +39,9 @@ function setupStaticFilesAndViews() {
  * @returns {void}
  */
 function startServer() {
-    const port = process.env.PORT || DEFAULT_PORT;
-    app.listen(port, () => {
-        console.log(`[Server ✅]: Servidor corriendo en http://localhost:${port}`);
+    nginxRouter.use(`${process.env.NGINX_TAG}`, app);
+    nginxRouter.listen(3000, '0.0.0.0', () => {
+        console.log(`[Server ✅]: Servidor corriendo en http://localhost:3000`);
     });
 }
 
