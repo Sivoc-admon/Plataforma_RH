@@ -204,7 +204,7 @@ async function setupTokenCookie(res, userData, isRootUser, doRefreshToken) {
     // Envia al navegador la cookie
     res.cookie(cookieName, newToken, {
         httpOnly: true,
-        secure: NODE_ENV === 'production', // Solo HTTPS en producción
+        secure: false,
         sameSite: 'strict',
         maxAge: maxAge,
     });
