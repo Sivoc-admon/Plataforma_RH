@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const app = express();
-app.disable('x-powered-by'); // <-- "security through obscurity"
+app.disable('x-powered-by'); // <-- "security through obscurity" 
 
 // Utilidades
 const { sessionManager } = require('./utils/middlewares/sessionManager');
