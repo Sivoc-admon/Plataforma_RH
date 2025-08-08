@@ -1,5 +1,3 @@
-# Changelog
-
 ## [0.0.6](https://github.com/Sivoc-admon/Plataforma_RH/compare/0.0.5...0.0.6) (2025-06-17)
 
 ### Fixed
