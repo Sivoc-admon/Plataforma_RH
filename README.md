@@ -4,12 +4,6 @@
 
 La **Plataforma RH SIVOC** es el sistema de gestión de recursos humanos desarrollado para SIVOC, empresa especializada en la administración, construcción, venta y comercialización de sistemas de energía eléctrica y telecomunicaciones.
 
-SIVOC se dedica a proyectos de:
-- Generación, transmisión, transformación y distribución de energía eléctrica
-- Energías renovables
-- Sistemas de comunicaciones y telecomunicaciones
-- Infraestructura para baja, media, alta y extra alta tensión
-
 ## Última Versión
 
 Consulta el último release disponible: [**Versión 0.2.0**](https://github.com/Sivoc-admon/Plataforma_RH/releases/tag/0.2.0)
