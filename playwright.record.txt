@@ -1,0 +1,25 @@
+// @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
+  // Solo Chromium
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        headless: false,
+      },
+    },
+  ],
+
+  // Configuración global de entorno
+  use: {
+    viewport: { width: 1280, height: 720 },
+    // Esto es lo que define la carpeta donde se guardarán los videos
+    video: {
+      mode: 'on',
+      dir: 'videos/', 
+    }
+  },
+};
+
+module.exports = config;
