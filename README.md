@@ -35,7 +35,7 @@ Una vez completado el proceso de construcción, accede a la aplicación mediante
 http://localhost/modulorrhh
 ```
 
-## 📧 Contacto
+## Contacto
 
 **Desarrollador Principal**
 - **Nombre:** Alfonso Macias
@@ -45,10 +45,6 @@ http://localhost/modulorrhh
 - **LinkedIn:** [Imanol Macias](https://www.linkedin.com/in/imanol-macias/)
 - **GitHub:** [Imanol57864](https://github.com/Imanol57864)
 
-## 📄 Licencia
+## Licencia
 
-[Especificar el tipo de licencia del proyecto]
-
----
-
-© 2024 SIVOC. Todos los derechos reservados.
+© 2025 SIVOC. Todos los derechos reservados.
