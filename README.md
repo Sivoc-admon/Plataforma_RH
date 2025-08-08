@@ -14,6 +14,9 @@ Consulta el último release disponible: [**Versión 0.2.0**](https://github.com/
 Descarga e instala [Docker Desktop](https://www.docker.com/products/docker-desktop/) desde el sitio oficial. Docker Desktop proporcionará una interfaz amigable para ejecutar la aplicación en el entorno local.
 
 ### Paso 2: Ejecutar la aplicación
+Consulta con el administrador [Imanol57864](https://github.com/Imanol57864) para obtener el archivo .env y los scripts para poblar la base de datos.
+
+### Paso 3: Ejecutar la aplicación
 1. Abre Docker Desktop
 2. Navega al directorio del proyecto en tu terminal
 3. Ejecuta el siguiente comando:
@@ -22,7 +25,7 @@ Descarga e instala [Docker Desktop](https://www.docker.com/products/docker-deskt
 docker-compose up --build -d
 ```
 
-### Paso 3: Acceder a la aplicación
+### Paso 4: Acceder a la aplicación
 Una vez completado el proceso de construcción, accede a la aplicación mediante tu navegador web en:
 
 ```
