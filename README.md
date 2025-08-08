@@ -34,7 +34,6 @@ http://localhost/modulorrhh
 
 ## Contacto
 
-**Desarrollador Principal**
 - **Nombre:** Alfonso Macias
 - **Rol:** Desarrollador de Software
 - **Teléfono:** +52 961 186 8350
