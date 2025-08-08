@@ -9,15 +9,19 @@ app.disable('x-powered-by'); // <-- "security through obscurity"
 const { sessionManager } = require('./utils/middlewares/sessionManager');
 const nginxRouter = express(); // <- router app for nginx
 
+// Performance
+const compression = require('compression')
+app.use(compression())
+
 /**
  * Configura los middlewares globales de la aplicación
  * @function
  * @returns {void}
  */
 function setupMiddlewares() {
-    app.use(express.json());
+    app.use(express.json({ limit: '100kb' }));
     app.use(cookieParser());
-    app.set('trust proxy', true); // <- permite rateLimiter funcionar con nginx
+    //app.set('trust proxy', true); // <- permite rateLimiter funcionar con nginx
     app.use(sessionManager);
     app.use('/', require('./routes/global.routes'));
 }
@@ -28,7 +32,10 @@ function setupMiddlewares() {
  * @returns {void}
  */
 function setupStaticFilesAndViews() {
-    app.use(express.static(path.join(__dirname, 'public')));
+    app.use(express.static(path.join(__dirname, 'public'), {
+        maxAge: '4h', 
+        etag: true
+    }));
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'ejs');
 }

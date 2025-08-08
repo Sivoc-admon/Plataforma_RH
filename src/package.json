@@ -84,6 +84,14 @@
             {
               "type": "refactor",
               "section": "Changed"
+            },
+            {
+              "type": "testing",
+              "section": "Security"
+            },
+            {
+              "type": "test",
+              "section": "Security"
             }
           ]
         }
