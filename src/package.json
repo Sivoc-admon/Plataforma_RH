@@ -1,6 +1,6 @@
 {
   "name": "plataforma_rh",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "SIVOC es una empresa de servicio dedicada a la administración y puesta en marcha, construcción, venta y comercialización para sistemas de: generación, transmisión, transformación y distribución de energía eléctrica, energías renovables, comunicaciones y telecomunicaciones para baja, media, alta y extra alta tensión.",
   "main": "server.js",
   "scripts": {
@@ -42,6 +42,8 @@
     "@types/express": "^5.0.3",
     "@types/multer": "^1.4.13",
     "autoprefixer": "^10.4.21",
+    "conventional-changelog-cli": "^5.0.0",
+    "conventional-changelog-conventionalcommits": "^9.1.0",
     "dependency-cruiser": "^17.0.0",
     "eslint": "^9.28.0",
     "eslint-plugin-import": "^2.31.0",
