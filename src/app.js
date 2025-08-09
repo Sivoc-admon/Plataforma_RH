@@ -72,7 +72,7 @@ function startServer() {
 async function initializeApp() {
     setupMiddlewares();
     setupStaticFilesAndViews();
-    //setupNoCaching();
+    setupNoCaching();
     startServer();
 }
 initializeApp().catch(error => {

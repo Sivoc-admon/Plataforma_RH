@@ -18,7 +18,7 @@ router.get(`${URL_TAG}/logout`, doLogout);
 
 // Rutas hacia los módulos
 router.use(`${URL_TAG}/usuarios`, generalLimiter, require('./usuarios.routes'));
-//router.use(`${URL_TAG}/permisos`, require('./permisos.routes'));
+router.use(`${URL_TAG}/permisos`, generalLimiter, require('./permisos.routes'));
 //router.use(`${URL_TAG}/vacaciones`, require('./vacaciones.routes'));
 //router.use(`${URL_TAG}/cursos`, require('./cursos.routes'));
 

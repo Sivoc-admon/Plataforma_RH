@@ -25,7 +25,7 @@
             <!-- Botón Usuarios (condicional) -->
             <% if (["DIRECCION", "JEFEINMEDIATO", "PERSONALRRHH"].includes(privilegio)) { %> 
             <li>
-                <a href="<%- NGINX_TAG %><%- URL_TAG %>/usuarios" class="text-white text-lg">
+                <a href="<%- NGINX_TAG %><%- URL_TAG %>/usuarios/verTableroActivados" class="text-white text-lg">
                     <svg class="icon-css" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -39,7 +39,7 @@
             <!-- Botones adicionales (ocultos para el root user) -->
             <% if ( userId !== "000" ) { %>
             <li>
-                <a href="<%- NGINX_TAG %><%- URL_TAG %>/permisos/accessPermitsModule" class="text-white text-lg">
+                <a href="<%- NGINX_TAG %><%- URL_TAG %>/permisos/verTableroPermisos" class="text-white text-lg">
                     <svg class="icon-css" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -50,7 +50,7 @@
             </li>
 
             <li>
-                <a href="<%- NGINX_TAG %><%- URL_TAG %>/vacaciones" class="text-white text-lg">
+                <a href="#" class="text-white text-lg">
                     <svg class="icon-css" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -61,7 +61,7 @@
             </li>
 
             <li>
-                <a href="<%- NGINX_TAG %><%- URL_TAG %>/cursos" class="text-white text-lg">
+                <a href="#" class="text-white text-lg">
                     <svg class="icon-css" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
