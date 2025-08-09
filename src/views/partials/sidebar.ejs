@@ -23,7 +23,7 @@
             </li>
 
             <!-- Botón Usuarios (condicional) -->
-            <% if (["DIRECTIVO", "JEFEINMEDIATO", "PERSONALRRHH"].includes(privilegio)) { %> 
+            <% if (["DIRECCION", "JEFEINMEDIATO", "PERSONALRRHH"].includes(privilegio)) { %> 
             <li>
                 <a href="<%- NGINX_TAG %><%- URL_TAG %>/usuarios" class="text-white text-lg">
                     <svg class="icon-css" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"

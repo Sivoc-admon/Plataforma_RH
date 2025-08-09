@@ -238,7 +238,7 @@ module.exports = {
       import statements. Implies "parser": "tsc", so the dependency-cruiser
       will use the typescript parser for JavaScript files.
      
-      For this to work the typescript compiler will need to be installed in the
+      For this to run the typescript compiler will need to be installed in the
       same spot as you're running dependency-cruiser from.
      */
     // detectJSDocImports: true,

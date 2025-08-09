@@ -24,9 +24,7 @@ const sessionManager = async (req, res, next) => {
     res.locals.NGINX_TAG = NGINX_TAG;
     res.locals.URL_TAG = URL_TAG;
     res.locals.ERROR_MESSAGE = ERROR_MESSAGE;
-
-    // TO DO
-    res.locals.reqUrl = req.url; 
+    res.locals.reqUrl = req.url;
 
     // Rutas de utilidades: el sistema accede a estas rutas para obtener recursos
     // No hay necesidad de agregar NGINX_TAG porque las rutas siguen siendo internas
@@ -41,14 +39,12 @@ const sessionManager = async (req, res, next) => {
         return next();
 
     // Obten las variables de la petición sin importar el estado de su sesión
-    let payload = "";
+    let payload = jwt.decode(req.cookies[AT_COOKIE_NAME]);
 
     // Verifica la autenticidad del *accessToken
     try {
         const accessToken = req.cookies[AT_COOKIE_NAME];
-        const decoded = jwt.verify(accessToken, ACCESS_TOKEN_SECRET);
-        payload = decoded; // case1&2 -> accessToken Working
-
+        jwt.verify(accessToken, ACCESS_TOKEN_SECRET); // case1&2 -> accessToken Working
     } catch (error) {
         // En caso de que el token no sea auténtico...
         // Consulta en la base de datos si el *refreshToken es auténtico
@@ -63,10 +59,10 @@ const sessionManager = async (req, res, next) => {
 
         // O en otro caso, renueva el *accessToken en caso que su token de sesión sea válido
         const previousPayload = {
-            name: res.locals.nameDisplay || 'mockName',
-            id: res.locals.userId || 'mockId',
-            email: res.locals.email || 'mockEmail',
-            privilegio: res.locals.privilegio || 'mockPrivilegio'
+            name: payload.nameDisplay || 'mockName',
+            id: payload.userId || 'mockId',
+            email: payload.email || 'mockEmail',
+            privilegio: payload.privilegio || 'mockPrivilegio'
         };
         const isRootUser = false;
         const doRefreshToken = false;
@@ -186,9 +182,20 @@ async function findActiveSession(userId) {
 async function setupTokenCookie(res, userData, isRootUser, doRefreshToken) {
 
     // Elige el payload correcto según si el usuario es el RootUser o un usuario común
-    const userPayload = isRootUser
-        ? { nameDisplay: 'Usuario Raíz', userId: '000', email: ROOT_USERNAME, privilegio: 'DIRECTIVO' }
-        : { nameDisplay: '(mock)userData.name', userId: userData.id, email: userData.email, privilegio: userData.privilegio };
+    let userPayload = {};
+    if (isRootUser) {
+        userPayload = { nameDisplay: 'Usuario Raíz', userId: '000', email: ROOT_USERNAME, privilegio: 'DIRECCION' };
+    } else {
+        let name = `${userData.dato_personal?.nombre || 'Sin nombre'} ${userData.dato_personal?.apellido_p || ''} ${userData.dato_personal?.apellido_m || ''}`;
+        const roles = {
+            'COLABORADOR': 'Colaborador',
+            'PERSONALRRHH': 'Recursos Humanos',
+            'JEFEINMEDIATO': 'Jefe Inmediato',
+            'DIRECCION': 'Dirección'
+        };
+        name += ` || ${roles[userData.privilegio]} `
+        userPayload = { nameDisplay: name, userId: userData.id, email: userData.email, privilegio: userData.privilegio };
+    }
 
     // Elige si la cookie será para un *refreshToken o un *accessToken (newToken, maxAge, cookieName)
     const newToken = doRefreshToken //newToken

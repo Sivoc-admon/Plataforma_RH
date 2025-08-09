@@ -5,3 +5,4 @@ pgdata/
 src/node_modules
 *.pid
 *.sock
+src/.env

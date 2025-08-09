@@ -1,3 +1,19 @@
+## 0.2.0 (2025-08-08)
+
+### Fixed
+
+* Cookie nginx fix ([baf621b](https://github.com/Sivoc-admon/Plataforma_RH/commit/baf621be681d192b7f6ade1b365592dff17ea3db))
+
+### Changed
+
+* Dockerfile optimizado (multi-stage build) ([dcd40eb](https://github.com/Sivoc-admon/Plataforma_RH/commit/dcd40ebfde3143f3ec6a989be4d35b7a5f84a57d))
+* First containerization of the web app ([beee064](https://github.com/Sivoc-admon/Plataforma_RH/commit/beee064e3cad6d604ccd3e737d72dd4ce3dd11b2))
+* Ready to deploy, first attempt. ([4d908ce](https://github.com/Sivoc-admon/Plataforma_RH/commit/4d908ce621238a1d1ae02a07c76393df7bc12ddb))
+
+### Security
+
+* KF-01 testing on droplet completed. ([91f082b](https://github.com/Sivoc-admon/Plataforma_RH/commit/91f082b464bdd5e79eeec53e6e0027ef13b1e52d))
+
 ## [0.0.6](https://github.com/Sivoc-admon/Plataforma_RH/compare/0.0.5...0.0.6) (2025-06-17)
 
 ### Fixed

@@ -5,6 +5,8 @@ const cookieParser = require('cookie-parser');
 const app = express();
 app.disable('x-powered-by'); // <-- "security through obscurity" 
 
+require('dotenv').config({ path: '../.env' }); // <- TO WORK
+
 // Utilidades
 const { sessionManager } = require('./utils/middlewares/sessionManager');
 const nginxRouter = express(); // <- router app for nginx
@@ -21,9 +23,20 @@ app.use(compression())
 function setupMiddlewares() {
     app.use(express.json({ limit: '100kb' }));
     app.use(cookieParser());
-    //app.set('trust proxy', true); // <- permite rateLimiter funcionar con nginx
     app.use(sessionManager);
     app.use('/', require('./routes/global.routes'));
+}
+
+/**
+ * Configura todas las rutas para que el caché esté completamente desactivado
+ * @function
+ * @returns {void}
+ */
+function setupNoCaching() {
+    app.use(`${process.env.NGINX_TAG}${process.env.URL_TAG}`, (req, res, next) => {
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        next();
+    });
 }
 
 /**
@@ -32,10 +45,9 @@ function setupMiddlewares() {
  * @returns {void}
  */
 function setupStaticFilesAndViews() {
-    app.use(express.static(path.join(__dirname, 'public'), {
-        maxAge: '4h', 
-        etag: true
-    }));
+    app.use(express.static(path.join(__dirname, 'public')
+    // ,{maxAge: '4h', etag: true }
+    ));
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'ejs');
 }
@@ -48,7 +60,7 @@ function setupStaticFilesAndViews() {
 function startServer() {
     nginxRouter.use(`${process.env.NGINX_TAG}`, app);
     nginxRouter.listen(3000, '0.0.0.0', () => {
-        console.log(`[Server ✅]: Servidor corriendo en http://localhost:3000`);
+        console.log(`[Server ✅]: Servidor corriendo en http://localhost:3000${process.env.NGINX_TAG}`);
     });
 }
 
@@ -60,6 +72,7 @@ function startServer() {
 async function initializeApp() {
     setupMiddlewares();
     setupStaticFilesAndViews();
+    //setupNoCaching();
     startServer();
 }
 initializeApp().catch(error => {

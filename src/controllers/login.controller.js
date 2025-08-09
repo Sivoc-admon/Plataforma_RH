@@ -71,10 +71,10 @@ async function isUserValid(email, password) {
     // Ejecuta el fetch de la información del usuario
     const pgRestRequest = {
         fetchMethod: 'GET',
-        fetchUrl: `${BACKEND_URL}/usuario?select=id,privilegio,password,habilitado,email&email=eq.${email}`,
+        fetchUrl: `${BACKEND_URL}/usuario?select=id,dato_personal(nombre,apellido_p,apellido_m),privilegio,password,habilitado,email&email=eq.${email}`,
         fetchBody: {}
     }
-
+    
     // Captura el error al consultar la base de datos
     const response = await fetchPostgREST(pgRestRequest);
     if (!response.ok) {
@@ -90,21 +90,21 @@ async function isUserValid(email, password) {
     if (userDbData.length === 0) {
         return {
             success: false,
-            message: 'El usuario no fue encontrado'
+            message: 'El usuario no fue encontrado.'
         }
     }
     const userJson = userDbData[0]; // Consigue el objeto del usuario
     if (!userJson.habilitado) {
         return {
             success: false,
-            message: 'El usuario no se encuentra habilitado para iniciar sesión'
+            message: 'El usuario no se encuentra habilitado para iniciar sesión.'
         }
     }
     const isPasswordValid = await bcrypt.compare(password, userJson.password);
     if (!isPasswordValid) {
         return {
             success: false,
-            message: 'La contraseña es incorrecta'
+            message: 'La contraseña es incorrecta.'
         }
     }
 
