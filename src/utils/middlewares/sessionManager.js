@@ -68,20 +68,18 @@ const sessionManager = async (req, res, next) => {
         }
 
         // O en otro caso, renueva el *accessToken en caso que su token de sesión sea válido
-        console.log("payload:", payload);
-        const previousPayload = {
-            name: payload.nameDisplay || 'mockName',
-            id: payload.userId || 'mockId',
-            email: payload.email || 'mockEmail',
+        const userDataRefactor = {
             privilegio: payload.privilegio || 'mockPrivilegio',
-            pfp_almacenado: payload.pfp_almacenado || 'mockPfp_almacenado'
+            pfp_almacenado: payload.pfp_almacenado || 'mockPfp_almacenado',
+            email: payload.email || 'mockEmail',
+            dato_personal: { nombre: payload.nameDisplay || 'mockName'},
+            id: payload.userId || 'mockId'
         };
         const isRootUser = false;
         const doRefreshToken = false;
-        const setupATresponse = setupTokenCookie(res, previousPayload, isRootUser, doRefreshToken);
+        const setupATresponse = setupTokenCookie(res, userDataRefactor, isRootUser, doRefreshToken);
         if (!setupATresponse.success) return res.status(205).send(setupATresponse.message);
-
-        payload = previousPayload; // case4 -> reload *accessToken
+        // case4 -> reload *accessToken
     }
 
     // Configura las variables de la petición antes de continuar
@@ -206,8 +204,9 @@ async function setupTokenCookie(res, userData, isRootUser, doRefreshToken) {
             'JEFEINMEDIATO': 'Jefe Inmediato',
             'DIRECCION': 'Dirección'
         };
-        name += ` || ${roles[userData.privilegio]} `
-        userPayload = { nameDisplay: name, userId: userData.id, email: userData.email, privilegio: userData.privilegio, pfp_almacenado: userData.pfp_almacenado };
+        userPayload = { nameDisplay: name, userId: userData.id, 
+            email: userData.email, privilegio: userData.privilegio, 
+            pfp_almacenado: userData.pfp_almacenado};
     }
 
     // Elige si la cookie será para un *refreshToken o un *accessToken (newToken, maxAge, cookieName)
