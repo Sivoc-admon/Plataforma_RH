@@ -71,7 +71,7 @@ async function isUserValid(email, password) {
     // Ejecuta el fetch de la información del usuario
     const pgRestRequest = {
         fetchMethod: 'GET',
-        fetchUrl: `${BACKEND_URL}/usuario?select=id,dato_personal(nombre,apellido_p,apellido_m),privilegio,password,habilitado,email&email=eq.${email}`,
+        fetchUrl: `${BACKEND_URL}/usuario?select=id,dato_personal(nombre,apellido_p,apellido_m),privilegio,password,habilitado,pfp_almacenado,email&email=eq.${email}`,
         fetchBody: {}
     }
     

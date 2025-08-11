@@ -13,8 +13,14 @@
     </svg>
     <!-- User information -->
     <div style="display: flex; justify-content: space-between; align-items: center;">
-        <img src="<%- NGINX_TAG %>/getPfp" class="pfp-css" onerror="this.onerror=null; this.src='<%- NGINX_TAG %>/img/SIVOC_PFP.png';"
-            alt="Foto de perfil">
+        <div x-data="{ imgSrc: '/modulorrhh/sivoc/getPfp', fallback: '<%- NGINX_TAG %>/img/SIVOC_PFP.png' }">
+            <img 
+                :src="imgSrc" 
+                alt="Foto de perfil" 
+                class="pfp-css" 
+                x-on:error="imgSrc = fallback"
+            >
+        </div>
         <span class="text-white text-lg ml-4 mr-4" style="text-shadow: 0 0 8px rgba(0, 0, 0, 1);">
             <%- nameDisplay %>
         </span>

@@ -9,9 +9,7 @@ const ACCESS_TOKEN_EXPIRATION = process.env.ACCESS_TOKEN_EXPIRATION;
 const AT_COOKIE_NAME = process.env.AT_COOKIE_NAME;
 const REFRESH_TOKEN_EXPIRATION = process.env.REFRESH_TOKEN_EXPIRATION;
 const RT_COOKIE_NAME = process.env.RT_COOKIE_NAME;
-const NODE_ENV = process.env.NODE_ENV;
 const BACKEND_URL = process.env.BACKEND_URL;
-
 
 /**
  * Middleware global para gestionar las sesiones
@@ -62,7 +60,8 @@ const sessionManager = async (req, res, next) => {
             name: payload.nameDisplay || 'mockName',
             id: payload.userId || 'mockId',
             email: payload.email || 'mockEmail',
-            privilegio: payload.privilegio || 'mockPrivilegio'
+            privilegio: payload.privilegio || 'mockPrivilegio',
+            pfp_almacenado: payload.pfp_almacenado || 'mockPfp_almacenado'
         };
         const isRootUser = false;
         const doRefreshToken = false;
@@ -77,6 +76,7 @@ const sessionManager = async (req, res, next) => {
     res.locals.userId = payload.userId;
     res.locals.email = payload.email;
     res.locals.privilegio = payload.privilegio;
+    res.locals.pfp_almacenado = payload.pfp_almacenado;
 
     // exit
     return next();
@@ -194,7 +194,7 @@ async function setupTokenCookie(res, userData, isRootUser, doRefreshToken) {
             'DIRECCION': 'Dirección'
         };
         name += ` || ${roles[userData.privilegio]} `
-        userPayload = { nameDisplay: name, userId: userData.id, email: userData.email, privilegio: userData.privilegio };
+        userPayload = { nameDisplay: name, userId: userData.id, email: userData.email, privilegio: userData.privilegio, pfp_almacenado: userData.pfp_almacenado };
     }
 
     // Elige si la cookie será para un *refreshToken o un *accessToken (newToken, maxAge, cookieName)

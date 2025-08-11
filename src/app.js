@@ -25,7 +25,8 @@ function setupMiddlewares() {
     app.use(cookieParser());
     app.use(sessionManager);
     app.use('/', require('./routes/global.routes'));
-}
+};
+
 
 /**
  * Configura todas las rutas para que el caché esté completamente desactivado
@@ -46,7 +47,7 @@ function setupNoCaching() {
  */
 function setupStaticFilesAndViews() {
     app.use(express.static(path.join(__dirname, 'public')
-    // ,{maxAge: '4h', etag: true }
+        // ,{maxAge: '4h', etag: true }
     ));
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'ejs');
