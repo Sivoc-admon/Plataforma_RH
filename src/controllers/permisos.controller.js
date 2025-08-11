@@ -25,7 +25,7 @@ async function verTableroPermisos(req, res) {
     // Ejecuta el fetch de la información de los usuarios
     const pgRestRequest = {
         fetchMethod: 'GET',
-        fetchUrl: `${BACKEND_URL}/usuario?select=id,email,habilitado,privilegio,dato_personal(nombre,apellido_p,apellido_m),dato_laboral(fecha_ingreso,area,puesto)`,
+        fetchUrl: `${BACKEND_URL}/permiso?select=*,gestion_permiso(id_permiso,id_equipo,descripcion,estado,solicitado,revisado),usuario(dato_personal(nombre,apellido_p,apellido_m))`,
         fetchBody: {}
     }
 
@@ -36,39 +36,24 @@ async function verTableroPermisos(req, res) {
     }
 
     const data = await response.json();
-    // Despliega la vista // TO WORK full modulo-usuarios dummy data script
-    // la base de datos de sivoc_scripting será wipeOut wipeIn con puros scripts
-    /* 
-                id: '1',
-                nombre: 'Juan',
-                apellidoP: 'Pérez',
-                apellidoM: 'González',
-                email: 'juan.perez@company.com',
-                //fechaIngreso: '2023-01-15',
-                area: 'Administración',
-                puesto: 'Director General',
-                privilegio: 'direccion',
-                habilitado: true
-    */
-
-    `${data.nombre} ${data.apellidoP} ${data.apellidoM}`
-
+    
     // Transformar datos
-    const dataUsuarios = data.map(u => ({
-        id: String(u.id),
-        fullName:
-            `${u.dato_personal?.nombre || "Sin nombre"} ` +
-            `${u.dato_personal?.apellido_p || "Sin apellido"} ` +
-            `${u.dato_personal?.apellido_m || "Sin apellido"}`, 
-        email: u.email,
-        fechaIngreso: u.dato_laboral?.fecha_ingreso || "Sin fecha",
-        area: u.dato_laboral?.area || "Sin área",
-        puesto: u.dato_laboral?.puesto || "Sin puesto",
-        privilegio: u.privilegio,
-        habilitado: u.habilitado
+    const dataJson = data.map(u => ({
+        //id: String(u.id),
+        solicitante_fullName:
+            `${u.usuario?.dato_personal?.nombre || "Sin nombre"} ` +
+            `${u.usuario?.dato_personal?.apellido_p || "Sin apellido"} ` +
+            `${u.usuario?.dato_personal?.apellido_m || "Sin apellido"}`, 
+        tipo: u.tipo,
+        descripcion: `${u.gestion_permiso?.descripcion||"-"} `,
+        fecha_inicio: u.fecha_inicio,
+        fecha_termino: u.fecha_termino,
+        solicitado: u.gestion_permiso?.solicitado,
+        revisado: u.gestion_permiso?.revisado,
+        estado: `${u.gestion_permiso?.estado}`,
     }));
 
-    return res.render('../views/permisos/tableroPermisos.ejs', { dataUsuarios });
+    return res.render('../views/permisos/tableroPermisos.ejs', { dataJson });
 };
 
 module.exports = { verTableroPermisos };

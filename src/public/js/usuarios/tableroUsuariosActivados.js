@@ -37,9 +37,9 @@ function usersModule() {
 
             // Initialize table after data is loaded
             this.$nextTick(() => {
-                if (this.usersRows.length > 0) {
+                //if (this.usersRows.length > 0) {
                     this.initializeTable();
-                }
+                //}
             });
 
             this.isLoading = false;

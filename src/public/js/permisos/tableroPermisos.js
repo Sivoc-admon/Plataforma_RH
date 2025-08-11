@@ -9,15 +9,6 @@ function usersModule() {
         isLoading: true,
         hasError: false,
 
-        // Configuration
-        areaToPuestos: {
-            "Administración": ["Director General", "Coordinador de Finanzas", "Gestora de Tesorería", "Coordinador de Recursos Humanos", "Gestor de Recursos Humanos", "Analista de Recursos Humanos"],
-            "Ventas": ["Coordinador Comercial", "Gestor de Ventas", "Analista de Ventas"],
-            "Calidad": ["Coordinador de Calidad", "Gestor de Calidad", "Analista de Calidad"],
-            "Operativo": ["Coordinador Operacional", "Gestor de Ingeniería", "Analista de Ingeniería", "Gestor de Compras", "Analista de Compras", "Gestor de Manufactura", "Analista de Manufactura", "Analista de Almacén"],
-            "Pruebas": ["Gestor de Pruebas", "Ingeniero de Servicio A", "Ingeniero de Servicio B", "Ingeniero de Servicio C"]
-        },
-
         // Initialize
         init() {
             this.loadUsersData();
@@ -28,18 +19,16 @@ function usersModule() {
             this.isLoading = true;
             this.hasError = false;
 
-            if (dataUsuarios) {
-                this.usersRows = dataUsuarios;
+            if (dataJson) {
+                this.usersRows = dataJson;
             } else {
                 this.usersRows = [];
-                console.error(ERROR_MESSAGE, '011');
+                console.error(ERROR_MESSAGE, '012');
             }
 
             // Initialize table after data is loaded
             this.$nextTick(() => {
-                if (this.usersRows.length > 0) {
-                    this.initializeTable();
-                }
+                this.initializeTable();
             });
 
             this.isLoading = false;
@@ -64,68 +53,77 @@ function usersModule() {
                 height: "310px",
                 columns: [
                     {
-                        title: "Nombre Completo",
-                        field: "fullName",
+                        title: "Nombre del solicitante",
+                        field: "solicitante_fullName", // usuario.dato_personal.nombre||apellido_m||apellido_p ...
                         minWidth: 125
                     },
                     {
-                        title: "Email",
-                        field: "email",
-                        //headerFilter: "input",
-                        width: 240
+                        title: "Tipo",
+                        field: "tipo",
+                        width: 155
                     },
                     {
-                        title: "Área",
-                        field: "area",
-                        //headerFilter: "select",
-                        headerFilterParams: {
-                            values: Object.keys(this.areaToPuestos).reduce((acc, area) => {
-                                acc[area] = area;
-                                return acc;
-                            }, {})
-                        },
-                        width: 170
+                        title: "Descripción",
+                        field: "descripcion", // gestion_permiso.descripcion
+                        width: 150,
+                        formatter: function (cell) {
+                            const rawValue = cell.getValue() || '';
+                            const truncated = rawValue.length > 40 ? rawValue.substring(0, 40) + "..." : rawValue;
+
+                            // Escapamos texto para pasarlo como atributo HTML de forma segura
+                            const safeValue = rawValue
+                                .replace(/&/g, '&amp;')
+                                .replace(/"/g, '&quot;')
+                                .replace(/'/g, '&#039;')
+                                .replace(/</g, '&lt;')
+                                .replace(/>/g, '&gt;');
+
+                            return `
+                            <button class="text-blue-600 hover:underline"
+                                    data-descripcion="${safeValue}"
+                                    onclick="mostrarDescripcionFromAttr(this)">
+                                Ver más
+                            </button>`;
+                        }
                     },
                     {
-                        title: "Puesto",
-                        field: "puesto",
-                        //headerFilter: "input",
-                        width: 200
+                        title: "Inicio",
+                        field: "fecha_inicio",
+                        width: 125
                     },
                     {
-                        title: "Privilegio",
-                        field: "privilegio",
-                        formatter: (cell) => {
-                            const privilegio = cell.getValue();
-                            const text = this.getPrivilegeText(privilegio);
-                            const className = this.getPrivilegeClass(privilegio);
-                            return `<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${className}">${text}</span>`;
-                        },
-                        //headerFilter: "select",
-                        headerFilterParams: {
-                            values: {
-                                'COLABORADOR': 'Colaborador',
-                                'PERSONALRRHH': 'Recursos Humanos',
-                                'JEFEINMEDIATO': 'Jefe Inmediato',
-                                'DIRECCION': 'Dirección'
-                            }
-                        },
-                        width: 130
+                        title: "Termino",
+                        field: "fecha_termino",
+                        width: 125
                     },
                     {
-                    title: "Habilitado",
-                    field: "habilitado",
-                    formatter: "tickCross",    
-                    //editor: "tickCross", // Permite editar con click la casilla
-                    hozAlign: "center",
-                    width: 130,
+                        title: "¿Solicitado?",
+                        field: "solicitado", // gestion_permiso.solicitado
+                        formatter: "tickCross",
+                        //editor: "tickCross", // Permite editar con click la casilla
+                        hozAlign: "center",
+                        width: 125
                     },
+                    {
+                        title: "¿Revisado?",
+                        field: "revisado", // gestion_permiso.revisado
+                        formatter: "tickCross",
+                        //editor: "tickCross", // Permite editar con click la casilla
+                        hozAlign: "center",
+                        width: 125
+                    },
+                    {
+                        title: "Estado",
+                        field: "estado", // gestion_permiso.estado
+                        width: 125
+                    }
                 ]
             });
         },
 
-        // Filter table based on search query
+        // Filter table based on search query // TO WORK
         filterTable() {
+            /*
             if (this.table) {
                 if (this.searchQuery.trim()) {
                     this.table.setFilter([
@@ -141,26 +139,7 @@ function usersModule() {
                     this.table.clearFilter();
                 }
             }
-        },
-
-        // Privilege display helpers
-        getPrivilegeText(privilegio) {
-            const privileges = {
-                'COLABORADOR': 'Colaborador',
-                'PERSONALRRHH': 'Recursos Humanos',
-                'JEFEINMEDIATO': 'Jefe Inmediato',
-                'DIRECCION': 'Dirección'
-            };
-            return privileges[privilegio];
-        },
-
-        getPrivilegeClass(privilegio) {
-            const classes = {
-                'JEFEINMEDIATO': 'bg-green-100 text-green-800',
-                'PERSONALRRHH': 'bg-blue-100 text-blue-800',
-                'DIRECCION': 'bg-red-100 text-red-800'
-            };
-            return classes[privilegio] || 'bg-yellow-100 text-yellow-800';
+                */
         },
 
         // Show notification
@@ -183,30 +162,6 @@ function usersModule() {
             `;
             document.body.appendChild(notification);
             setTimeout(() => notification.remove(), 5000);
-        },
-
-        // Button functionality placeholders (only navigation)
-        addUser() {
-            this.showNotification('Información', 'Funcionalidad de añadir usuario no implementada.', 'info');
-        },
-
-        // Navigation functions
-        async restoreUsersView() {
-            try {
-                window.location.href = `${NGINX_TAG}/usuarios/restoreUsersView`;
-            } catch (error) {
-                console.log("error catch", error);
-                this.showNotification('Error', 'Error al navegar.', 'error');
-            }
-        },
-
-        async configureTeamView() {
-            try {
-                window.location.href = `${NGINX_TAG}/usuarios/configureTeamView`;
-            } catch (error) {
-                console.log("error catch", error);
-                this.showNotification('Error', 'Error al navegar.', 'error');
-            }
         },
 
         // Download functions using Tabulator's built-in functionality

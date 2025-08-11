@@ -52,10 +52,23 @@ const sessionManager = async (req, res, next) => {
 
         // Detén la petición por completo en caso que el *refreshToken sea inválido (case 3)
         if (!rationaleResponse.token) { // case3 -> both tokens are invalid
-            return res.status(401).send('Tu sesión ha caducado. Por favor, inicia sesión nuevamente en la página de LogIn');
+            return res.status(401).send(`
+            <html>
+                <head>
+                <meta charset="UTF-8">
+                <meta http-equiv="refresh" content="30;url=${NGINX_TAG}${URL_TAG}/login" />
+                <title>Sesión Caducada</title>
+                </head>
+                <body>
+                <p>Tu sesión ha caducado. Serás redirigido a la página de inicio de sesión en 30 segundos...</p>
+                <p>Podrías guardar tu sesión si das clic en 'Recordarme' dentro de la página de LogIn. :)</p>
+                </body>
+            </html>
+            `);
         }
 
         // O en otro caso, renueva el *accessToken en caso que su token de sesión sea válido
+        console.log("payload:", payload);
         const previousPayload = {
             name: payload.nameDisplay || 'mockName',
             id: payload.userId || 'mockId',

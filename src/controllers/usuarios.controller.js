@@ -49,11 +49,9 @@ async function verTableroActivados(req, res) {
                 habilitado: true
     */
 
-    `${data.nombre} ${data.apellidoP} ${data.apellidoM}`
-
     // Transformar datos
     const dataUsuarios = data.map(u => ({
-        id: String(u.id),
+        //id: String(u.id),
         fullName:
             `${u.dato_personal?.nombre || "Sin nombre"} ` +
             `${u.dato_personal?.apellido_p || "Sin apellido"} ` +

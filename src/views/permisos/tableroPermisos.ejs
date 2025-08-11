@@ -13,7 +13,7 @@
 
     <!-- Let the script use the data -->
     <script>
-        const dataUsuarios = <%- JSON.stringify(dataUsuarios) %>;
+        const dataJson = <%- JSON.stringify(dataJson) %>;
     </script>
 
 </head>
@@ -24,6 +24,21 @@
 
     <!-- Side Bar -->
     <%- include('../partials/sidebar.ejs') %>
+
+    <script>
+        function mostrarDescripcionFromAttr(btn) {
+            const descripcion = btn.getAttribute("data-descripcion");
+            const modal = document.querySelector('[x-data]');
+            if (modal && modal.__x) {
+                modal.__x.$data.descripcion = descripcion;
+                modal.__x.$data.show = true;
+            } else {
+                console.warn("Modal o Alpine no inicializado.");
+            }
+        }
+    </script>
+
+
 
     <div class="pt-12">
         <div class="container mx-auto px-4 py-8" x-data="usersModule()">
@@ -120,25 +135,6 @@
             <template x-if="!isLoading && usersRows.length > 0">
                 <div>
                     <div id="users-table" class="bg-white rounded-lg shadow-md overflow-hidden mb-6"></div>
-
-                    <!-- Pagination
-                    <div class="flex justify-between items-center mt-6">
-                        <div class="text-sm text-gray-700">
-                            Mostrando <span x-text="table ? dataUsuarios.length : <%= dataUsuarios.length %>"><%= dataUsuarios.length %></span> usuarios
-                        </div>
-
-                        <div class="flex space-x-2">
-                            <button @click="table && table.previousPage()"
-                                class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                Anterior
-                            </button>
-                            <button @click="table && table.nextPage()"
-                                class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                Siguiente
-                            </button>
-                        </div>
-                    </div>
-                     -->
                 </div>
             </template>
 
@@ -172,6 +168,22 @@
                     </button>
                 </div>
             </template>
+
+            <!-- PopUp Row Information -->
+            <div x-data="{ show: false, descripcion: '' }" x-show="show"
+                x-transition
+                class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white p-6 rounded shadow-lg max-w-lg w-full">
+                    <h2 class="text-lg font-semibold mb-4">Descripción completa</h2>
+                    <p class="text-gray-800 whitespace-pre-wrap" x-text="descripcion"></p>
+                    <div class="mt-4 text-right">
+                        <button @click="show = false" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </body>
