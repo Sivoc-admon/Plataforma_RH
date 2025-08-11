@@ -7,3 +7,7 @@ src/node_modules
 *.sock
 src/docs
 src/.env
+
+# uploads
+src/uploads/archivo_permiso/*
+!src/uploads/archivo_permiso/.gitkeep
