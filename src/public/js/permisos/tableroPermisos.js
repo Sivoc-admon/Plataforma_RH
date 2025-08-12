@@ -8,6 +8,8 @@ function usersModule() {
         table: null,
         isLoading: true,
         hasError: false,
+        show: false,
+        descripcion: '',
 
         // Initialize
         init() {
@@ -50,7 +52,7 @@ function usersModule() {
                 //movableColumns: true,
                 //resizableRows: true,
                 //headerFilterPlaceholder: "Filtrar...",
-                height: "310px",
+                height: "240px",
                 columns: [
                     {
                         title: "Nombre del solicitante",
@@ -64,13 +66,12 @@ function usersModule() {
                     },
                     {
                         title: "Descripción",
-                        field: "descripcion", // gestion_permiso.descripcion
+                        field: "descripcion",
                         width: 150,
                         formatter: function (cell) {
                             const rawValue = cell.getValue() || '';
-                            const truncated = rawValue.length > 40 ? rawValue.substring(0, 40) + "..." : rawValue;
-
-                            // Escapamos texto para pasarlo como atributo HTML de forma segura
+                            
+                            // Escapamos para seguridad
                             const safeValue = rawValue
                                 .replace(/&/g, '&amp;')
                                 .replace(/"/g, '&quot;')
@@ -79,17 +80,17 @@ function usersModule() {
                                 .replace(/>/g, '&gt;');
 
                             return `
-                            <button class="text-blue-600 hover:underline"
-                                    data-descripcion="${safeValue}"
-                                    onclick="mostrarDescripcionFromAttr(this)">
-                                Ver más
-                            </button>`;
+                                <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                    onclick="openDescripcionModal('${safeValue}')">
+                                    Ver más
+                                </button>
+                            `;
                         }
                     },
                     {
                         title: "Inicio",
                         field: "fecha_inicio",
-                        width: 125
+                        width: 150
                     },
                     {
                         title: "Termino",
@@ -150,8 +151,8 @@ function usersModule() {
             notification.innerHTML = `
                 <div class="flex items-center">
                     <div class="flex-1">
-                        <h4 class="font-bold">${title}</h4>
-                        <p class="text-sm">${message}</p>
+                        <h4 class="font-bold">${DOMPurify.sanitize(title)}</h4>
+                        <p class="text-sm">${DOMPurify.sanitize(message)}</p>
                     </div>
                     <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

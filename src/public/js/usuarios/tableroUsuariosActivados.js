@@ -61,7 +61,7 @@ function usersModule() {
                 //movableColumns: true,
                 //resizableRows: true,
                 //headerFilterPlaceholder: "Filtrar...",
-                height: "310px",
+                height: "240px",
                 columns: [
                     {
                         title: "Nombre Completo",
@@ -171,8 +171,8 @@ function usersModule() {
             notification.innerHTML = `
                 <div class="flex items-center">
                     <div class="flex-1">
-                        <h4 class="font-bold">${title}</h4>
-                        <p class="text-sm">${message}</p>
+                        <h4 class="font-bold">${DOMPurify.sanitize(title)}</h4>
+                        <p class="text-sm">${DOMPurify.sanitize(message)}</p>
                     </div>
                     <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
