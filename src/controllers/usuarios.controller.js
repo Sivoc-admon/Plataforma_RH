@@ -15,10 +15,13 @@ const BACKEND_URL = process.env.BACKEND_URL;
  */
 async function verTableroActivados(req, res) {
     // Consulta los permisos de la petición
+
+    /* TO WORK
     const userRole = res.locals.privilegio;
     if (!userRole || !IAM[userRole]?.usuario.verTableroActivados) {
         return res.status(401).send("No tienes permisos para acceder a este recurso.");
     }
+    */
 
     // Ejecuta el fetch de la información de los usuarios
     const pgRestRequest = {
@@ -34,20 +37,6 @@ async function verTableroActivados(req, res) {
     }
 
     const data = await response.json();
-    // Despliega la vista // TO WORK full modulo-usuarios dummy data script
-    // la base de datos de sivoc_scripting será wipeOut wipeIn con puros scripts
-    /* 
-                id: '1',
-                nombre: 'Juan',
-                apellidoP: 'Pérez',
-                apellidoM: 'González',
-                email: 'juan.perez@company.com',
-                //fechaIngreso: '2023-01-15',
-                area: 'Administración',
-                puesto: 'Director General',
-                privilegio: 'direccion',
-                habilitado: true
-    */
 
     // Transformar datos
     const dataUsuarios = data.map(u => ({

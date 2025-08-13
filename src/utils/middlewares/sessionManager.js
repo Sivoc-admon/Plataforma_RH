@@ -56,11 +56,11 @@ const sessionManager = async (req, res, next) => {
             <html>
                 <head>
                 <meta charset="UTF-8">
-                <meta http-equiv="refresh" content="30;url=${NGINX_TAG}${URL_TAG}/login" />
+                <meta http-equiv="refresh" content="15;url=${NGINX_TAG}${URL_TAG}/login" />
                 <title>Sesión Caducada</title>
                 </head>
                 <body>
-                <p>Tu sesión ha caducado. Serás redirigido a la página de inicio de sesión en 30 segundos...</p>
+                <p>Tu sesión ha caducado. Serás redirigido a la página de inicio de sesión en 15 segundos...</p>
                 <p>Podrías guardar tu sesión si das clic en 'Recordarme' dentro de la página de LogIn. :)</p>
                 </body>
             </html>

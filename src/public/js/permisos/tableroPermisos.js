@@ -57,20 +57,55 @@ function usersModule() {
                     {
                         title: "Nombre del solicitante",
                         field: "solicitante_fullName", // usuario.dato_personal.nombre||apellido_m||apellido_p ...
-                        minWidth: 125
+                        minWidth: 220,
+                        //hozAlign: "center",
                     },
-                    {
+                    {   
                         title: "Tipo",
                         field: "tipo",
-                        width: 155
+                        width: 125,
+                        //hozAlign: "center",
                     },
                     {
-                        title: "Descripción",
+                        title: "Inicio",
+                        field: "fecha_inicio",
+                        width: 110,
+                        //hozAlign: "center",
+                    },
+                    {
+                        title: "Termino",
+                        field: "fecha_termino",
+                        width: 110,
+                        //hozAlign: "center",
+                    },
+                    {
+                        title: "¿Solicitado?",
+                        field: "solicitado", // gestion_permiso.solicitado
+                        formatter: "tickCross",
+                        //editor: "tickCross", // Permite editar con click la casilla
+                        width: 115
+                    },
+                    {
+                        title: "¿Revisado?",
+                        field: "revisado", // gestion_permiso.revisado
+                        formatter: "tickCross",
+                        //editor: "tickCross", // Permite editar con click la casilla
+                        width: 110
+                    },
+                    {
+                        title: "Estado",
+                        field: "estado", // gestion_permiso.estado
+                        width: 110,
+                        //hozAlign: "center",
+                    },
+                    {
+                        title: "Acciones",
                         field: "descripcion",
-                        width: 150,
+                        width: 260,
+                        hozAlign: "center",
                         formatter: function (cell) {
                             const rawValue = cell.getValue() || '';
-                            
+
                             // Escapamos para seguridad
                             const safeValue = rawValue
                                 .replace(/&/g, '&amp;')
@@ -80,43 +115,20 @@ function usersModule() {
                                 .replace(/>/g, '&gt;');
 
                             return `
-                                <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                <button class="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 mr-2 ml-2"
                                     onclick="openDescripcionModal('${safeValue}')">
-                                    Ver más
+                                    Consultar
+                                </button>
+                                <button class="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 mr-2 ml-2"
+                                    onclick="openDescripcionModal('${safeValue}')">
+                                    Editar
+                                </button>
+                                <button class="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 mr-2 ml-2"
+                                    onclick="openDescripcionModal('${safeValue}')">
+                                    Enviar
                                 </button>
                             `;
                         }
-                    },
-                    {
-                        title: "Inicio",
-                        field: "fecha_inicio",
-                        width: 150
-                    },
-                    {
-                        title: "Termino",
-                        field: "fecha_termino",
-                        width: 125
-                    },
-                    {
-                        title: "¿Solicitado?",
-                        field: "solicitado", // gestion_permiso.solicitado
-                        formatter: "tickCross",
-                        //editor: "tickCross", // Permite editar con click la casilla
-                        hozAlign: "center",
-                        width: 125
-                    },
-                    {
-                        title: "¿Revisado?",
-                        field: "revisado", // gestion_permiso.revisado
-                        formatter: "tickCross",
-                        //editor: "tickCross", // Permite editar con click la casilla
-                        hozAlign: "center",
-                        width: 125
-                    },
-                    {
-                        title: "Estado",
-                        field: "estado", // gestion_permiso.estado
-                        width: 125
                     }
                 ]
             });

@@ -14,7 +14,7 @@ router.get(`${URL_TAG}/inicio`, (req, res) => { res.render('inicio.ejs'); });
 router.get(`${URL_TAG}/getPfp`, (req, res, next) => {
     res.locals.entidad_nombre = 'foto_perfil'; 
     res.locals.nombre_almacenado = res.locals.pfp_almacenado || '';
-    res.locals.isDownload = c ;
+    res.locals.isDownload = false ;
     next();
 }, getFile);
 

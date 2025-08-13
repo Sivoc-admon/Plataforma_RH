@@ -8,19 +8,29 @@ const ERROR_MESSAGE = process.env.ERROR_MESSAGE;
 const BACKEND_URL = process.env.BACKEND_URL;
 
 /**
- * Controla el acceso y la carga de la vista del tablero de los usuarios
- * Tambien tiene acceso a edición directamente sobre la tabla, activación y desactivacion shinshon
+ * Controla el acceso y la carga de la vista del tablero de permisos
+ * Todos los usuarios tienen acceso a este tablero, solo que con diferencias de los datos
  * @async req res next
  * @returns {Promise<Object>}
  */
 async function verTableroPermisos(req, res) {
-    // Consulta los permisos de la petición
-    /*
+
+    // Consulta y valida los permisos de la petición
     const userRole = res.locals.privilegio;
-    if (!userRole || !IAM[userRole]?.usuario.verTableroPermisos) {
+    const privilegiosActuales = IAM.verTableroPermisos?.[userRole];
+    if (!privilegiosActuales) {
         return res.status(401).send("No tienes permisos para acceder a este recurso.");
     }
-    */
+
+    // TO WORK
+    // load in sequence: cargarTodosLosPermisos, cargarPermisosEquipo, cargarTusPermisos
+    res.locals.cargarTodosLosPermisos = privilegiosActuales.cargarTodosLosPermisos;
+    res.locals.cargarPermisosEquipo = privilegiosActuales.cargarPermisosEquipo;
+    res.locals.cargarTusPermisos = privilegiosActuales.cargarTusPermisos;
+    // just use a simple if cargarTodosLosPermisos === true, load table,
+    // and stack em up
+
+    // Ejecuta un fetch con su dataJson por cada tablesToLoad, que quede todo automático
 
     // Ejecuta el fetch de la información de los usuarios
     const pgRestRequest = {
@@ -36,16 +46,16 @@ async function verTableroPermisos(req, res) {
     }
 
     const data = await response.json();
-    
+
     // Transformar datos
     const dataJson = data.map(u => ({
         //id: String(u.id),
         solicitante_fullName:
             `${u.usuario?.dato_personal?.nombre || "Sin nombre"} ` +
             `${u.usuario?.dato_personal?.apellido_p || "Sin apellido"} ` +
-            `${u.usuario?.dato_personal?.apellido_m || "Sin apellido"}`, 
+            `${u.usuario?.dato_personal?.apellido_m || "Sin apellido"}`,
         tipo: u.tipo,
-        descripcion: `${u.gestion_permiso?.descripcion||"-"} `,
+        descripcion: `${u.gestion_permiso?.descripcion || "-"} `,
         fecha_inicio: u.fecha_inicio,
         fecha_termino: u.fecha_termino,
         solicitado: u.gestion_permiso?.solicitado,
