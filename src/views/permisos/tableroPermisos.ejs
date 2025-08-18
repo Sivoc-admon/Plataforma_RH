@@ -60,9 +60,7 @@
                         <span class="text-sm font-medium text-gray-700">Descargar Excel</span>
                     </button>
                 </div>
-
                 
-
                 <!-- Loading indicator -->
                 <template x-if="isLoading">
                     <div class="text-center py-12">
@@ -71,12 +69,12 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                             </svg>
                         </div>
-                        <h2 class="text-xl font-semibold text-gray-800">Cargando usuarios...</h2>
+                        <h2 class="text-xl font-semibold text-gray-800">Cargando datos...</h2>
                     </div>
                 </template>
 
                 <!-- Search Input -->
-                <template x-if="!isLoading && usersRows.length > 0">
+                <template x-if="!isLoading">
                     <div class="mb-6">
                         <div class="relative">
                             <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
@@ -92,26 +90,32 @@
                 </template>
             </div>
 
-            <!-- Tabulator Table -->
-            <template x-if="!isLoading && usersRows.length > 0">
+            <!-- Tabulator Table P1 -->
+            <% if (cargarTodosLosPermisos) { %> 
+            <template x-if="!isLoading">
                 <div>
-                    <div id="users-table" class="bg-white rounded-lg shadow-md overflow-hidden mb-6"></div>
+                    <div id="data-table-1" class="bg-white rounded-lg shadow-md overflow-hidden mb-6"></div>
                 </div>
             </template>
+            <% }; %>
 
-            <!-- No Users Message -->
-            <template x-if="!isLoading && usersRows.length === 0">
-                <div class="text-center py-12">
-                    <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
-                            </path>
-                        </svg>
-                    </div>
-                    <h2 class="text-2xl font-semibold text-gray-800">El sistema no cuenta con usuarios.</h2>
-                    <p class="text-gray-600">Empieza creando un nuevo usuario.</p>
+            <!-- Tabulator Table P2 -->
+            <% if (cargarPermisosEquipo) { %> 
+            <template x-if="!isLoading">
+                <div>
+                    <div id="data-table-2" class="bg-white rounded-lg shadow-md overflow-hidden mb-6"></div>
                 </div>
             </template>
+            <% }; %>
+
+            <!-- Tabulator Table P3 -->
+            <% if (cargarTusPermisos) { %> 
+            <template x-if="!isLoading">
+                <div>
+                    <div id="data-table-3" class="bg-white rounded-lg shadow-md overflow-hidden mb-6"></div>
+                </div>
+            </template>
+            <% }; %>
 
             <!-- Error Message -->
             <template x-if="!isLoading && hasError">

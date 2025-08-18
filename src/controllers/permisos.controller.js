@@ -32,7 +32,7 @@ async function verTableroPermisos(req, res) {
         if (!fetchResponse.success) return res.status(500).send(ERROR_MESSAGE + '007.1');
         tables.cargarTodosLosPermisos = fetchResponse.dataJson;
         res.locals.cargarTodosLosPermisos = true;
-    }
+    } else { res.locals.cargarTodosLosPermisos = false; }
 
     if (privilegiosActuales.cargarPermisosEquipo) {
         // Fetch the current user's team_id
@@ -47,12 +47,12 @@ async function verTableroPermisos(req, res) {
         const equipoId = data[0].dato_laboral.id_equipo;
 
         // Proceed with the origina query
-        const query = `/permiso?select=*,gestion_permiso!inner(id_permiso,id_equipo,descripcion,estado,solicitado,revisado)&gestion_permiso.id_equipo=eq.${equipoId}&id_u_solicitante=neq.${userId}`;
+        const query = `/permiso?select=*,usuario(dato_personal(nombre,apellido_p,apellido_m)),gestion_permiso!inner(id_permiso,id_equipo,descripcion,estado,solicitado,revisado)&gestion_permiso.id_equipo=eq.${equipoId}&id_u_solicitante=neq.${userId}`;
         const fetchResponse = await fetchDataForTable(query);
         if (!fetchResponse.success) return res.status(500).send(ERROR_MESSAGE + '007.2B');
         tables.cargarPermisosEquipo = fetchResponse.dataJson;
         res.locals.cargarPermisosEquipo = true;
-    }
+    } else { res.locals.cargarPermisosEquipo = false; }
 
     if (privilegiosActuales.cargarTusPermisos) {
         const query = `/permiso?select=*,gestion_permiso(id_permiso,id_equipo,descripcion,estado,solicitado,revisado),usuario(dato_personal(nombre,apellido_p,apellido_m))&id_u_solicitante=eq.${userId}`;
@@ -60,9 +60,10 @@ async function verTableroPermisos(req, res) {
         if (!fetchResponse.success) return res.status(500).send(ERROR_MESSAGE + '007.3');
         tables.cargarTusPermisos = fetchResponse.dataJson;
         res.locals.cargarTusPermisos = true;
-    }
+    } else { res.locals.cargarTusPermisos = false; }
 
-    const dataJson = tables.cargarTodosLosPermisos;
+
+    const dataJson = tables;
     return res.render('../views/permisos/tableroPermisos.ejs', { dataJson });
 };
 

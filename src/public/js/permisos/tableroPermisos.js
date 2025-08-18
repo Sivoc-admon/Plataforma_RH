@@ -1,11 +1,15 @@
-// users-module.js - Simplified version
+// users-module.js - Multi-table version
 
 function usersModule() {
     return {
-        // Data properties
-        usersRows: [],
+        // Data properties for three tables
+        dataRows1: [],
+        dataRows2: [],
+        dataRows3: [],
         searchQuery: '',
-        table: null,
+        table1: null,
+        table2: null,
+        table3: null,
         isLoading: true,
         hasError: false,
         show: false,
@@ -22,30 +26,30 @@ function usersModule() {
             this.hasError = false;
 
             if (dataJson) {
-                this.usersRows = dataJson;
+                this.dataRows1 = dataJson.cargarTodosLosPermisos || [];
+                this.dataRows2 = dataJson.cargarPermisosEquipo || [];
+                this.dataRows3 = dataJson.cargarTusPermisos || [];
             } else {
-                this.usersRows = [];
+                this.dataRows1 = [];
+                this.dataRows2 = [];
+                this.dataRows3 = [];
                 console.error(ERROR_MESSAGE, '012');
             }
 
-            // Initialize table after data is loaded
+            // Initialize tables after data is loaded
             this.$nextTick(() => {
-                this.initializeTable();
+                this.initializeTable1();
+                this.initializeTable2();
+                this.initializeTable3();
             });
 
             this.isLoading = false;
         },
 
-        // Initialize Tabulator table
-        initializeTable() {
-            // Destroy existing table if it exists
-            if (this.table) {
-                this.table.destroy();
-                this.table = null;
-            }
-
-            this.table = new Tabulator("#users-table", {
-                data: this.usersRows,
+        // Get table configuration
+        getTableConfig(data) {
+            return {
+                data: data,
                 layout: "fitColumns",
                 //responsiveLayout: "hide",
                 paginationSize: 15,
@@ -131,28 +135,64 @@ function usersModule() {
                         }
                     }
                 ]
-            });
+            };
+        },
+
+        // Initialize Tabulator table 1
+        initializeTable1() {
+            // Destroy existing table if it exists
+            if (this.table1) {
+                this.table1.destroy();
+                this.table1 = null;
+            }
+
+            this.table1 = new Tabulator("#data-table-1", this.getTableConfig(this.dataRows1));
+        },
+
+        // Initialize Tabulator table 2
+        initializeTable2() {
+            // Destroy existing table if it exists
+            if (this.table2) {
+                this.table2.destroy();
+                this.table2 = null;
+            }
+
+            this.table2 = new Tabulator("#data-table-2", this.getTableConfig(this.dataRows2));
+        },
+
+        // Initialize Tabulator table 3
+        initializeTable3() {
+            // Destroy existing table if it exists
+            if (this.table3) {
+                this.table3.destroy();
+                this.table3 = null;
+            }
+
+            this.table3 = new Tabulator("#data-table-3", this.getTableConfig(this.dataRows3));
         },
 
         // Filter table based on search query // TO WORK
-        filterTable() {
+        filterTable(tableNumber = null) {
             /*
-            if (this.table) {
-                if (this.searchQuery.trim()) {
-                    this.table.setFilter([
-                        [
-                            { field: "nombre", type: "like", value: this.searchQuery },
-                            { field: "apellidoP", type: "like", value: this.searchQuery },
-                            { field: "apellidoM", type: "like", value: this.searchQuery },
-                            { field: "area", type: "like", value: this.searchQuery },
-                            { field: "email", type: "like", value: this.searchQuery }
-                        ]
-                    ]);
-                } else {
-                    this.table.clearFilter();
+            const tables = tableNumber ? [this[`table${tableNumber}`]] : [this.table1, this.table2, this.table3];
+            
+            tables.forEach(table => {
+                if (table) {
+                    if (this.searchQuery.trim()) {
+                        table.setFilter([
+                            [
+                                { field: "solicitante_fullName", type: "like", value: this.searchQuery },
+                                { field: "tipo", type: "like", value: this.searchQuery },
+                                { field: "estado", type: "like", value: this.searchQuery },
+                                { field: "descripcion", type: "like", value: this.searchQuery }
+                            ]
+                        ]);
+                    } else {
+                        table.clearFilter();
+                    }
                 }
-            }
-                */
+            });
+            */
         },
 
         // Show notification
@@ -177,37 +217,101 @@ function usersModule() {
             setTimeout(() => notification.remove(), 5000);
         },
 
-        // Download functions using Tabulator's built-in functionality
+        // Download functions for Table 3
+        /*
+        async downloadPDF3() {
+            try {
+                if (this.table3) { // wanna do table 2? just do: this.table2
+                    this.table3.download("pdf", "usuarios_tabla3.pdf", {
+                        orientation: "landscape",
+                        title: "Lista de Usuarios - Tabla 3 - SIVOC"
+                    });
+                    this.showNotification('Éxito', 'PDF de Tabla 3 descargado correctamente.');
+                } else {
+                    this.showNotification('Error', 'No hay datos para descargar en Tabla 3.', 'error');
+                }
+            } catch (error) {
+                console.log("error catch", error);
+                this.showNotification('Error', 'Error al descargar PDF de Tabla 3.', 'error');
+            }
+        },
+        async downloadExcel1() {
+            try {
+                if (this.table1) {
+                    this.table1.download("xlsx", "usuarios_tabla1.xlsx", {
+                        sheetName: "Usuarios Tabla 1"
+                    });
+                    this.showNotification('Éxito', 'Excel de Tabla 1 descargado correctamente.');
+                } else {
+                    this.showNotification('Error', 'No hay datos para descargar en Tabla 1.', 'error');
+                }
+            } catch (error) {
+                console.log("error catch", error);
+                this.showNotification('Error', 'Error al descargar Excel de Tabla 1.', 'error');
+            }
+        },
+        */
+
+
+        // Combined download functions (downloads all tables data in one file)
         async downloadPDF() {
             try {
-                if (this.table) {
-                    this.table.download("pdf", "usuarios.pdf", {
+                // Combine all data from the three tables
+                const combinedData = [
+                    ...this.dataRows1,
+                    ...this.dataRows2,
+                    ...this.dataRows3
+                ];
+
+                if (combinedData.length > 0) {
+                    // Create a temporary table with combined data for download
+                    const tempTable = new Tabulator(document.createElement("div"), this.getTableConfig(combinedData));
+                    
+                    tempTable.download("pdf", "permisos.pdf", {
                         orientation: "landscape",
-                        title: "Lista de Usuarios - SIVOC"
+                        title: "Lista Completa de Usuarios - SIVOC"
                     });
-                    this.showNotification('Éxito', 'PDF descargado correctamente.');
+                    
+                    this.showNotification('Éxito', 'PDF con todas las tablas descargado correctamente.');
+                    
+                    // Clean up temporary table
+                    tempTable.destroy();
                 } else {
                     this.showNotification('Error', 'No hay datos para descargar.', 'error');
                 }
             } catch (error) {
                 console.log("error catch", error);
-                this.showNotification('Error', 'Error al descargar PDF.', 'error');
+                this.showNotification('Error', 'Error al descargar PDF combinado.', 'error');
             }
         },
 
         async downloadExcel() {
             try {
-                if (this.table) {
-                    this.table.download("xlsx", "usuarios.xlsx", {
-                        sheetName: "Usuarios"
+                // Combine all data from the three tables
+                const combinedData = [
+                    ...this.dataRows1,
+                    ...this.dataRows2,
+                    ...this.dataRows3
+                ];
+
+                if (combinedData.length > 0) {
+                    // Create a temporary table with combined data for download
+                    const tempTable = new Tabulator(document.createElement("div"), this.getTableConfig(combinedData));
+                    
+                    tempTable.download("xlsx", "permisos.xlsx", {
+                        sheetName: "Usuarios Completo"
                     });
-                    this.showNotification('Éxito', 'Excel descargado correctamente.');
+                    
+                    this.showNotification('Éxito', 'Excel con todas las tablas descargado correctamente.');
+                    
+                    // Clean up temporary table
+                    tempTable.destroy();
                 } else {
                     this.showNotification('Error', 'No hay datos para descargar.', 'error');
                 }
             } catch (error) {
                 console.log("error catch", error);
-                this.showNotification('Error', 'Error al descargar Excel.', 'error');
+                this.showNotification('Error', 'Error al descargar Excel combinado.', 'error');
             }
         }
     };
