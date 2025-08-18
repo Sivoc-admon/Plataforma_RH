@@ -19,35 +19,67 @@ async function verTableroPermisos(req, res) {
     const userRole = res.locals.privilegio;
     const privilegiosActuales = IAM.verTableroPermisos?.[userRole];
     if (!privilegiosActuales) {
-        return res.status(401).send("No tienes permisos para acceder a este recurso.");
+        return res.status(401).send('No tienes permisos para acceder a este recurso.');
     }
 
-    // TO WORK
-    // load in sequence: cargarTodosLosPermisos, cargarPermisosEquipo, cargarTusPermisos
-    res.locals.cargarTodosLosPermisos = privilegiosActuales.cargarTodosLosPermisos;
-    res.locals.cargarPermisosEquipo = privilegiosActuales.cargarPermisosEquipo;
-    res.locals.cargarTusPermisos = privilegiosActuales.cargarTusPermisos;
-    // just use a simple if cargarTodosLosPermisos === true, load table,
-    // and stack em up
+    // Load in sequence: cargarTodosLosPermisos, cargarPermisosEquipo, cargarTusPermisos
+    let tables = {};
+    const userId = res.locals.userId;
 
-    // Ejecuta un fetch con su dataJson por cada tablesToLoad, que quede todo automático
+    if (privilegiosActuales.cargarTodosLosPermisos) {
+        const query = `/permiso?select=*,gestion_permiso(id_permiso,id_equipo,descripcion,estado,solicitado,revisado),usuario(dato_personal(nombre,apellido_p,apellido_m))&id_u_solicitante=neq.${userId}`;
+        const fetchResponse = await fetchDataForTable(query);
+        if (!fetchResponse.success) return res.status(500).send(ERROR_MESSAGE + '007.1');
+        tables.cargarTodosLosPermisos = fetchResponse.dataJson;
+        res.locals.cargarTodosLosPermisos = true;
+    }
 
-    // Ejecuta el fetch de la información de los usuarios
+    if (privilegiosActuales.cargarPermisosEquipo) {
+        // Fetch the current user's team_id
+        const pgRestRequest = {
+            fetchMethod: 'GET',
+            fetchUrl: `${BACKEND_URL}/usuario?select=dato_laboral(id_equipo)&id=eq.${userId}`,
+            fetchBody: {}
+        }
+        const response = await fetchPostgREST(pgRestRequest);
+        if (!response.ok) return res.status(500).send(ERROR_MESSAGE + '007.2A');
+        const data = await response.json();
+        const equipoId = data[0].dato_laboral.id_equipo;
+
+        // Proceed with the origina query
+        const query = `/permiso?select=*,gestion_permiso!inner(id_permiso,id_equipo,descripcion,estado,solicitado,revisado)&gestion_permiso.id_equipo=eq.${equipoId}&id_u_solicitante=neq.${userId}`;
+        const fetchResponse = await fetchDataForTable(query);
+        if (!fetchResponse.success) return res.status(500).send(ERROR_MESSAGE + '007.2B');
+        tables.cargarPermisosEquipo = fetchResponse.dataJson;
+        res.locals.cargarPermisosEquipo = true;
+    }
+
+    if (privilegiosActuales.cargarTusPermisos) {
+        const query = `/permiso?select=*,gestion_permiso(id_permiso,id_equipo,descripcion,estado,solicitado,revisado),usuario(dato_personal(nombre,apellido_p,apellido_m))&id_u_solicitante=eq.${userId}`;
+        const fetchResponse = await fetchDataForTable(query);
+        if (!fetchResponse.success) return res.status(500).send(ERROR_MESSAGE + '007.3');
+        tables.cargarTusPermisos = fetchResponse.dataJson;
+        res.locals.cargarTusPermisos = true;
+    }
+
+    const dataJson = tables.cargarTodosLosPermisos;
+    return res.render('../views/permisos/tableroPermisos.ejs', { dataJson });
+};
+
+/**
+ * Ejecuta la query de PostgREST y regresa la data en formato JSON
+ * @async {query} - String que se agrega a la url para ejecutar una petición en PostgREST
+ * @returns {Promise<Object>} dataJson - El json listo para mostrarse en una tabla
+ */
+async function fetchDataForTable(query) {
     const pgRestRequest = {
         fetchMethod: 'GET',
-        fetchUrl: `${BACKEND_URL}/permiso?select=*,gestion_permiso(id_permiso,id_equipo,descripcion,estado,solicitado,revisado),usuario(dato_personal(nombre,apellido_p,apellido_m))`,
+        fetchUrl: `${BACKEND_URL}${query}`,
         fetchBody: {}
     }
-
-    // Captura el error al consultar la base de datos
     const response = await fetchPostgREST(pgRestRequest);
-    if (!response.ok) {
-        return res.status(500).send(ERROR_MESSAGE + '007');
-    }
-
+    if (!response.ok) return { success: false, data: '' };
     const data = await response.json();
-
-    // Transformar datos
     const dataJson = data.map(u => ({
         //id: String(u.id),
         solicitante_fullName:
@@ -62,8 +94,7 @@ async function verTableroPermisos(req, res) {
         revisado: u.gestion_permiso?.revisado,
         estado: `${u.gestion_permiso?.estado}`,
     }));
-
-    return res.render('../views/permisos/tableroPermisos.ejs', { dataJson });
-};
+    return { success: true, dataJson: dataJson };
+}
 
 module.exports = { verTableroPermisos };
