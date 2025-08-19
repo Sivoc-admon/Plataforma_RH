@@ -52,11 +52,12 @@ function usersModule() {
                 data: data,
                 layout: "fitColumns",
                 //responsiveLayout: "hide",
-                paginationSize: 15,
+                pagination: true,
+                paginationSize: 3,
                 //movableColumns: true,
                 //resizableRows: true,
                 //headerFilterPlaceholder: "Filtrar...",
-                height: "240px",
+                height: "241px",
                 columns: [
                     {
                         title: "Nombre del solicitante",
@@ -64,7 +65,7 @@ function usersModule() {
                         minWidth: 220,
                         //hozAlign: "center",
                     },
-                    {   
+                    {
                         title: "Tipo",
                         field: "tipo",
                         width: 125,
@@ -134,7 +135,7 @@ function usersModule() {
                             `;
                         }
                     }
-                ]
+                ],
             };
         },
 
@@ -266,14 +267,14 @@ function usersModule() {
                 if (combinedData.length > 0) {
                     // Create a temporary table with combined data for download
                     const tempTable = new Tabulator(document.createElement("div"), this.getTableConfig(combinedData));
-                    
+
                     tempTable.download("pdf", "permisos.pdf", {
                         orientation: "landscape",
                         title: "Lista Completa de Usuarios - SIVOC"
                     });
-                    
+
                     this.showNotification('Éxito', 'PDF con todas las tablas descargado correctamente.');
-                    
+
                     // Clean up temporary table
                     tempTable.destroy();
                 } else {
@@ -297,13 +298,13 @@ function usersModule() {
                 if (combinedData.length > 0) {
                     // Create a temporary table with combined data for download
                     const tempTable = new Tabulator(document.createElement("div"), this.getTableConfig(combinedData));
-                    
+
                     tempTable.download("xlsx", "permisos.xlsx", {
                         sheetName: "Usuarios Completo"
                     });
-                    
+
                     this.showNotification('Éxito', 'Excel con todas las tablas descargado correctamente.');
-                    
+
                     // Clean up temporary table
                     tempTable.destroy();
                 } else {

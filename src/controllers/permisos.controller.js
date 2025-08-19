@@ -1,6 +1,8 @@
 const IAM = require('../utils/IAM.json');
 const { fetchPostgREST } = require('../utils/scripts/postgrestHelper');
 
+// TO WORK, FIX FRONTEND, y si no tiene info añade algo también que lo indique
+
 /**
  * Constantes para la configuración del módulo de usuarios.
  */
@@ -61,7 +63,6 @@ async function verTableroPermisos(req, res) {
         tables.cargarTusPermisos = fetchResponse.dataJson;
         res.locals.cargarTusPermisos = true;
     } else { res.locals.cargarTusPermisos = false; }
-
 
     const dataJson = tables;
     return res.render('../views/permisos/tableroPermisos.ejs', { dataJson });

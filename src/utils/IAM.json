@@ -12,7 +12,9 @@
             "cargarTusPermisos": true
         },
         "DIRECCION": {
-            "cargarTodosLosPermisos": true
+            "cargarTodosLosPermisos": true,
+            "cargarPermisosEquipo": true,
+            "cargarTusPermisos": true
         }
     }
 }

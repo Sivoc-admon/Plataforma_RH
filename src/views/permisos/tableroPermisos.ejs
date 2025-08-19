@@ -92,6 +92,8 @@
 
             <!-- Tabulator Table P1 -->
             <% if (cargarTodosLosPermisos) { %> 
+            <h2 class="text-lg font-bold text-gray-600 mb-1">Todos los permisos de SIVOC</h2>
+            <div id="row-count" class="text-gray-700 font-small mb-2">Permisos dentro esta tabla: <%- dataJson.cargarTodosLosPermisos.length %></div>
             <template x-if="!isLoading">
                 <div>
                     <div id="data-table-1" class="bg-white rounded-lg shadow-md overflow-hidden mb-6"></div>
@@ -101,6 +103,8 @@
 
             <!-- Tabulator Table P2 -->
             <% if (cargarPermisosEquipo) { %> 
+            <h2 class="text-lg font-bold text-gray-600 mb-1">Los permisos de tu equipo</h2>
+            <div id="row-count" class="text-gray-700 font-small mb-2">Permisos dentro esta tabla: <%- dataJson.cargarPermisosEquipo.length %></div>
             <template x-if="!isLoading">
                 <div>
                     <div id="data-table-2" class="bg-white rounded-lg shadow-md overflow-hidden mb-6"></div>
@@ -110,6 +114,8 @@
 
             <!-- Tabulator Table P3 -->
             <% if (cargarTusPermisos) { %> 
+            <h2 class="text-lg font-bold text-gray-600 mb-2">Tus permisos</h2>
+            <div id="row-count" class="text-gray-700 font-small mb-2">Permisos dentro esta tabla: <%- dataJson.cargarTusPermisos.length %></div>
             <template x-if="!isLoading">
                 <div>
                     <div id="data-table-3" class="bg-white rounded-lg shadow-md overflow-hidden mb-6"></div>
