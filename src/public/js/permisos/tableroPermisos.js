@@ -53,16 +53,17 @@ function usersModule() {
                 layout: "fitColumns",
                 //responsiveLayout: "hide",
                 pagination: true,
-                paginationSize: 3,
+                paginationSize: 2,
+                paginationSizeSelector: [2, 5, 10, 20, 50, 100], // opciones que el usuario puede elegir
                 //movableColumns: true,
                 //resizableRows: true,
                 //headerFilterPlaceholder: "Filtrar...",
-                height: "241px",
+                height: "184px",
                 columns: [
                     {
                         title: "Nombre del solicitante",
                         field: "solicitante_fullName", // usuario.dato_personal.nombre||apellido_m||apellido_p ...
-                        minWidth: 220,
+                        minWidth: 280,
                         //hozAlign: "center",
                     },
                     {
@@ -74,13 +75,13 @@ function usersModule() {
                     {
                         title: "Inicio",
                         field: "fecha_inicio",
-                        width: 110,
+                        width: 120,
                         //hozAlign: "center",
                     },
                     {
                         title: "Termino",
                         field: "fecha_termino",
-                        width: 110,
+                        width: 120,
                         //hozAlign: "center",
                     },
                     {
@@ -119,20 +120,41 @@ function usersModule() {
                                 .replace(/</g, '&lt;')
                                 .replace(/>/g, '&gt;');
 
+                            
+                            // TO WORK, botón de descripción, que tenga el botón de "habilitar edición" si se tienen los permisos
+                            // ESTE SET DE BOTONES ES PARA ROL:SOLICITANTE
+                            // + Crear Permiso (que solo cree una row vacia con un título indicativo de haberlo creado recientemente, location.reload)
                             return `
-                                <button class="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 mr-2 ml-2"
-                                    onclick="openDescripcionModal('${safeValue}')">
-                                    Consultar
-                                </button>
-                                <button class="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 mr-2 ml-2"
-                                    onclick="openDescripcionModal('${safeValue}')">
+                                <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
+                                    onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
                                     Editar
                                 </button>
-                                <button class="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 mr-2 ml-2"
-                                    onclick="openDescripcionModal('${safeValue}')">
-                                    Enviar
+                                <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
+                                    onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
+                                    Terminar solicitud
+                                </button>
+                                <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
+                                    onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
+                                    Borrar
                                 </button>
                             `;
+
+                            /* ESTOS SERÍAN PARA EL ROL:REVISOR
+                            return `
+                                <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
+                                    onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
+                                    Consultar
+                                </button>
+                                <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
+                                    onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
+                                    Cambiar estado
+                                </button>
+                                <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
+                                    onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
+                                    Terminar revisión
+                                </button>
+                            `;
+                            */
                         }
                     }
                 ],

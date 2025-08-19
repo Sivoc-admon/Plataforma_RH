@@ -12,9 +12,12 @@
             "cargarTusPermisos": true
         },
         "DIRECCION": {
-            "cargarTodosLosPermisos": true,
-            "cargarPermisosEquipo": true,
-            "cargarTusPermisos": true
+            "cargarTodosLosPermisos": true
         }
+    },
+    "verTableroActivados": {
+        "JEFEINMEDIATO": true,
+        "PERSONALRRHH": true,
+        "DIRECCION": true
     }
 }

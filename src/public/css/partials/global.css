@@ -5,8 +5,10 @@
     --cyan: #87c1d3;
     --dark-green: #016e76;
     --black: #292f38;
+    --glass-black: #292f384f;
     --font: 'HK Grotesk', sans-serif;
     --sidebar-width: 200px;
+    --light-green: #4a9ca8;
 }
 
 .navbar {

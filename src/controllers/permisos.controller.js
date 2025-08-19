@@ -1,8 +1,6 @@
 const IAM = require('../utils/IAM.json');
 const { fetchPostgREST } = require('../utils/scripts/postgrestHelper');
 
-// TO WORK, FIX FRONTEND, y si no tiene info añade algo también que lo indique
-
 /**
  * Constantes para la configuración del módulo de usuarios.
  */

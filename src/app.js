@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 app.disable('x-powered-by'); // <-- "security through obscurity" 
 
-require('dotenv').config({ path: '../.env' }); // <- TO WORK
+require('dotenv').config({ path: '../.env' }); // <- TO WORK (delete manually inside the server)
 
 // Utilidades
 const { sessionManager } = require('./utils/middlewares/sessionManager');

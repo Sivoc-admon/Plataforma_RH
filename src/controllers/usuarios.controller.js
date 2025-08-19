@@ -16,12 +16,11 @@ const BACKEND_URL = process.env.BACKEND_URL;
 async function verTableroActivados(req, res) {
     // Consulta los permisos de la petición
 
-    /* TO WORK
     const userRole = res.locals.privilegio;
-    if (!userRole || !IAM[userRole]?.usuario.verTableroActivados) {
-        return res.status(401).send("No tienes permisos para acceder a este recurso.");
+    const privilegiosActuales = IAM.verTableroActivados?.[userRole];
+    if (!privilegiosActuales) {
+        return res.status(401).send('No tienes permisos para acceder a este recurso.');
     }
-    */
 
     // Ejecuta el fetch de la información de los usuarios
     const pgRestRequest = {
