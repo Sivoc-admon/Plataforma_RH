@@ -6,7 +6,6 @@ function tableroPermisos() {
         dataRows1: [],
         dataRows2: [],
         dataRows3: [],
-        searchQuery: '',
         table1: null,
         table2: null,
         table3: null,
@@ -47,64 +46,82 @@ function tableroPermisos() {
         },
 
         // Get table configuration
-        getTableConfig(data) {
+        getTableConfig(data, isRevisor) {
             return {
                 data: data,
                 layout: "fitColumns",
-                //responsiveLayout: "hide",
-                //movableColumns: true,
-                //resizableRows: true,
-                //headerFilterPlaceholder: "Filtrar...",
+                movableColumns: true,
+                resizableRows: true,
+                headerFilterPlaceholder: "Filtrar...",
                 height: "415px",
                 columns: [
                     {
                         title: "Nombre del solicitante",
                         field: "solicitante_fullName", // usuario.dato_personal.nombre||apellido_m||apellido_p ...
                         minWidth: 280,
-                        //hozAlign: "center",
+                        headerFilter: "input"
                     },
                     {
                         title: "Tipo",
                         field: "tipo",
                         width: 125,
-                        //hozAlign: "center",
+                        headerFilter: "select",
+                        headerFilterParams: {
+                            values: ['Home Office', 'Incapacidad', 'Cita médica', 'Asunto familiar']
+                        }
                     },
                     {
                         title: "Inicio",
                         field: "fecha_inicio",
                         width: 120,
-                        //hozAlign: "center",
+                        headerFilter: "input"
                     },
                     {
                         title: "Termino",
                         field: "fecha_termino",
                         width: 120,
-                        //hozAlign: "center",
+                        headerFilter: "input"
                     },
                     {
                         title: "¿Solicitado?",
                         field: "solicitado", // gestion_permiso.solicitado
                         formatter: "tickCross",
-                        //editor: "tickCross", // Permite editar con click la casilla
-                        width: 115
+                        width: 115,
+                        headerFilter: "select",
+                        headerFilterParams: {
+                            values: {
+                                true: "Sí",
+                                false: "No"
+                            }
+                        }
                     },
                     {
                         title: "¿Revisado?",
                         field: "revisado", // gestion_permiso.revisado
                         formatter: "tickCross",
                         //editor: "tickCross", // Permite editar con click la casilla
-                        width: 110
+                        width: 110,
+                        headerFilter: "select",
+                        headerFilterParams: {
+                            values: {
+                                true: "Sí",
+                                false: "No"
+                            }
+                        }
                     },
                     {
                         title: "Estado",
                         field: "estado", // gestion_permiso.estado
                         width: 110,
-                        //hozAlign: "center",
+                        headerFilter: "select",
+                        headerFilterParams: {
+                            values: ['Aprobado', 'Pendiente', 'Cancelado', 'Justificado', 'Injustificado']
+                        }
                     },
                     {
                         title: "Acciones",
                         field: "descripcion",
-                        width: 260,
+                        width: 280,
                         hozAlign: "center",
                         formatter: function (cell) {
                             const rawValue = cell.getValue() || '';
@@ -119,39 +136,39 @@ function tableroPermisos() {
 
 
                             // TO WORK, botón de descripción, que tenga el botón de "habilitar edición" si se tienen los permisos
-                            // ESTE SET DE BOTONES ES PARA ROL:SOLICITANTE
                             // + Crear Permiso (que solo cree una row vacia con un título indicativo de haberlo creado recientemente, location.reload)
-                            return `
-                                <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
-                                    onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
-                                    Editar
-                                </button>
-                                <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
-                                    onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
-                                    Terminar solicitud
-                                </button>
-                                <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
-                                    onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
-                                    Borrar
-                                </button>
-                            `;
 
-                            /* ESTOS SERÍAN PARA EL ROL:REVISOR
-                            return `
-                                <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
-                                    onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
-                                    Consultar
-                                </button>
-                                <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
-                                    onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
-                                    Cambiar estado
-                                </button>
-                                <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
-                                    onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
-                                    Terminar revisión
-                                </button>
-                            `;
-                            */
+                            if (isRevisor) {
+                                return `
+                                    <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
+                                        onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
+                                        Consultar
+                                    </button>
+                                    <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
+                                        onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
+                                        Cambiar estado
+                                    </button>
+                                    <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
+                                        onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
+                                        Terminar revisión
+                                    </button>
+                                `;
+                            } else {
+                                return `
+                                    <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
+                                        onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
+                                        Editar
+                                    </button>
+                                    <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
+                                        onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
+                                        Enviar solicitud
+                                    </button>
+                                    <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
+                                        onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
+                                        Borrar
+                                    </button>
+                                `;
+                            }
                         }
                     }
                 ],
@@ -166,7 +183,7 @@ function tableroPermisos() {
                 this.table1 = null;
             }
 
-            this.table1 = new Tabulator("#data-table-1", this.getTableConfig(this.dataRows1));
+            this.table1 = new Tabulator("#data-table-1", this.getTableConfig(this.dataRows1, true));
         },
 
         // Initialize Tabulator table 2
@@ -177,7 +194,7 @@ function tableroPermisos() {
                 this.table2 = null;
             }
 
-            this.table2 = new Tabulator("#data-table-2", this.getTableConfig(this.dataRows2));
+            this.table2 = new Tabulator("#data-table-2", this.getTableConfig(this.dataRows2, true));
         },
 
         // Initialize Tabulator table 3
@@ -188,53 +205,7 @@ function tableroPermisos() {
                 this.table3 = null;
             }
 
-            this.table3 = new Tabulator("#data-table-3", this.getTableConfig(this.dataRows3));
-        },
-
-        // Filter table based on search query // TO WORK
-        filterTable(tableNumber = null) {
-            /*
-            const tables = tableNumber ? [this[`table${tableNumber}`]] : [this.table1, this.table2, this.table3];
-            
-            tables.forEach(table => {
-                if (table) {
-                    if (this.searchQuery.trim()) {
-                        table.setFilter([
-                            [
-                                { field: "solicitante_fullName", type: "like", value: this.searchQuery },
-                                { field: "tipo", type: "like", value: this.searchQuery },
-                                { field: "estado", type: "like", value: this.searchQuery },
-                                { field: "descripcion", type: "like", value: this.searchQuery }
-                            ]
-                        ]);
-                    } else {
-                        table.clearFilter();
-                    }
-                }
-            });
-            */
-        },
-
-        // Show notification
-        showNotification(title, message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-                }`;
-            notification.innerHTML = `
-                <div class="flex items-center">
-                    <div class="flex-1">
-                        <h4 class="font-bold">${DOMPurify.sanitize(title)}</h4>
-                        <p class="text-sm">${DOMPurify.sanitize(message)}</p>
-                    </div>
-                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-            `;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 5000);
+            this.table3 = new Tabulator("#data-table-3", this.getTableConfig(this.dataRows3, false));
         },
 
         // Download functions for Table 3
@@ -292,16 +263,16 @@ function tableroPermisos() {
                         title: "Lista Completa de Usuarios - SIVOC"
                     });
 
-                    this.showNotification('Éxito', 'PDF con todas las tablas descargado correctamente.');
+                    //this.showNotification('Éxito', 'PDF con todas las tablas descargado correctamente.');
 
                     // Clean up temporary table
                     tempTable.destroy();
                 } else {
-                    this.showNotification('Error', 'No hay datos para descargar.', 'error');
+                    //this.showNotification('Error', 'No hay datos para descargar.', 'error');
                 }
             } catch (error) {
                 console.log("error catch", error);
-                this.showNotification('Error', 'Error al descargar PDF combinado.', 'error');
+                //this.showNotification('Error', 'Error al descargar PDF combinado.', 'error');
             }
         },
 
@@ -322,38 +293,34 @@ function tableroPermisos() {
                         sheetName: "Usuarios Completo"
                     });
 
-                    this.showNotification('Éxito', 'Excel con todas las tablas descargado correctamente.');
+                    //this.showNotification('Éxito', 'Excel con todas las tablas descargado correctamente.');
 
                     // Clean up temporary table
                     tempTable.destroy();
                 } else {
-                    this.showNotification('Error', 'No hay datos para descargar.', 'error');
+                    //this.showNotification('Error', 'No hay datos para descargar.', 'error');
                 }
             } catch (error) {
                 console.log("error catch", error);
-                this.showNotification('Error', 'Error al descargar Excel combinado.', 'error');
+                //this.showNotification('Error', 'Error al descargar Excel combinado.', 'error');
             }
         },
         async crearPermiso() {
             try {
-                
                 // Llamar al endpoint
                 const url = `${NGINX_TAG}${URL_TAG}/permisos/crearSolicitudPermiso`;
                 const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
-                // Eliminar notificación de loading
-                loadingNotification.remove();
-
                 if (!response.ok) {
-                    this.showNotification('Error', 'Ocurrió un error al crear una nueva solicitud.', 'error');
+                    //this.showNotification('Error', 'Ocurrió un error al crear una nueva solicitud.', 'error');
                     return;
                 }
 
-                this.showNotification('Éxito', 'Se creó un nuevo permiso vacío con éxito.');
+                //this.showNotification('Éxito', 'Se creó un nuevo permiso vacío con éxito.');
             } catch (error) {
                 console.error("error catch", error);
                 document.querySelectorAll('.fixed.top-4.right-4').forEach(el => el.remove()); // borrar loading si quedó
-                this.showNotification('Error', 'Ocurrió un error al crear una nueva solicitud.', 'error');
+                //this.showNotification('Error', 'Ocurrió un error al crear una nueva solicitud.', 'error');
             }
         }
 

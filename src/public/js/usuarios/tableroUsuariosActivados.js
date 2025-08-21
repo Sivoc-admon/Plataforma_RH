@@ -56,11 +56,7 @@ function usersModule() {
             this.table = new Tabulator("#users-table", {
                 data: this.usersRows,
                 layout: "fitColumns",
-                //responsiveLayout: "hide",
                 paginationSize: 15,
-                //movableColumns: true,
-                //resizableRows: true,
-                //headerFilterPlaceholder: "Filtrar...",
                 height: "240px",
                 columns: [
                     {
