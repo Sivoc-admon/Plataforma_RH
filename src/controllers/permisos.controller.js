@@ -97,4 +97,27 @@ async function fetchDataForTable(query) {
     return { success: true, dataJson: dataJson };
 }
 
-module.exports = { verTableroPermisos };
+/**
+ * Controla la petición del frontend para generar un nuevo permiso vacio según el id del usuario loggeado
+ * Todos los usuarios tienen acceso a este tablero, solo que con diferencias de los datos
+ * @async req res next
+ * @returns {Promise<Object>}
+ */
+async function crearSolicitudPermiso(req, res) {
+
+    // Create an empty permit for the current logged user
+    // This works because PostgreSQL has a trigger to create a "gestion_permiso" after creating a new permiso
+    const userId = res.locals.userId;
+    const pgrestRequest_1 = {
+        fetchMethod: 'POST',
+        fetchUrl: `${BACKEND_URL}/permiso`,
+        fetchBody: { id_u_solicitante: userId }
+    };
+    const permisoRes = await fetchPostgREST(pgrestRequest_1);
+    if (!permisoRes.ok) return { ok: false };
+
+    // exit
+    return { ok: true };
+}
+
+module.exports = { verTableroPermisos, crearSolicitudPermiso };

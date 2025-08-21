@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
  * @returns {object} response - El objeto de la respuesta del fetch.
  */
 async function fetchPostgREST(requestJSON) {
+
     // Genera el Bearer token para autorizar la consulta a postgREST
     const roleMapping = {
         'POST': 'create_only_role',

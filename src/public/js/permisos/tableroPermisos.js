@@ -1,6 +1,6 @@
 // users-module.js - Multi-table version
 
-function usersModule() {
+function tableroPermisos() {
     return {
         // Data properties for three tables
         dataRows1: [],
@@ -52,13 +52,10 @@ function usersModule() {
                 data: data,
                 layout: "fitColumns",
                 //responsiveLayout: "hide",
-                pagination: true,
-                paginationSize: 2,
-                paginationSizeSelector: [2, 5, 10, 20, 50, 100], // opciones que el usuario puede elegir
                 //movableColumns: true,
                 //resizableRows: true,
                 //headerFilterPlaceholder: "Filtrar...",
-                height: "184px",
+                height: "415px",
                 columns: [
                     {
                         title: "Nombre del solicitante",
@@ -120,7 +117,7 @@ function usersModule() {
                                 .replace(/</g, '&lt;')
                                 .replace(/>/g, '&gt;');
 
-                            
+
                             // TO WORK, botón de descripción, que tenga el botón de "habilitar edición" si se tienen los permisos
                             // ESTE SET DE BOTONES ES PARA ROL:SOLICITANTE
                             // + Crear Permiso (que solo cree una row vacia con un título indicativo de haberlo creado recientemente, location.reload)
@@ -336,6 +333,29 @@ function usersModule() {
                 console.log("error catch", error);
                 this.showNotification('Error', 'Error al descargar Excel combinado.', 'error');
             }
+        },
+        async crearPermiso() {
+            try {
+                
+                // Llamar al endpoint
+                const url = `${NGINX_TAG}${URL_TAG}/permisos/crearSolicitudPermiso`;
+                const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+
+                // Eliminar notificación de loading
+                loadingNotification.remove();
+
+                if (!response.ok) {
+                    this.showNotification('Error', 'Ocurrió un error al crear una nueva solicitud.', 'error');
+                    return;
+                }
+
+                this.showNotification('Éxito', 'Se creó un nuevo permiso vacío con éxito.');
+            } catch (error) {
+                console.error("error catch", error);
+                document.querySelectorAll('.fixed.top-4.right-4').forEach(el => el.remove()); // borrar loading si quedó
+                this.showNotification('Error', 'Ocurrió un error al crear una nueva solicitud.', 'error');
+            }
         }
+
     };
 }

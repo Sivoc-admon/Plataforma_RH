@@ -28,7 +28,7 @@
         <style>
             html,
             body {
-                background: linear-gradient(160deg, var(--white), var(--glass-black));
+                background: linear-gradient(160deg, var(--white));
                 height: 100%;
                 margin: 0;
             }
@@ -83,7 +83,7 @@
         </style>
 </head>
 
-<body id="content" class="content relative overflow-hidden">
+<body id="content">
     <!-- Navigation Bar -->
     <%- include('./partials/navbar.ejs') %>
 
@@ -91,7 +91,7 @@
         <%- include('./partials/sidebar.ejs') %>
 
             <!-- Main Content -->
-            <div class="min-h-screen flex items-center justify-center relative z-10 pt-0">
+            <div class="min-h-screen flex items-center justify-center relative z-10 pt-16">
                 <!-- Hero Section -->
                 <div class="max-w-7xl mx-auto text-center w-full" x-data="{ loaded: false }"
                     x-init="setTimeout(() => loaded = true, 300)">
@@ -107,19 +107,19 @@
                         <!-- Animated Subtitle -->
                         <div class="flex items-center justify-center space-x-3 opacity-80" style="color: var(--black);">
                             <div class="w-16 h-px bg-gradient-to-r from-transparent via-current to-transparent"></div>
-                            <span class="text-sm uppercase tracking-widest font-medium">SIVOC Ingeniería Eléctrica
+                            <span class="text-sm uppercase tracking-widest font-medium">Ingeniería Eléctrica
                                 Especializada</span>
                             <div class="w-16 h-px bg-gradient-to-r from-transparent via-current to-transparent"></div>
                         </div>
                     </div>
 
                     <!-- Logo Container -->
-                    <div class="mb-16 transform transition-all duration-1000 delay-500"
+                    <div class="mb-16 transform transition-all duration-1000 delay-500 pt-8"
                         :class="loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'">
                         <div class="relative inline-block">
                             <!-- Logo Card -->
                             <div class="rounded-3xl p-8 lg:p-12 relative z-10 float-animation"
-                                style="background: var(--black)">
+                                style="background: radial-gradient(circle, var(--white) 0%, var(--white) 0%, var(--glass-black) 100%);">
                                 <img src="<%- NGINX_TAG %>/img/SIVOC_LOGO.png"
                                     class="w-64 lg:w-80 h-auto mx-auto drop-shadow-2xl" alt="Logo SIVOC" x-show="loaded"
                                     x-transition:enter="transition ease-out duration-1000"

@@ -12,7 +12,8 @@
             "cargarTusPermisos": true
         },
         "DIRECCION": {
-            "cargarTodosLosPermisos": true
+            "cargarTodosLosPermisos": true,
+            "cargarTusPermisos": true
         }
     },
     "verTableroActivados": {
