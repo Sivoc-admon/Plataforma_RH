@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 
 const getFile = async (req, res, next) => {
-    const entidad_nombre = res.locals.entidad_nombre || ''; 
+    const entidad_nombre = res.locals.entidad_nombre || '';
     const nombre_original = res.locals.nombre_original || '';
     const nombre_almacenado = res.locals.nombre_almacenado || '';
     const isDownload = res.locals.isDownload || '';

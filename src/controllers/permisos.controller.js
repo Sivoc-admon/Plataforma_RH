@@ -57,7 +57,7 @@ async function verTableroPermisos(req, res) {
     if (privilegiosActuales.cargarTusPermisos) {
         const query = `/permiso?select=*,gestion_permiso(id_permiso,id_equipo,descripcion,estado,solicitado,revisado),usuario(dato_personal(nombre,apellido_p,apellido_m))&id_u_solicitante=eq.${userId}`;
         const fetchResponse = await fetchDataForTable(query);
-        if (!fetchResponse.success) return res.status(500).send(ERROR_MESSAGE + '007.3');
+        if (!fetchResponse.success) return res.status(500).send(ERROR_MESSAGE + '007.2C');
         tables.cargarTusPermisos = fetchResponse.dataJson;
         res.locals.cargarTusPermisos = true;
     } else { res.locals.cargarTusPermisos = false; }

@@ -61,7 +61,7 @@ function setupStaticFilesAndViews() {
 function startServer() {
     nginxRouter.use(`${process.env.NGINX_TAG}`, app);
     nginxRouter.listen(3000, '0.0.0.0', () => {
-        console.log(`[Server ✅]: Servidor corriendo en http://localhost:3000${process.env.NGINX_TAG}`);
+        console.log(`[Server ✅]: Servidor corriendo en https://localhost:3000${process.env.NGINX_TAG}`);
     });
 }
 

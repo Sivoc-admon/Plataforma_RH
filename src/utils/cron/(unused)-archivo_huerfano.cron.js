@@ -1,4 +1,3 @@
-// TO WORK
 const cron = require('node-cron');
 
 const POSTGREST_URL = 'http://localhost:3001';

@@ -2,22 +2,13 @@
 <html lang="es" class="h-full">
 
 <head>
-    <!-- do not format html -->
-    
-    <!-- Global Headers -->
+    <!-- Setup -->
     <%- include('../partials/globalHeaders.ejs') %>
-
-    <!-- CSS personalizado -->
-    <link rel="stylesheet" href="<%- NGINX_TAG %>/css/partials/global.css">
-
-    <!-- JS personalizado -->
-    <script src="<%- NGINX_TAG %>/js/permisos/tableroPermisos.js"></script>
-
-    <!-- Let the script use the data -->
     <script>
         const dataJson = <%- JSON.stringify(dataJson) %>;
     </script>
-
+    <link rel="stylesheet" href="<%- NGINX_TAG %>/css/partials/global.css">
+    <%- include('../partials/filepond.header.ejs') %>
     <style>
         .tabulator-cell {
             display: flex;
@@ -25,6 +16,9 @@
             padding: 10px !important; /* Opcional: ajusta según tu diseño */
         }
     </style>
+
+    <!-- Main JS personalizado -->
+    <script src="<%- NGINX_TAG %>/js/permisos/tableroPermisos.js"></script>
 
 </head>
 
@@ -147,15 +141,15 @@
                     
                     <!-- Texto de carga -->
                     <div class="flex-1">
-                        <h4 class="font-bold">Creando solicitud vacía...</h4>
+                        <h4 class="font-bold">Creando una solicitud vacía para ti...</h4>
                         <p class="text-sm">Por favor espera un momento</p>
                     </div>
                 </div>
             </div>
 
             <!-- Modal de descripción global -->
-            <div id="descripcionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div class="bg-white rounded-lg shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
+            <div id="descripcionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[998]">
+                <div class="bg-white rounded-lg shadow-2xl w-[90vw] h-[90vh] flex flex-col overflow-hidden z-[999]">
                     <div class="px-6 py-4 border-b flex justify-between items-center">
                         <h3 class="text-xl font-medium text-gray-800">Descripción completa</h3>
                         <button onclick="closeDescripcionModal()" class="text-gray-500 hover:text-gray-700 focus:outline-none">
@@ -166,27 +160,11 @@
                         <!-- Aquí se inserta el texto -->
                     </div>
                     <div class="px-6 py-4 border-t">
-                        <h4 class="text-lg font-semibold text-gray-800 mb-3">Archivos para Descargar:</h4>
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li>
-                                <a href="http://localhost:3000/modulorrhh/sivoc/getPfp/file1" 
-                                class="block text-blue-600 hover:text-blue-700 focus:outline-none transition duration-300">
-                                    Archivo 1
-                                </a>
-                            </li>
-                            <li>
-                                <a href="http://localhost:3000/modulorrhh/sivoc/getPfp/file2" 
-                                class="block text-blue-600 hover:text-blue-700 focus:outline-none transition duration-300">
-                                    Archivo 2
-                                </a>
-                            </li>
-                            <li>
-                                <a href="http://localhost:3000/modulorrhh/sivoc/getPfp/file3" 
-                                class="block text-blue-600 hover:text-blue-700 focus:outline-none transition duration-300">
-                                    Archivo 3
-                                </a>
-                            </li>
-                        </ul>
+                        <h4 class="text-lg font-semibold text-gray-800">Archivos adjuntos relacionados con la solicitud</h4>
+                    </div>
+                    <div class="px-6 py-4 border-t">
+                        <!-- Aquí se inserta la FilePond data -->
+                        <input type="file" class="filepond" name="file" multiple />
                     </div>
                     <div class="px-6 py-4 border-t text-right">
                         <button onclick="closeDescripcionModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none transition duration-300">
@@ -198,25 +176,8 @@
         </div>
     </div>
 
-    <script>
-        function openDescripcionModal(text) {
-            const modal = document.getElementById("descripcionModal");
-            const content = document.getElementById("descripcionModalContent");
-            content.textContent = text;
-            modal.classList.remove("hidden");
-        }
-
-        async function openPermisoNotification() {
-            const modal = document.getElementById("crearPermisoModal");
-            modal.classList.remove("hidden");
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            location.href = location.href;
-        }
-
-        function closeDescripcionModal() {
-            document.getElementById("descripcionModal").classList.add("hidden");
-        }
-    </script>
+    <!-- Last JS personalizado -->
+    <script src="<%- NGINX_TAG %>/js/permisos/tableroPermisos.last.js"></script>
 
 </body>
 

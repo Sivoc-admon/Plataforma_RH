@@ -29,4 +29,7 @@ router.use(`${URL_TAG}/permisos`, generalLimiter, (req, res, next) => { res.loca
 //router.use('/vacaciones', require('./vacaciones.routes'));
 //router.use('/cursos', require('./cursos.routes'));
 
+// Rutas relacionadas con FilePond
+//router.use(`${URL_TAG}/filepond`, generalLimiter, require('./filepond.routes'));
+
 module.exports = router;

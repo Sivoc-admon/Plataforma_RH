@@ -135,23 +135,21 @@ function tableroPermisos() {
                                 .replace(/>/g, '&gt;');
 
 
-                            // TO WORK, botón de descripción, que tenga el botón de "habilitar edición" si se tienen los permisos
-                            // + Crear Permiso (que solo cree una row vacia con un título indicativo de haberlo creado recientemente, location.reload)
-
+                            // TO WORK
                             if (isRevisor) {
                                 return `
                                     <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
                                         onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
                                         Consultar
                                     </button>
+                                    <!-- 
                                     <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
-                                        onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
                                         Cambiar estado
                                     </button>
                                     <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
-                                        onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
                                         Terminar revisión
                                     </button>
+                                    -->
                                 `;
                             } else {
                                 return `
@@ -159,14 +157,14 @@ function tableroPermisos() {
                                         onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
                                         Editar
                                     </button>
+                                    <!-- 
                                     <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
-                                        onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
                                         Enviar solicitud
                                     </button>
                                     <button class="bg-blue-600 text-white rounded hover:bg-blue-700 mr-2 ml-2"
-                                        onclick="openDescripcionModal('${safeValue}')" style="padding: 0.3rem 0.750rem">
                                         Borrar
                                     </button>
+                                    -->
                                 `;
                             }
                         }
