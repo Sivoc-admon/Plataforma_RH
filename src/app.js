@@ -6,6 +6,7 @@ const app = express();
 app.disable('x-powered-by'); // <-- "security through obscurity" 
 
 require('dotenv').config({ path: '../.env' }); // <- TO WORK (delete manually inside the server)
+// app.set("trust proxy", 1); // <- TO WORK (delete on develop, keep on production)
 
 // Utilidades
 const { sessionManager } = require('./utils/middlewares/sessionManager');

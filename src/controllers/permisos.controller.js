@@ -1,9 +1,11 @@
 const IAM = require('../utils/IAM.json');
 const { fetchPostgREST } = require('../utils/scripts/postgrestHelper');
+const JWT = require('jsonwebtoken');
 
 /**
  * Constantes para la configuración del módulo de usuarios.
  */
+const TABLE_SECRETS = process.env.TABLE_SECRETS;
 const ERROR_MESSAGE = process.env.ERROR_MESSAGE;
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -81,7 +83,7 @@ async function fetchDataForTable(query) {
     if (!response.ok) return { success: false, data: '' };
     const data = await response.json();
     const dataJson = data.map(u => ({
-        //id: String(u.id),
+        id: JWT.sign({ id: String(u.id) }, TABLE_SECRETS, { expiresIn: '15m' }),
         solicitante_fullName:
             `${u.usuario?.dato_personal?.nombre || "Sin nombre"} ` +
             `${u.usuario?.dato_personal?.apellido_p || "Sin apellido"} ` +

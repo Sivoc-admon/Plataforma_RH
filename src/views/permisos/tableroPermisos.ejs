@@ -12,14 +12,13 @@
     <style>
         .tabulator-cell {
             display: flex;
-            align-items: center !important;     /* Centrado vertical */
-            padding: 10px !important; /* Opcional: ajusta según tu diseño */
+            align-items: center !important;
+            padding: 10px !important;
         }
     </style>
 
     <!-- Main JS personalizado -->
-    <script src="<%- NGINX_TAG %>/js/permisos/tableroPermisos.js"></script>
-
+    <script src="<%- NGINX_TAG %>/js/permisos/modalManager.js"></script>
 </head>
 
 <body class="bg-gray-50 min-h-full">
@@ -30,16 +29,14 @@
     <%- include('../partials/sidebar.ejs') %>
 
     <div class="pt-[5.5rem]">
-        <div class="container mx-auto px-4 py-8" x-data="tableroPermisos()">
+        <div class="container mx-auto px-4 py-8" x-data="tableroPermisos()" x-init="window.tableroPermisosInstance = $data">
             <div>
                 <!-- Action Buttons -->
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-
-                    <button @click="crearPermiso()" onclick="openPermisoNotification()"
+                    <button @click="crearPermiso(); openPermisoNotification()"
                         class="flex flex-col items-center justify-center p-4 bg-white border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all duration-200 shadow-sm">
                         <svg class="w-6 h-6 mb-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 4v16m8-8H4" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                         <span class="text-sm font-medium text-gray-700">Crear solicitud</span>
                     </button>
@@ -78,38 +75,43 @@
                 </template>
             </div>
 
-            <!-- Tabulator Table P1 -->
-            <% if (cargarTodosLosPermisos) { %> 
-            <h2 class="text-lg font-bold text-gray-600 mb-1">Todos los permisos de SIVOC</h2>
-            <div id="row-count" class="text-gray-700 text-sm mb-2">Permisos dentro de esta tabla: <%- dataJson.cargarTodosLosPermisos.length %></div>
+            <!-- Tabulator Tables -->
             <template x-if="!isLoading">
                 <div>
-                    <div id="data-table-1" class="bg-white rounded-lg shadow-md overflow-hidden mb-6"></div>
-                </div>
-            </template>
-            <% }; %>
+                    <!-- Table 1: All Permissions -->
+                    <% if (cargarTodosLosPermisos) { %> 
+                    <div class="mb-8">
+                        <h2 class="text-lg font-bold text-gray-600 mb-1">Todos los permisos de SIVOC</h2>
+                        <div class="text-gray-700 text-sm mb-2">
+                            Permisos dentro de esta tabla: <%- dataJson.cargarTodosLosPermisos.length %>
+                        </div>
+                        <div id="data-table-1" class="bg-white rounded-lg shadow-md overflow-hidden"></div>
+                    </div>
+                    <% } %>
 
-            <!-- Tabulator Table P2 -->
-            <% if (cargarPermisosEquipo) { %> 
-            <h2 class="text-lg font-bold text-gray-600 mb-1">Los permisos de tu equipo</h2>
-            <div id="row-count" class="text-gray-700 text-sm mb-2">Permisos dentro de esta tabla: <%- dataJson.cargarPermisosEquipo.length %></div>
-            <template x-if="!isLoading">
-                <div>
-                    <div id="data-table-2" class="bg-white rounded-lg shadow-md overflow-hidden mb-6"></div>
-                </div>
-            </template>
-            <% }; %>
+                    <!-- Table 2: Team Permissions -->
+                    <% if (cargarPermisosEquipo) { %> 
+                    <div class="mb-8">
+                        <h2 class="text-lg font-bold text-gray-600 mb-1">Los permisos de tu equipo</h2>
+                        <div class="text-gray-700 text-sm mb-2">
+                            Permisos dentro de esta tabla: <%- dataJson.cargarPermisosEquipo.length %>
+                        </div>
+                        <div id="data-table-2" class="bg-white rounded-lg shadow-md overflow-hidden"></div>
+                    </div>
+                    <% } %>
 
-            <!-- Tabulator Table P3 -->
-            <% if (cargarTusPermisos) { %> 
-            <h2 class="text-lg font-bold text-gray-600 mb-2">Tus permisos</h2>
-            <div id="row-count" class="text-gray-700 text-sm mb-2">Permisos dentro de esta tabla: <%- dataJson.cargarTusPermisos.length %></div>
-            <template x-if="!isLoading">
-                <div>
-                    <div id="data-table-3" class="bg-white rounded-lg shadow-md overflow-hidden mb-6"></div>
+                    <!-- Table 3: Your Permissions -->
+                    <% if (cargarTusPermisos) { %> 
+                    <div class="mb-8">
+                        <h2 class="text-lg font-bold text-gray-600 mb-1">Tus permisos</h2>
+                        <div class="text-gray-700 text-sm mb-2">
+                            Permisos dentro de esta tabla: <%- dataJson.cargarTusPermisos.length %>
+                        </div>
+                        <div id="data-table-3" class="bg-white rounded-lg shadow-md overflow-hidden"></div>
+                    </div>
+                    <% } %>
                 </div>
             </template>
-            <% }; %>
 
             <!-- Error Message -->
             <template x-if="!isLoading && hasError">
@@ -127,57 +129,103 @@
                     </button>
                 </div>
             </template>
+        </div>
+    </div>
 
-            <!-- Notificación al crear un permiso -->
-            <div id="crearPermisoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div class="bg-white p-6 rounded-lg shadow-xl w-[400px] max-w-xl max-h-[80vh] flex items-center space-x-4">
-                    <!-- Icono de carga -->
-                    <div class="flex-shrink-0" style="margin: 0rem 0.75rem;">
-                        <svg class="w-8 h-8 text-blue-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                        </svg>
-                    </div>
-                    
-                    <!-- Texto de carga -->
-                    <div class="flex-1">
-                        <h4 class="font-bold">Creando una solicitud vacía para ti...</h4>
-                        <p class="text-sm">Por favor espera un momento</p>
-                    </div>
-                </div>
+    <!-- Create Permission Notification Modal -->
+    <div id="crearPermisoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-[400px] max-w-xl max-h-[80vh] flex items-center space-x-4">
+            <div class="flex-shrink-0" style="margin: 0rem 0.75rem;">
+                <svg class="w-8 h-8 text-blue-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
             </div>
-
-            <!-- Modal de descripción global -->
-            <div id="descripcionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[998]">
-                <div class="bg-white rounded-lg shadow-2xl w-[90vw] h-[90vh] flex flex-col overflow-hidden z-[999]">
-                    <div class="px-6 py-4 border-b flex justify-between items-center">
-                        <h3 class="text-xl font-medium text-gray-800">Descripción completa</h3>
-                        <button onclick="closeDescripcionModal()" class="text-gray-500 hover:text-gray-700 focus:outline-none">
-                            ✕
-                        </button>
-                    </div>
-                    <div id="descripcionModalContent" class="px-6 py-4 text-gray-700 whitespace-pre-wrap overflow-y-auto">
-                        <!-- Aquí se inserta el texto -->
-                    </div>
-                    <div class="px-6 py-4 border-t">
-                        <h4 class="text-lg font-semibold text-gray-800">Archivos adjuntos relacionados con la solicitud</h4>
-                    </div>
-                    <div class="px-6 py-4 border-t">
-                        <!-- Aquí se inserta la FilePond data -->
-                        <input type="file" class="filepond" name="file" multiple />
-                    </div>
-                    <div class="px-6 py-4 border-t text-right">
-                        <button onclick="closeDescripcionModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none transition duration-300">
-                            Cerrar
-                        </button>
-                    </div>
-                </div>
+            <div class="flex-1">
+                <h4 class="font-bold">Creando una solicitud vacía para ti...</h4>
+                <p class="text-sm">Por favor espera un momento</p>
             </div>
         </div>
     </div>
 
-    <!-- Last JS personalizado -->
-    <script src="<%- NGINX_TAG %>/js/permisos/tableroPermisos.last.js"></script>
+    <!-- Description Modal -->
+    <div id="descripcionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[998]">
+        <div class="bg-white rounded-lg shadow-2xl w-[90vw] h-[90vh] flex flex-col overflow-hidden z-[999]">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b flex justify-between items-center bg-gray-50">
+                <h3 class="text-xl font-medium text-gray-800">Descripción completa</h3>
+                <button type="button" 
+                    @click="closeDescripcionModal()" 
+                    onclick="closeDescripcionModal()"
+                    class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full p-2 transition-colors duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <!-- Description Section -->
+                <div class="px-6 py-4 border-b">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-2">Descripción del permiso</h4>
+                    <div id="descripcionModalContent" 
+                        class="text-gray-700 whitespace-pre-wrap max-h-32 overflow-y-auto p-3 bg-gray-50 rounded border">
+                        <!-- Content will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Files Section -->
+                <div class="px-6 py-4 border-b">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-3">Archivos adjuntos</h4>
+                </div>
+
+                <!-- FilePond Container -->
+                <div class="flex-1 px-6 py-4 overflow-y-auto">
+                    <input type="file" class="filepond" name="filepond" multiple />
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 border-t bg-gray-50 flex justify-between">
+                <div class="flex space-x-2">
+                    <!-- Show additional buttons based on modal state -->
+                    <template x-if="currentModalData.isRevisor">
+                        <div class="flex space-x-2">
+                            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none transition duration-300">
+                                Aprobar
+                            </button>
+                            <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 focus:outline-none transition duration-300">
+                                Rechazar
+                            </button>
+                            <button class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 focus:outline-none transition duration-300">
+                                Marcar como Revisado
+                            </button>
+                        </div>
+                    </template>
+                    <template x-if="!currentModalData.isRevisor">
+                        <div class="flex space-x-2">
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none transition duration-300">
+                                Guardar Cambios
+                            </button>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none transition duration-300">
+                                Enviar Solicitud
+                            </button>
+                            <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 focus:outline-none transition duration-300">
+                                Eliminar
+                            </button>
+                        </div>
+                    </template>
+                </div>
+                <button type="button" 
+                    @click="closeDescripcionModal()" 
+                    onclick="closeDescripcionModal()"
+                    class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 transition duration-300">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
 
 </body>
 
